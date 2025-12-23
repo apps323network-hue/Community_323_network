@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons+Outlined');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background-light dark:bg-background-dark text-slate-900 dark:text-gray-200 transition-colors duration-300;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  /* Light mode scrollbar */
+  .light-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .light-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  
+  .light-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+  
+  .light-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+}
+
+@layer utilities {
+  .text-glow-blue {
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+  }
+  
+  .text-glow-pink {
+    text-shadow: 0 0 10px rgba(244, 37, 244, 0.6);
+  }
+  
+  .neon-text-gradient {
+    background: linear-gradient(to right, #f425f4, #00f0ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .border-gradient-blue-pink {
+    position: relative;
+    border: 1px solid transparent;
+    background: linear-gradient(#12121A, #12121A) padding-box,
+                linear-gradient(to right, #00F0FF, #FF00AA) border-box;
+  }
+}
+
+/* Scrollbar customizado */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0C15;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
