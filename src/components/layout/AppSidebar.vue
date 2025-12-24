@@ -63,6 +63,16 @@
           <span class="material-icons-outlined mr-3 text-gray-500 group-hover:text-secondary transition-colors">business_center</span>
           Oportunidades
         </RouterLink>
+        <RouterLink
+          to="/meus-pedidos"
+          class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all"
+          :class="$route.path === '/meus-pedidos' 
+            ? 'font-semibold bg-surface-lighter text-white border-l-4 border-primary shadow-neon-pink/10' 
+            : 'text-gray-400 hover:bg-surface-lighter hover:text-white group'"
+        >
+          <span class="material-icons-outlined mr-3 text-gray-500 group-hover:text-primary transition-colors">assignment</span>
+          Meus Pedidos
+        </RouterLink>
       </nav>
     </div>
   </aside>
