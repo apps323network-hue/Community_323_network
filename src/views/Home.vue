@@ -4,6 +4,14 @@
       <!-- Post Form -->
       <PostForm @post-created="handlePostCreated" @event-created="handleEventCreated" />
 
+      <!-- Featured Event Card -->
+      <EventCard
+        v-if="featuredEvent"
+        :event="featuredEvent"
+        @click="handleEventClick"
+        @deleted="handleEventDeleted"
+      />
+
       <!-- Loading State -->
       <div v-if="loading && posts.length === 0" class="space-y-4">
         <div v-for="i in 3" :key="i" class="bg-white dark:bg-surface-dark rounded-xl p-6 animate-pulse border border-slate-200 dark:border-white/10">
@@ -31,6 +39,7 @@
           @share="handleShare"
           @edit-comment="handleEditComment"
           @delete-comment="handleDeleteComment"
+          @delete-post="handleDeletePost"
         >
           <template #comment-form>
             <CommentForm :post-id="post.id" @comment-added="handleCommentAdded(post.id)" />
@@ -55,11 +64,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { usePosts } from '@/composables/usePosts'
+import { supabase } from '@/lib/supabase'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import PostForm from '@/components/features/feed/PostForm.vue'
 import PostCard from '@/components/features/feed/PostCard.vue'
 import CommentForm from '@/components/features/feed/CommentForm.vue'
+import EventCard from '@/components/features/events/EventCard.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import Button from '@/components/ui/Button.vue'
 import type { PostFilters as PostFiltersType } from '@/types/posts'
@@ -70,13 +82,14 @@ const {
   hasMore,
   loadPosts,
   loadMorePosts,
-  updateComment,
   removeComment,
 } = usePosts()
 
+const router = useRouter()
 const expandedComments = ref(new Set<string>())
 const loadMoreRef = ref<HTMLElement | null>(null)
 const filters = ref<PostFiltersType>({ sortBy: 'recent' })
+const featuredEvent = ref<any>(null)
 
 async function handlePostCreated() {
   // Reload posts to show the new one
@@ -85,7 +98,40 @@ async function handlePostCreated() {
 
 async function handleEventCreated() {
   // Evento criado - já foi criado um post sobre ele
-  // Pode adicionar lógica adicional se necessário
+  // Recarregar eventos em destaque
+  await loadFeaturedEvent()
+}
+
+async function loadFeaturedEvent() {
+  try {
+    const { data, error } = await supabase
+      .from('events')
+      .select('id, titulo, descricao, data_hora, tipo, local, image_url, created_by')
+      .gte('data_hora', new Date().toISOString())
+      .order('data_hora', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+
+    if (error) throw error
+    
+    if (data) {
+      featuredEvent.value = data
+    } else {
+      featuredEvent.value = null
+    }
+  } catch (error) {
+    console.error('Error loading featured event:', error)
+    featuredEvent.value = null
+  }
+}
+
+function handleEventClick(eventId: string) {
+  router.push(`/eventos/${eventId}`)
+}
+
+async function handleEventDeleted() {
+  // Recarregar eventos em destaque
+  await loadFeaturedEvent()
 }
 
 async function handleToggleComments(postId: string) {
@@ -157,6 +203,11 @@ async function handleCommentAdded(postId: string) {
   await loadComments(postId)
 }
 
+async function handleDeletePost() {
+  // Post já foi deletado no store, apenas recarregar a lista
+  await loadPosts(filters.value, true)
+}
+
 async function loadMore() {
   if (!loading.value && hasMore.value) {
     await loadMorePosts(filters.value)
@@ -169,6 +220,7 @@ let observer: IntersectionObserver | null = null
 
 onMounted(async () => {
   await loadPosts(filters.value, true)
+  await loadFeaturedEvent()
 
   // Setup intersection observer for infinite scroll
   if (loadMoreRef.value) {

@@ -29,9 +29,41 @@
           </p>
         </div>
       </div>
-      <button class="text-gray-500 dark:text-gray-400 hover:text-white transition-colors">
-        <span class="material-icons-outlined">more_horiz</span>
-      </button>
+      <div class="relative" ref="menuContainer">
+        <button 
+          class="text-gray-500 dark:text-gray-400 hover:text-white transition-colors"
+          @click.stop="showMenu = !showMenu"
+        >
+          <span class="material-icons-outlined">more_horiz</span>
+        </button>
+        <!-- Dropdown Menu -->
+        <Transition
+          enter-active-class="transition-all duration-200"
+          enter-from-class="opacity-0 scale-95 translate-y-2"
+          enter-to-class="opacity-100 scale-100 translate-y-0"
+          leave-active-class="transition-all duration-200"
+          leave-from-class="opacity-100 scale-100 translate-y-0"
+          leave-to-class="opacity-0 scale-95 translate-y-2"
+        >
+          <div
+            v-if="showMenu"
+            class="absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-surface-dark border border-slate-200 dark:border-white/10 shadow-2xl z-50 overflow-hidden"
+            @click.stop
+          >
+            <button
+              v-if="isOwnPost"
+              class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left"
+              @click="handleDelete"
+            >
+              <span class="material-icons-outlined text-[20px]">delete</span>
+              Deletar Post
+            </button>
+            <div v-else class="px-4 py-2 text-xs text-gray-400">
+              Apenas o autor pode deletar
+            </div>
+          </div>
+        </Transition>
+      </div>
     </div>
 
     <!-- Post Content -->
@@ -103,7 +135,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 import { usePosts } from '@/composables/usePosts'
 import Card from '@/components/ui/Card.vue'
 import Avatar from '@/components/ui/Avatar.vue'
@@ -125,11 +158,17 @@ const emit = defineEmits<{
   'share': [postId: string]
   'edit-comment': [commentId: string]
   'delete-comment': [commentId: string]
+  'delete-post': [postId: string]
 }>()
 
-const { toggleLike, loadComments } = usePosts()
+const authStore = useAuthStore()
+const { toggleLike, loadComments, deletePost } = usePosts()
 const commentsLoaded = ref(false)
 const showCommentsSection = ref(props.showComments)
+const showMenu = ref(false)
+const menuContainer = ref<HTMLElement | null>(null)
+
+const isOwnPost = computed(() => authStore.user?.id === props.post.user_id)
 
 // Computed for author display
 const authorName = computed(() => props.post.author?.nome || 'Usuário')
@@ -179,5 +218,34 @@ function formatTime(date: string) {
   if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d atrás`
   return postDate.toLocaleDateString('pt-BR')
 }
+
+async function handleDelete() {
+  if (!confirm('Tem certeza que deseja deletar este post? Esta ação não pode ser desfeita.')) {
+    return
+  }
+
+  try {
+    await deletePost(props.post.id)
+    emit('delete-post', props.post.id)
+    showMenu.value = false
+  } catch (error) {
+    console.error('Error deleting post:', error)
+    alert('Erro ao deletar post. Tente novamente.')
+  }
+}
+
+function handleClickOutside(event: MouseEvent) {
+  if (menuContainer.value && !menuContainer.value.contains(event.target as Node)) {
+    showMenu.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 

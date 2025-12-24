@@ -82,6 +82,35 @@
             placeholder="Descreva o evento..."
           ></textarea>
         </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-300 mb-2">Banner do Evento</label>
+          <div class="space-y-3">
+            <label class="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-slate-700 rounded-xl bg-slate-900/30 hover:border-secondary transition-colors cursor-pointer group">
+              <input
+                type="file"
+                accept="image/*"
+                class="hidden"
+                @change="handleEventImageSelect"
+              />
+              <div class="flex flex-col items-center gap-2">
+                <span class="material-icons-outlined text-secondary group-hover:scale-110 transition-transform">image</span>
+                <span class="text-sm text-gray-400 group-hover:text-secondary transition-colors">
+                  {{ eventImageFile ? 'Trocar imagem' : 'Adicionar banner' }}
+                </span>
+              </div>
+            </label>
+            <!-- Preview da imagem do evento -->
+            <div v-if="eventImagePreview" class="relative rounded-xl overflow-hidden">
+              <img :src="eventImagePreview" alt="Preview do banner" class="w-full h-48 object-cover" />
+              <button
+                class="absolute top-2 right-2 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
+                @click="removeEventImage"
+              >
+                <span class="material-icons-outlined text-lg">close</span>
+              </button>
+            </div>
+          </div>
+        </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-semibold text-gray-300 mb-2">Data e Hora</label>
@@ -148,6 +177,8 @@ const selectedImage = ref<string | null>(null)
 const selectedImageFile = ref<File | null>(null)
 const uploadingImage = ref(false)
 const showEventModal = ref(false)
+const eventImageFile = ref<File | null>(null)
+const eventImagePreview = ref<string | null>(null)
 
 const eventForm = ref({
   titulo: '',
@@ -177,9 +208,9 @@ async function handleImageSelect(event: Event) {
     return
   }
 
-  // Validar tamanho (máximo 5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    error.value = 'A imagem deve ter no máximo 5MB'
+  // Validar tamanho (máximo 20MB)
+  if (file.size > 20 * 1024 * 1024) {
+    error.value = 'A imagem deve ter no máximo 20MB'
     return
   }
 
@@ -199,6 +230,73 @@ function removeImage() {
   error.value = null
 }
 
+async function handleEventImageSelect(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  
+  if (!file) return
+
+  // Validar tipo de arquivo
+  if (!file.type.startsWith('image/')) {
+    error.value = 'Por favor, selecione apenas arquivos de imagem'
+    return
+  }
+
+  // Validar tamanho (máximo 20MB)
+  if (file.size > 20 * 1024 * 1024) {
+    error.value = 'A imagem deve ter no máximo 20MB'
+    return
+  }
+
+  eventImageFile.value = file
+  
+  // Criar preview
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    eventImagePreview.value = e.target?.result as string
+  }
+  reader.readAsDataURL(file)
+}
+
+function removeEventImage() {
+  eventImageFile.value = null
+  eventImagePreview.value = null
+  error.value = null
+}
+
+async function uploadEventImage(): Promise<string | null> {
+  if (!eventImageFile.value || !authStore.user) return null
+
+  uploadingImage.value = true
+  try {
+    const fileExt = eventImageFile.value.name.split('.').pop()
+    const fileName = `event-${authStore.user.id}-${Date.now()}.${fileExt}`
+    const filePath = `events/${fileName}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('post-images')
+      .upload(filePath, eventImageFile.value, {
+        cacheControl: '3600',
+        upsert: false
+      })
+
+    if (uploadError) throw uploadError
+
+    // Obter URL pública
+    const { data: { publicUrl } } = supabase.storage
+      .from('post-images')
+      .getPublicUrl(filePath)
+
+    return publicUrl
+  } catch (err: any) {
+    console.error('Error uploading event image:', err)
+    error.value = 'Erro ao fazer upload da imagem. Tente novamente.'
+    return null
+  } finally {
+    uploadingImage.value = false
+  }
+}
+
 async function uploadImage(): Promise<string | null> {
   if (!selectedImageFile.value || !authStore.user) return null
 
@@ -208,7 +306,7 @@ async function uploadImage(): Promise<string | null> {
     const fileName = `${authStore.user.id}-${Date.now()}.${fileExt}`
     const filePath = `posts/${fileName}`
 
-    const { error: uploadError, data } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('post-images')
       .upload(filePath, selectedImageFile.value, {
         cacheControl: '3600',
@@ -278,6 +376,16 @@ async function handleCreateEvent() {
   error.value = null
 
   try {
+    // Upload da imagem do evento se houver
+    let eventImageUrl: string | null = null
+    if (eventImageFile.value) {
+      eventImageUrl = await uploadEventImage()
+      if (!eventImageUrl) {
+        loading.value = false
+        return
+      }
+    }
+
     const { data, error: eventError } = await supabase
       .from('events')
       .insert({
@@ -286,6 +394,7 @@ async function handleCreateEvent() {
         data_hora: eventForm.value.data_hora,
         tipo: eventForm.value.tipo,
         local: eventForm.value.tipo === 'presencial' ? eventForm.value.local : null,
+        image_url: eventImageUrl || null,
         created_by: authStore.user?.id,
       })
       .select()
@@ -308,6 +417,8 @@ async function handleCreateEvent() {
       tipo: 'presencial',
       local: '',
     }
+    eventImageFile.value = null
+    eventImagePreview.value = null
     content.value = ''
 
     emit('post-created', newPost.id)
