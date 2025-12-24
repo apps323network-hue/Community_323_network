@@ -19,20 +19,20 @@
           <div class="relative group">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <span
-                class="material-icons text-secondary/70 group-focus-within:text-secondary transition-colors"
+                class="material-icons text-secondary/70 pb-2 group-focus-within:text-secondary transition-colors"
                 >search</span
               >
             </div>
             <input
               v-model="searchQuery"
-              class="block w-full sm:w-80 pl-11 pr-4 py-3.5 border border-secondary/30 rounded-xl leading-5 bg-card-dark/80 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary focus:shadow-neon-blue sm:text-sm transition-all duration-300"
+              class="block w-full sm:w-80 pl-11 pr-4 py-3.5 border border-secondary/50 rounded-xl leading-5 bg-[#0a040f] text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] sm:text-sm transition-all duration-300"
               placeholder="Buscar por nome, área ou cidade..."
               type="text"
               @input="handleSearch"
             />
           </div>
           <button
-            class="group flex items-center justify-center gap-2 px-6 py-3.5 border border-secondary/30 rounded-xl text-sm font-semibold text-gray-200 bg-card-dark/80 hover:bg-secondary/10 hover:border-secondary hover:shadow-neon-pink transition-all duration-300"
+            class="group flex items-center justify-center gap-2 px-6 py-3.5 border border-secondary/50 rounded-xl text-sm font-bold text-gray-200 bg-[#0a040f] hover:bg-secondary/10 hover:border-secondary hover:shadow-[0_0_15px_rgba(244,37,244,0.3)] transition-all duration-300"
             @click="showFilters = !showFilters"
           >
             <span class="material-icons text-lg text-secondary group-hover:animate-pulse"
@@ -199,8 +199,37 @@ const searchQuery = ref('')
 const showFilters = ref(false)
 const featuredMembersList = ref<Member[]>([])
 
-// Featured members (membros com bookmark)
-const featuredMembers = computed(() => featuredMembersList.value)
+// Featured members (membros com bookmark) com filtro aplicado
+const featuredMembers = computed(() => {
+  let list = featuredMembersList.value
+
+  // Filtrar por busca textual
+  if (filters.value.search) {
+    const term = filters.value.search.toLowerCase()
+    list = list.filter(m => 
+      m.nome.toLowerCase().includes(term) ||
+      (m.area_atuacao && m.area_atuacao.toLowerCase().includes(term)) ||
+      (m.cidade && m.cidade.toLowerCase().includes(term))
+    )
+  }
+
+  // Filtrar por Área
+  if (filters.value.area_atuacao) {
+     list = list.filter(m => m.area_atuacao === filters.value.area_atuacao)
+  }
+
+  // Filtrar por Cidade
+  if (filters.value.cidade) {
+     list = list.filter(m => m.cidade === filters.value.cidade)
+  }
+
+  // Filtrar por Objetivo
+  if (filters.value.objetivo) {
+     list = list.filter(m => m.objetivo === filters.value.objetivo)
+  }
+
+  return list
+})
 
 // Todos os membros (mostrar todos, incluindo os 3 primeiros)
 const allMembers = computed(() => members.value)
