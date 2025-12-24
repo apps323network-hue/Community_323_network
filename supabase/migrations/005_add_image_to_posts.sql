@@ -13,3 +13,4 @@ ADD COLUMN IF NOT EXISTS image_url TEXT;
 -- ============================================
 COMMENT ON COLUMN public.posts.image_url IS 'URL da imagem anexada ao post (armazenada no Supabase Storage)';
 
+

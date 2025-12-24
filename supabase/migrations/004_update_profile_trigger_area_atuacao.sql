@@ -26,3 +26,4 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- ============================================
 COMMENT ON FUNCTION public.handle_new_user() IS 'Cria ou atualiza profile automaticamente quando novo usuário é criado em auth.users, incluindo area_atuacao do user_metadata';
 
+

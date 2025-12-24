@@ -53,3 +53,4 @@ COMMENT ON POLICY "Imagens de posts são públicas para leitura" ON storage.obje
 COMMENT ON POLICY "Usuários podem deletar suas próprias imagens" ON storage.objects IS 
 'Permite que usuários deletem apenas as imagens que eles próprios fizeram upload';
 
+
