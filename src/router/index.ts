@@ -59,6 +59,12 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/meus-pedidos',
+    name: 'MyRequests',
+    component: () => import('@/views/MyRequests.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/vagas',
     name: 'Jobs',
     component: () => import('@/views/Jobs.vue'),

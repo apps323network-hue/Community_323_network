@@ -125,15 +125,7 @@
 
         <!-- User Menu -->
         <div class="hidden md:flex items-center gap-5">
-          <button
-            class="hidden md:flex p-2 rounded-full text-slate-600 dark:text-gray-400 hover:text-primary dark:hover:text-secondary transition-colors"
-            @click="toggleTheme"
-            :title="theme === 'dark' ? 'Modo claro' : 'Modo escuro'"
-          >
-            <span class="material-icons-outlined">{{
-              theme === 'dark' ? 'light_mode' : 'dark_mode'
-            }}</span>
-          </button>
+          <AnimatedThemeToggler />
           <button
             class="relative p-2 rounded-full text-slate-600 dark:text-gray-400 hover:text-primary dark:hover:text-secondary transition-colors group"
           >
@@ -223,10 +215,11 @@ import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/user'
 import { useTheme } from '@/composables/useTheme'
 import Avatar from '@/components/ui/Avatar.vue'
+import AnimatedThemeToggler from '@/components/ui/AnimatedThemeToggler.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
-const { theme, toggleTheme } = useTheme()
+const { theme } = useTheme() // removed toggleTheme as it's not used in this file anymore directly
 
 const showUserMenu = ref(false)
 const userMenuContainer = ref<HTMLElement | null>(null)

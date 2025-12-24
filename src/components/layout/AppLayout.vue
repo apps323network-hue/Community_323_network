@@ -60,9 +60,9 @@ import AppFooter from './AppFooter.vue'
 const router = useRouter()
 const route = useRoute()
 
-// Hide sidebars on Members and MemberProfile pages
+// Hide sidebars on Members, MemberProfile, and Services pages
 const hideSidebars = computed(() => {
-  return route.path === '/membros' || route.path.startsWith('/membros/')
+  return route.path === '/membros' || route.path.startsWith('/membros/') || route.path === '/servicos'
 })
 
 function handleEditProfile() {

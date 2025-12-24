@@ -12,6 +12,7 @@
         @deleted="handleEventDeleted"
       />
 
+
       <!-- Loading State -->
       <div v-if="loading && posts.length === 0" class="space-y-4">
         <div v-for="i in 3" :key="i" class="bg-white dark:bg-surface-dark rounded-xl p-6 animate-pulse border border-slate-200 dark:border-white/10">
@@ -125,6 +126,7 @@ async function loadFeaturedEvent() {
   }
 }
 
+
 function handleEventClick(eventId: string) {
   router.push(`/eventos/${eventId}`)
 }
@@ -219,6 +221,7 @@ async function loadMore() {
 let observer: IntersectionObserver | null = null
 
 onMounted(async () => {
+  await loadPosts(filters.value, true)
   await loadPosts(filters.value, true)
   await loadFeaturedEvent()
 
