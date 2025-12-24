@@ -2,8 +2,20 @@
   <AppLayout>
     <div class="space-y-8 w-full">
       <!-- Hero Section -->
-      <div class="relative overflow-hidden rounded-2xl border border-white/5">
-        <div class="absolute inset-0 bg-cover bg-center z-0" style='background-image: linear-gradient(to right, rgba(10, 4, 15, 0.95) 0%, rgba(10, 4, 15, 0.7) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuALfXL1KTlc_1eSX81JItIX5qshZk2hpi-9nqP0N2E00hURq_KtHJFfdx0E9VDYim_MzvsfNn3GHutoZA884R1TGD0PBAk2Tjz_UKAVLX1TSbJXR1g_fYFLgdCKqCojHSwjnIX1CG8w3HQPj8XvVJLuKXkMDbkwPk1FhR-xJ1D-Xk-wTV1gdIGI0OlWvXd09ClVIuZs6FJCTj9B3KpnSRhTmaQWkuI1-89s1KS_wJgsJgR5p_UFp_9MLJ3BqReHx-KUHbyjGIbORsas");'></div>
+      <div class="relative overflow-hidden rounded-2xl border border-white/5 bg-[#0a040f]">
+        <!-- FlickeringGrid Background -->
+        <FlickeringGrid
+          :squareSize="4"
+          :gridGap="6"
+          :flickerChance="0.3"
+          color="rgb(244, 37, 244)"
+          :maxOpacity="0.2"
+          class="absolute inset-0 z-0"
+        />
+        
+        <!-- Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-r from-[#0a040f]/95 via-[#0a040f]/80 to-[#0a040f]/60 z-[1]"></div>
+        
         <div class="relative z-10 flex flex-col gap-6 px-6 py-16 md:px-12 md:py-20 text-center md:text-left items-center md:items-start">
           <div class="flex flex-col gap-3 max-w-2xl">
             <div class="inline-flex items-center gap-2 self-center md:self-start px-3 py-1 rounded-full bg-secondary/10 border border-secondary/20 backdrop-blur-sm shadow-[0_0_15px_rgba(0,243,255,0.1)]">
@@ -129,6 +141,43 @@
         </button>
       </div>
     </Modal>
+    <!-- Modal Como Funciona -->
+    <Modal
+      v-model="showHowItWorksModal"
+      title="Como Funciona o Concierge"
+    >
+      <div class="space-y-8 py-4">
+        <!-- Step 1 -->
+        <div class="relative pl-8 border-l-2 border-white/10 group">
+          <div class="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-surface-dark border-2 border-primary shadow-[0_0_10px_rgba(244,37,244,0.5)] group-hover:scale-125 transition-transform"></div>
+          <h3 class="text-white text-lg font-bold mb-2">1. Escolha o Serviço</h3>
+          <p class="text-gray-400 text-sm">Navegue por nossa curadoria de serviços premium. De abertura de empresas a vistos e marketing, selecionamos apenas os melhores parceiros.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="relative pl-8 border-l-2 border-white/10 group">
+          <div class="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-surface-dark border-2 border-secondary shadow-[0_0_10px_rgba(0,243,255,0.5)] group-hover:scale-125 transition-transform"></div>
+          <h3 class="text-white text-lg font-bold mb-2">2. Solicite com um Clique</h3>
+          <p class="text-gray-400 text-sm">Interessou? Clique em solicitar. Não cobramos nada antecipadamente. Nossa equipe conecta você diretamente ao especialista.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="relative pl-8 border-l-2 border-transparent group">
+          <div class="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-gradient-to-r from-primary to-secondary shadow-[0_0_15px_rgba(255,255,255,0.5)] group-hover:scale-125 transition-transform"></div>
+          <h3 class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary text-lg font-bold mb-2">3. Aproveite os Benefícios</h3>
+          <p class="text-gray-400 text-sm">Como membro da 323 Network, você garante descontos exclusivos e atendimento prioritário VIP em todos os parceiros.</p>
+        </div>
+
+        <div class="pt-4 flex justify-center">
+          <button 
+            @click="showHowItWorksModal = false"
+            class="px-8 py-2 rounded-full border border-white/10 hover:bg-white/5 text-white text-sm transition-colors"
+          >
+            Entendi, vamos começar!
+          </button>
+        </div>
+      </div>
+    </Modal>
   </AppLayout>
 </template>
 
@@ -139,6 +188,7 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 import ServiceCard from '@/components/features/services/ServiceCard.vue'
 import TestimonialCard from '@/components/features/services/TestimonialCard.vue'
 import Modal from '@/components/ui/Modal.vue'
+import FlickeringGrid from '@/components/ui/FlickeringGrid.vue'
 
 const { supabase } = useSupabase()
 const loading = ref(true)
@@ -146,6 +196,7 @@ const services = ref<any[]>([])
 const activeFilter = ref('all')
 
 const showRequestModal = ref(false)
+const showHowItWorksModal = ref(false)
 const selectedService = ref<any>(null)
 const requestMessage = ref('')
 const submitting = ref(false)
@@ -257,11 +308,12 @@ function exploreServices() {
 }
 
 function howItWorks() {
-  // TODO: Implementar
+  showHowItWorksModal.value = true
 }
 
 function contactSupport() {
-  // TODO: Implementar
+  const message = encodeURIComponent('Olá! Sou membro da 323 Network e preciso de ajuda com um serviço personalizado.')
+  window.open(`https://wa.me/5511999999999?text=${message}`, '_blank')
 }
 </script>
 
