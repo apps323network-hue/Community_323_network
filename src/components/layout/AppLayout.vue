@@ -1,34 +1,38 @@
 <template>
   <div class="min-h-screen bg-background-light dark:bg-background-dark flex flex-col">
     <AppHeader />
-    
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:pl-0 lg:pr-8 py-8 flex-1 pb-20 lg:pb-8 min-h-[calc(100vh-200px)]">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12">
+
+    <main
+      class="max-w-7xl mx-auto px-4 sm:px-6 lg:pl-0 lg:pr-8 py-8 flex-1 pb-20 lg:pb-8 min-h-[calc(100vh-200px)]"
+    >
+      <div :class="hideSidebars ? 'w-full' : 'grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12'">
         <!-- Sidebar Esquerda - Desktop -->
-        <div class="hidden lg:block lg:col-span-2 -ml-32">
+        <div v-if="!hideSidebars" class="hidden lg:block lg:col-span-2 -ml-32">
           <div class="w-[280px]">
             <AppSidebar @edit-profile="handleEditProfile" />
           </div>
         </div>
-        
+
         <!-- Conteúdo Principal -->
-        <div class="lg:col-span-8">
+        <div :class="hideSidebars ? 'w-full max-w-[1400px] mx-auto' : 'lg:col-span-8'">
           <slot />
         </div>
-        
+
         <!-- Sidebar Direita -->
-        <div class="hidden lg:block lg:col-span-2 -mr-32">
+        <div v-if="!hideSidebars" class="hidden lg:block lg:col-span-2 -mr-32">
           <div class="w-[280px] ml-auto">
             <AppRightSidebar />
           </div>
         </div>
       </div>
     </main>
-    
+
     <AppFooter />
-    
+
     <!-- Mobile Menu - Sempre visível -->
-    <div class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 shadow-lg lg:hidden">
+    <div
+      class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 shadow-lg lg:hidden"
+    >
       <nav class="flex justify-around items-center h-16 px-2">
         <RouterLink
           v-for="item in mobileMenuItems"
@@ -46,15 +50,20 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
-import { RouterLink } from 'vue-router'
+import { computed } from 'vue'
+import { useRouter, useRoute, RouterLink } from 'vue-router'
 import AppHeader from './AppHeader.vue'
 import AppSidebar from './AppSidebar.vue'
 import AppRightSidebar from './AppRightSidebar.vue'
 import AppFooter from './AppFooter.vue'
 
 const router = useRouter()
+const route = useRoute()
 
+// Hide sidebars on Members and MemberProfile pages
+const hideSidebars = computed(() => {
+  return route.path === '/membros' || route.path.startsWith('/membros/')
+})
 
 function handleEditProfile() {
   router.push('/perfil')
