@@ -12,7 +12,7 @@
 
 ## 📊 FASE 1 - ESSENCIAL (MVP)
 
-### 1.1. Sistema de Aprovação de Membros
+### 16. Sistema de Aprovação de Membros
 
 #### Task 1.1.1: Migração de Banco - Status de Usuário
 - [ ] Criar migration para adicionar campo `status` na tabela `profiles`
