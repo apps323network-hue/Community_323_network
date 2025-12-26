@@ -38,7 +38,7 @@
           Feed Principal
         </RouterLink>
         <RouterLink
-          to="/membros"
+          to="/comunidade"
           class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-400 hover:bg-surface-lighter hover:text-white group transition-all"
         >
           <span class="material-icons-outlined mr-3 text-gray-500 group-hover:text-secondary transition-colors">groups</span>

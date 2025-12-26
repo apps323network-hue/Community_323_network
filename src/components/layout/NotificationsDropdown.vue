@@ -139,7 +139,7 @@ async function handleNotificationClick(notification: any) {
   
   // Redirecionar baseado no tipo de notificação
   if (notification.type === 'connection_request') {
-    router.push('/membros') // Ou para uma aba específica de solicitações
+    router.push('/comunidade') // Ou para uma aba específica de solicitações
   } else if (notification.type === 'post_like' && notification.metadata?.post_id) {
     router.push(`/?post=${notification.metadata.post_id}`)
   }

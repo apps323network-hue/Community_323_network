@@ -36,13 +36,13 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresGuest: true },
   },
   {
-    path: '/membros',
+    path: '/comunidade',
     name: 'Members',
     component: () => import('@/views/Members.vue'),
     meta: { requiresAuth: true },
   },
   {
-    path: '/membros/:id',
+    path: '/comunidade/:id',
     name: 'MemberProfile',
     component: () => import('@/views/MemberProfile.vue'),
     meta: { requiresAuth: true },
