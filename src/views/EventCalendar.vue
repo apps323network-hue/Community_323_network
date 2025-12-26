@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
@@ -178,8 +178,8 @@ function getFilteredEvents() {
   return events.value.filter((e) => e.tipo === eventType)
 }
 
-function handleFilterChange(filter: EventFilterType) {
-  activeFilter.value = filter
+function handleFilterChange(filter: string) {
+  activeFilter.value = filter as EventFilterType
   // Calendar will automatically update via computed
 }
 

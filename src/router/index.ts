@@ -106,6 +106,18 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/pagamento/sucesso',
+    name: 'PaymentSuccess',
+    component: () => import('@/views/PaymentSuccess.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/pagamento/cancelado',
+    name: 'PaymentCancel',
+    component: () => import('@/views/PaymentCancel.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/admin/eventos',
     name: 'AdminEvents',
     component: () => import('@/views/admin/AdminEvents.vue'),
@@ -188,16 +200,16 @@ router.beforeEach(async (to, _from, next) => {
       await userStore.fetchProfile(authStore.user.id)
     }
 
-    const userRole = userStore.profile?.role || 'user'
+    const userRole: string = userStore.profile?.role || 'user'
 
     // Admin pode acessar tudo
     if (userRole !== 'admin') {
       // Verificar se tem a role necessária
-      if (requiresRole === 'admin' && userRole !== 'admin') {
+      if (requiresRole === 'admin') {
         next({ name: 'Home' })
         return
       }
-      if (requiresRole === 'partner' && userRole !== 'partner' && userRole !== 'admin') {
+      if (requiresRole === 'partner' && userRole !== 'partner') {
         next({ name: 'Home' })
         return
       }

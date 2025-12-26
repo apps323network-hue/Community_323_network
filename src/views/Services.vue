@@ -105,24 +105,94 @@
       </div>
     </div>
 
-    <!-- Modal de Solicitação -->
+    <!-- Modal de Solicitação / Checkout -->
     <Modal
       v-if="selectedService"
       v-model="showRequestModal"
-      :title="'Solicitar ' + selectedService.nome"
+      :title="selectedService.preco ? 'Contratar ' + selectedService.nome : 'Solicitar ' + selectedService.nome"
     >
       <div class="flex flex-col gap-4">
+        <!-- Descrição -->
         <p class="text-sm text-gray-300">
-          Você está solicitando atendimento para <strong class="text-white">{{ selectedService.nome }}</strong>.
-          O parceiro responsável entrará em contato em breve.
+          <template v-if="selectedService.preco">
+            Você está contratando <strong class="text-white">{{ selectedService.nome }}</strong>.
+          </template>
+          <template v-else>
+            Você está solicitando atendimento para <strong class="text-white">{{ selectedService.nome }}</strong>.
+            O parceiro responsável entrará em contato em breve.
+          </template>
         </p>
+
+        <!-- Preço (se existir) -->
+        <div v-if="selectedService.preco" class="space-y-3">
+          <!-- Breakdown de Valores -->
+          <div class="p-4 rounded-lg bg-white/5 border border-white/10 space-y-2">
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-gray-400">Valor do serviço</span>
+              <span class="text-white font-medium">{{ formatPrice(selectedService.preco, selectedService.moeda) }}</span>
+            </div>
+            
+            <div v-if="paymentMethod" class="flex justify-between items-center text-sm">
+              <span class="text-gray-400">Taxa Stripe ({{ paymentMethod === 'card' ? '3.9% + $0.30' : '~1.8%' }})</span>
+              <span class="text-white font-medium">{{ formatPrice(calculateFee(selectedService.preco, paymentMethod), paymentMethod === 'pix' ? 'BRL' : selectedService.moeda) }}</span>
+            </div>
+            
+            <div class="border-t border-white/10 pt-2 mt-2"></div>
+            
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300 font-bold">Total a pagar</span>
+              <span class="text-2xl font-bold text-white">
+                {{ paymentMethod ? formatPrice(calculateTotal(selectedService.preco, paymentMethod), paymentMethod === 'pix' ? 'BRL' : selectedService.moeda) : formatPrice(selectedService.preco, selectedService.moeda) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Nota sobre conversão PIX -->
+          <div v-if="paymentMethod === 'pix'" class="flex items-start gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+            <span class="material-symbols-outlined text-blue-400 text-base">info</span>
+            <p class="text-xs text-blue-300">
+              Valor convertido de USD para BRL usando taxa de câmbio de R$ {{ exchangeRate.toFixed(2) }}.
+            </p>
+          </div>
+        </div>
         
-        <div class="p-4 rounded-lg bg-secondary/10 border border-secondary/20">
+        <!-- Benefício Membro -->
+        <div v-if="selectedService.beneficio_membro" class="p-4 rounded-lg bg-secondary/10 border border-secondary/20">
           <p class="text-xs font-bold text-secondary uppercase mb-1">Seu Benefício:</p>
           <p class="text-sm text-gray-300 font-medium">{{ selectedService.beneficio_membro }}</p>
         </div>
 
-        <div class="flex flex-col gap-1.5">
+        <!-- Método de Pagamento (apenas para serviços pagos) -->
+        <div v-if="selectedService.preco" class="space-y-3">
+          <label class="text-sm font-bold text-gray-300">Método de Pagamento</label>
+          <div class="grid grid-cols-2 gap-3">
+            <button
+              @click="paymentMethod = 'card'"
+              class="flex flex-col items-center gap-2 p-4 rounded-lg border transition-all"
+              :class="paymentMethod === 'card' 
+                ? 'border-primary bg-primary/10 text-white' 
+                : 'border-white/10 hover:border-white/30 text-gray-400'"
+            >
+              <span class="material-symbols-outlined text-2xl">credit_card</span>
+              <span class="text-sm font-bold">Cartão</span>
+              <span class="text-[10px] text-gray-500">Débito ou Crédito</span>
+            </button>
+            <button
+              @click="paymentMethod = 'pix'"
+              class="flex flex-col items-center gap-2 p-4 rounded-lg border transition-all"
+              :class="paymentMethod === 'pix' 
+                ? 'border-secondary bg-secondary/10 text-white' 
+                : 'border-white/10 hover:border-white/30 text-gray-400'"
+            >
+              <span class="material-symbols-outlined text-2xl">qr_code_2</span>
+              <span class="text-sm font-bold">PIX</span>
+              <span class="text-[10px] text-gray-500">Pagamento Instantâneo</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mensagem (para serviços gratuitos) -->
+        <div v-if="!selectedService.preco" class="flex flex-col gap-1.5">
           <label class="text-sm font-bold text-gray-300">Mensagem Adicional (Opcional)</label>
           <textarea
             v-model="requestMessage"
@@ -132,13 +202,31 @@
           ></textarea>
         </div>
 
+        <!-- Botão de Ação -->
         <button
-          @click="submitRequest"
-          :disabled="submitting"
+          @click="selectedService.preco ? handleCheckout() : submitRequest()"
+          :disabled="submitting || (selectedService.preco && !paymentMethod)"
           class="w-full rounded-lg bg-gradient-to-r from-primary to-secondary py-3 text-sm font-bold text-black shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all disabled:opacity-50"
         >
-          {{ submitting ? 'Enviando...' : 'Confirmar Solicitação' }}
+          <template v-if="submitting">
+            <span class="flex items-center justify-center gap-2">
+              <span class="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
+              Processando...
+            </span>
+          </template>
+          <template v-else-if="selectedService.preco">
+            Pagar {{ formatPrice(selectedService.preco, selectedService.moeda) }}
+          </template>
+          <template v-else>
+            Confirmar Solicitação
+          </template>
         </button>
+
+        <!-- Segurança -->
+        <p v-if="selectedService.preco" class="text-[10px] text-gray-500 text-center flex items-center justify-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">lock</span>
+          Pagamento seguro processado por Stripe
+        </p>
       </div>
     </Modal>
     <!-- Modal Como Funciona -->
@@ -201,6 +289,8 @@ const showHowItWorksModal = ref(false)
 const selectedService = ref<any>(null)
 const requestMessage = ref('')
 const submitting = ref(false)
+const paymentMethod = ref<'card' | 'pix' | null>(null)
+const exchangeRate = ref(5.90) // Taxa de câmbio USD → BRL
 
 const filters = [
   { id: 'all', label: 'Todos' },
@@ -237,6 +327,44 @@ const testimonials = [
   },
 ]
 
+function formatPrice(cents: number, currency: string = 'USD'): string {
+  const amount = cents / 100
+  if (currency === 'BRL') {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount)
+  }
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
+}
+
+// Taxas Stripe (conforme GUIA_RAPIDO_STRIPE.md)
+const CARD_FEE_PERCENTAGE = 0.039 // 3.9%
+const CARD_FEE_FIXED = 30 // $0.30 em centavos
+const PIX_FEE_PERCENTAGE = 0.0179 // ~1.8%
+
+function calculateFee(basePriceCents: number, method: 'card' | 'pix'): number {
+  if (method === 'card') {
+    // Taxa cartão: 3.9% + $0.30
+    return Math.round((basePriceCents * CARD_FEE_PERCENTAGE) + CARD_FEE_FIXED)
+  } else {
+    // PIX: converter para BRL e aplicar taxa
+    const baseAmountBRL = (basePriceCents / 100) * exchangeRate.value
+    const grossAmountBRL = baseAmountBRL / (1 - PIX_FEE_PERCENTAGE)
+    const feeAmountBRL = grossAmountBRL - baseAmountBRL
+    return Math.round(feeAmountBRL * 100) // em centavos de BRL
+  }
+}
+
+function calculateTotal(basePriceCents: number, method: 'card' | 'pix'): number {
+  if (method === 'card') {
+    // Total em USD
+    return basePriceCents + calculateFee(basePriceCents, method)
+  } else {
+    // Total em BRL
+    const baseAmountBRL = (basePriceCents / 100) * exchangeRate.value
+    const grossAmountBRL = baseAmountBRL / (1 - PIX_FEE_PERCENTAGE)
+    return Math.round(grossAmountBRL * 100) // em centavos de BRL
+  }
+}
+
 async function fetchServices() {
   try {
     loading.value = true
@@ -262,7 +390,49 @@ const filteredServices = computed(() => {
 
 function handleRequestService(service: any) {
   selectedService.value = service
+  paymentMethod.value = null
+  requestMessage.value = ''
   showRequestModal.value = true
+}
+
+async function handleCheckout() {
+  if (!selectedService.value || !paymentMethod.value) return
+
+  try {
+    submitting.value = true
+    
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (!session) {
+      toast.error('Você precisa estar logado para contratar um serviço.')
+      return
+    }
+
+    const { data, error } = await supabase.functions.invoke('create-service-checkout', {
+      body: {
+        service_id: selectedService.value.id,
+        payment_method: paymentMethod.value,
+        exchange_rate: exchangeRate.value,
+        mensagem: requestMessage.value
+      },
+      headers: {
+        Authorization: `Bearer ${session.access_token}`
+      }
+    })
+
+    if (error) throw error
+
+    if (data?.checkout_url) {
+      window.location.href = data.checkout_url
+    } else {
+      throw new Error('URL de checkout não retornada')
+    }
+  } catch (error: any) {
+    console.error('Erro ao iniciar checkout:', error)
+    toast.error(error.message || 'Erro ao processar pagamento. Tente novamente.')
+  } finally {
+    submitting.value = false
+  }
 }
 
 async function submitRequest() {

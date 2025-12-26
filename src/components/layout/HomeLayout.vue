@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { RouterLink } from 'vue-router'
 import AppHeader from './AppHeader.vue'
 import AppSidebar from './AppSidebar.vue'
@@ -68,8 +68,6 @@ import AppRightSidebar from './AppRightSidebar.vue'
 import AppFooter from './AppFooter.vue'
 
 const router = useRouter()
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _route = useRoute() // Used via $route in template
 
 function handleEditProfile() {
   router.push('/perfil')
