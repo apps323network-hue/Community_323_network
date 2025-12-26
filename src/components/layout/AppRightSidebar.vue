@@ -48,7 +48,8 @@
         >
           <RouterLink 
             :to="`/membros/${member.id}`"
-            class="flex items-center gap-3 flex-grow"
+            class="flex items-center gap-3 flex-grow member-link"
+            style="text-decoration: none !important;"
           >
             <div class="relative">
               <Avatar 
@@ -68,10 +69,18 @@
             </div>
           </RouterLink>
           <button 
-            class="text-gray-400 hover:text-primary hover:bg-gray-800 p-1.5 rounded-full transition-colors"
+            class="p-1.5 rounded-full transition-all flex items-center justify-center min-w-[32px] min-h-[32px]"
+            :class="[
+                connectionStatuses[member.id] 
+                ? 'text-green-500 bg-green-500/10 cursor-default' 
+                : 'text-gray-400 hover:text-primary hover:bg-gray-800'
+            ]"
             @click.stop="handleFollowMember(member.id)"
+            :disabled="requesting.has(member.id) || !!connectionStatuses[member.id]"
           >
-            <span class="material-icons-outlined text-xl">person_add</span>
+            <div v-if="requesting.has(member.id)" class="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <span v-else-if="connectionStatuses[member.id]" class="material-icons-outlined text-xl">check</span>
+            <span v-else class="material-icons-outlined text-xl">person_add</span>
           </button>
         </div>
         <div 
@@ -79,7 +88,7 @@
           class="text-center py-4 text-xs text-gray-500"
         >
           <p>Nenhum membro em destaque.</p>
-          <RouterLink to="/membros" class="text-primary hover:underline mt-1 block">
+          <RouterLink to="/membros" class="text-primary hover:text-primary-hover mt-1 block">
             Explorar membros
           </RouterLink>
         </div>
@@ -117,6 +126,10 @@ import { RouterLink } from 'vue-router'
 import { supabase } from '@/lib/supabase'
 import Avatar from '@/components/ui/Avatar.vue'
 import { useBookmarks } from '@/composables/useBookmarks'
+import { useConnections } from '@/composables/useConnections'
+import { useAuthStore } from '@/stores/auth'
+import { toast } from 'vue-sonner'
+import { sendConnectionRequestEmail } from '@/lib/emails'
 
 interface Event {
   id: string
@@ -190,8 +203,74 @@ async function loadUpcomingEvents() {
   }
 }
 
-
 const { fetchBookmarkedMembers } = useBookmarks()
+const authStore = useAuthStore()
+const { sendConnectionRequest, getConnectionStatus } = useConnections()
+const requesting = ref<Set<string>>(new Set())
+const connectionStatuses = ref<Record<string, string | null>>({})
+
+async function handleFollowMember(memberId: string) {
+  if (!authStore.user) {
+    toast.error('Você precisa estar logado para conectar.')
+    return
+  }
+  
+  if (requesting.value.has(memberId) || connectionStatuses.value[memberId]) return
+  requesting.value.add(memberId)
+
+  try {
+    const { success, error } = await sendConnectionRequest(authStore.user.id, memberId)
+    
+    if (success) {
+      connectionStatuses.value[memberId] = 'pending'
+      
+      // 1. Criar notificação in-app
+      await supabase.from('notifications').insert({
+        user_id: memberId,
+        type: 'connection_request',
+        title: 'Nova solicitação de conexão',
+        content: `${authStore.user.user_metadata?.nome || 'Um membro'} quer se conectar com você.`,
+        metadata: { requester_id: authStore.user.id }
+      })
+
+      // 2. Enviar Email
+      // Precisamos do email do destinatário
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('email, nome')
+        .eq('id', memberId)
+        .single()
+
+      if (profile?.email) {
+        await sendConnectionRequestEmail(
+          profile.email,
+          profile.nome || 'Membro',
+          authStore.user.user_metadata?.nome || 'Um membro'
+        )
+      }
+
+      toast.success('Solicitação de conexão enviada!')
+    } else {
+      if (error === 'Request already exists') {
+        connectionStatuses.value[memberId] = 'pending'
+        toast.info('Solicitação já enviada anteriormente.')
+      } else {
+        console.error(error)
+        toast.error('Erro ao conectar. Tente novamente.')
+      }
+    }
+  } catch (err) {
+    console.error(err)
+    toast.error('Ocorreu um erro inesperado.')
+  } finally {
+    requesting.value.delete(memberId)
+  }
+}
+
+function handleEventClick(eventId: string) {
+  // TODO: Navegar para detalhes do evento
+  console.log('Event clicked:', eventId)
+}
 
 async function loadFeaturedMembers() {
   try {
@@ -202,22 +281,20 @@ async function loadFeaturedMembers() {
       nome: member.nome,
       area_atuacao: member.area_atuacao || 'Membro da Comunidade',
       avatar_url: member.avatar_url,
-      isOnline: false // Status online real não implementado ainda
+      isOnline: false
     }))
+
+    // Batch check connection status
+    if (authStore.user) {
+        for (const member of featuredMembers.value) {
+            const status = await getConnectionStatus(authStore.user.id, member.id)
+            connectionStatuses.value[member.id] = status
+        }
+    }
   } catch (error) {
     console.error('Error loading featured members:', error)
     featuredMembers.value = []
   }
-}
-
-function handleEventClick(eventId: string) {
-  // TODO: Navegar para detalhes do evento
-  console.log('Event clicked:', eventId)
-}
-
-function handleFollowMember(memberId: string) {
-  // TODO: Implementar funcionalidade de seguir membro
-  console.log('Follow member:', memberId)
 }
 
 function handleBusinessClick() {
@@ -231,12 +308,18 @@ onMounted(() => {
 })
 </script>
 
+
+
 <style scoped>
 .border-gradient-blue-pink {
   position: relative;
   border: 1px solid transparent;
   background: linear-gradient(#12121A, #12121A) padding-box,
               linear-gradient(to right, #00F0FF, #FF00AA) border-box;
+}
+
+.member-link, .member-link:hover, .member-link:focus, .member-link:active {
+  text-decoration: none !important;
 }
 </style>
 
