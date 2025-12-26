@@ -147,7 +147,7 @@
           <AnimatedThemeToggler />
           <NotificationsDropdown />
           <div class="relative group cursor-pointer" ref="userMenuContainer">
-            <div class="flex items-center gap-3" @click.stop="toggleUserMenu">
+            <div class="flex items-center gap-2 lg:gap-3" @click.stop="toggleUserMenu">
               <div class="relative">
                 <div
                   class="absolute -inset-0.5 bg-gradient-to-r from-primary to-secondary rounded-full blur opacity-75 group-hover:opacity-100 transition duration-200"
@@ -165,7 +165,7 @@
                 >
                   {{ userDisplayName }}
                 </p>
-                <p class="text-xs text-gray-400 dark:text-gray-400">{{ userTitle }}</p>
+                <p class="text-xs text-gray-400 dark:text-gray-400 truncate">{{ userTitle }}</p>
               </div>
             </div>
 

@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 
+import type { UserRole } from '@/types/admin'
+
 export interface UserProfile {
   id: string
   nome?: string
