@@ -243,7 +243,6 @@ const userAvatar = computed(
 )
 const userDisplayName = computed(() => userStore.profile?.nome || userName.value)
 const userTitle = computed(() => userStore.profile?.area_atuacao || 'Membro')
-const hasNotifications = computed(() => false) // Deprecated: No local use now, handled in component
 
 function toggleUserMenu() {
   showUserMenu.value = !showUserMenu.value
