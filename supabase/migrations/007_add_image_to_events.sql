@@ -11,3 +11,4 @@ ADD COLUMN IF NOT EXISTS image_url TEXT;
 COMMENT ON COLUMN public.events.image_url IS 'URL da imagem/banner do evento (armazenada no Supabase Storage)';
 
 
+

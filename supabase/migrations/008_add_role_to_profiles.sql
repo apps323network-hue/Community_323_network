@@ -17,3 +17,4 @@ COMMENT ON COLUMN public.profiles.role IS 'Role do usuário: user (padrão), par
 -- Por padrão, todos os usuários existentes terão role='user' devido ao DEFAULT
 
 
+
