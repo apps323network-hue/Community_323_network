@@ -194,9 +194,22 @@ function handleSuspend(_userId: string) {
   toast.info('Funcionalidade de suspensão será implementada em breve')
 }
 
-function handleBan(_userId: string) {
-  // TODO: Implementar banimento (Sprint 2)
-  toast.info('Funcionalidade de banimento será implementada em breve')
+async function handleBan(userId: string) {
+  if (!confirm('Tem certeza que deseja banir este usuário? Esta ação impedirá completamente o acesso à plataforma.')) {
+    return
+  }
+
+  const reason = prompt('Motivo do banimento (opcional):')
+
+  try {
+    await adminStore.banUser(userId, reason || undefined)
+    toast.success('Usuário banido com sucesso')
+    await adminStore.fetchAllUsers()
+    await adminStore.fetchUserStats()
+  } catch (error: any) {
+    toast.error(error.message || 'Erro ao banir usuário')
+    console.error('Error banning user:', error)
+  }
 }
 
 function handleUnsuspend(_userId: string) {
