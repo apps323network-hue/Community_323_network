@@ -22,13 +22,13 @@
             <span class="material-symbols-outlined text-secondary text-2xl sm:text-3xl drop-shadow-[0_0_5px_rgba(0,240,255,0.8)]">
               calendar_month
             </span>
-            Próximos Eventos
+            {{ t('events.title') }}
           </h3>
           <router-link
             to="/eventos/calendario"
             class="group text-xs sm:text-sm font-bold flex items-center gap-1 text-white hover:text-primary transition-colors whitespace-nowrap"
           >
-            Ver calendário completo
+            {{ t('events.viewFullCalendar') }}
             <span class="material-symbols-outlined text-primary text-base sm:text-lg group-hover:translate-x-1 transition-transform">
               arrow_forward
             </span>
@@ -51,8 +51,8 @@
         <!-- Empty State -->
         <EmptyState
           v-else-if="!loading && displayedEvents.length === 0"
-          title="Nenhum evento encontrado"
-          description="Não há eventos disponíveis no momento. Verifique os filtros ou tente novamente mais tarde."
+          :title="t('events.noEventsFound')"
+          :description="t('events.noEventsFoundDesc')"
           icon="event"
         />
 
@@ -69,13 +69,13 @@
         </div>
 
         <!-- Load More Button -->
-        <div v-if="displayedEvents.length > 0" class="mt-12 flex justify-center">
+        <div v-if="hasMore" class="mt-12 flex justify-center">
           <button
             class="flex items-center gap-2 text-white/60 hover:text-white hover:border-white text-sm font-bold transition-all px-8 py-3 border border-white/10 rounded-full hover:bg-white/5 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]"
             @click="loadMore"
           >
             <span class="material-symbols-outlined animate-spin-slow">refresh</span>
-            Carregar mais eventos
+            {{ t('events.loadMoreEvents') }}
           </button>
         </div>
       </section>
@@ -89,23 +89,23 @@
             <span class="material-symbols-outlined text-white text-2xl sm:text-2xl md:text-3xl">mail</span>
           </div>
           <h3 class="text-white text-xl sm:text-2xl md:text-2xl lg:text-3xl font-black tracking-tight px-2">
-            Não perca nenhum <span class="text-primary">E</span><span class="text-secondary">vento</span>
+            {{ t('events.newsletterTitlePrefix') }} <span class="text-primary">{{ t('events.newsletterTitleHighlight1') }}</span><span class="text-secondary">{{ t('events.newsletterTitleHighlight2') }}</span>
           </h3>
           <p class="text-white/60 max-w-lg mx-auto mb-4 sm:mb-6 text-sm sm:text-base md:text-lg px-4">
-            Receba atualizações exclusivas, descontos e oportunidades da 323 Network diretamente.
+            {{ t('events.newsletterDesc') }}
           </p>
           <form class="flex w-full max-w-md flex-col sm:flex-row gap-2 sm:gap-3 px-4 sm:px-0" @submit.prevent="handleNewsletterSubmit">
             <input
               v-model="newsletterEmail"
               class="flex-1 rounded-lg bg-black/50 border border-white/10 px-3 sm:px-4 py-2.5 sm:py-3 text-white text-sm sm:text-base placeholder:text-white/30 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all"
-              placeholder="Seu melhor e-mail"
+              :placeholder="t('events.emailPlaceholder')"
               type="email"
             />
             <button
               class="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-black font-black py-2.5 sm:py-3 px-6 sm:px-8 rounded-lg text-sm sm:text-base transition-all shadow-[0_0_20px_rgba(244,37,244,0.3)] hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] transform hover:-translate-y-1 whitespace-nowrap"
               type="submit"
             >
-              Inscrever
+              {{ t('events.subscribe') }}
             </button>
           </form>
         </div>
@@ -117,6 +117,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useEvents } from '@/composables/useEvents'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import EventHero from '@/components/features/events/EventHero.vue'
@@ -131,6 +132,7 @@ const {
   events,
   featuredEvent,
   loading,
+  hasMore,
   loadEvents,
   loadFeaturedEvent,
   confirmEvent,
@@ -139,6 +141,7 @@ const {
 
 const activeFilter = ref<string>('all')
 const searchQuery = ref('')
+const { t } = useI18n()
 const newsletterEmail = ref('')
 
 const currentFilters = ref<EventFiltersType>({
@@ -178,7 +181,7 @@ async function handleConfirm(eventId: string) {
     await loadEvents(currentFilters.value, false)
   } catch (error) {
     console.error('Error confirming event:', error)
-    alert('Erro ao confirmar presença. Tente novamente.')
+    alert(t('events.errorConfirming'))
   }
 }
 
@@ -189,7 +192,7 @@ async function handleCancel(eventId: string) {
     await loadEvents(currentFilters.value, false)
   } catch (error) {
     console.error('Error canceling confirmation:', error)
-    alert('Erro ao cancelar confirmação. Tente novamente.')
+    alert(t('events.errorCanceling'))
   }
 }
 
@@ -214,7 +217,7 @@ async function loadMore() {
 function handleNewsletterSubmit() {
   // TODO: Implement newsletter subscription
   console.log('Newsletter subscription:', newsletterEmail.value)
-  alert('Newsletter subscription será implementado em breve!')
+  alert(t('events.newsletterAlert'))
   newsletterEmail.value = ''
 }
 
