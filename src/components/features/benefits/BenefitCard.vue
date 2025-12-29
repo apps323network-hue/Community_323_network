@@ -24,7 +24,7 @@
       <!-- Resgatado -->
       <div v-if="isClaimed" class="w-full py-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-sm font-bold text-emerald-400 text-center flex items-center justify-center gap-2">
         <span class="material-symbols-outlined text-[18px]">check_circle</span>
-        Resgatado
+        {{ t('benefits.claimed') }}
       </div>
       
     </div>
@@ -33,7 +33,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Benefit } from '@/types/benefits'
+
+const { t } = useI18n()
 
 interface Props {
   benefit: Benefit
@@ -74,32 +77,36 @@ const icon = computed(() => {
 })
 
 // Map de badges coloridos por categoria
-const categoryBadgeMap: Record<string, { label: string, class: string }> = {
-  'LIFESTYLE': { label: 'LIFESTYLE', class: 'bg-[#f425f4]/10 text-[#f425f4] border border-[#f425f4]/20' },
-  'EDUCAÇÃO': { label: 'EDUCAÇÃO', class: 'bg-[#00f3ff]/10 text-[#00f3ff] border border-[#00f3ff]/20' },
-  'TECH': { label: 'TECH', class: 'bg-blue-400/10 text-blue-400 border border-blue-400/20' },
-  'SERVIÇOS': { label: 'SERVIÇOS', class: 'bg-purple-400/10 text-purple-400 border border-purple-400/20' },
-  'EVENTOS': { label: 'EVENTOS', class: 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' },
-  'FINANÇAS': { label: 'FINANÇAS', class: 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20' },
-  'COWORKING': { label: 'COWORKING', class: 'bg-orange-400/10 text-orange-400 border border-orange-400/20' },
-  'VIAGEM': { label: 'VIAGEM', class: 'bg-sky-400/10 text-sky-400 border border-sky-400/20' },
-  'JURÍDICO': { label: 'JURÍDICO', class: 'bg-indigo-400/10 text-indigo-400 border border-indigo-400/20' },
+const categoryBadgeMap = computed<Record<string, { label: string, class: string }>>(() => ({
+  'LIFESTYLE': { label: t('benefits.categories.lifestyle'), class: 'bg-[#f425f4]/10 text-[#f425f4] border border-[#f425f4]/20' },
+  'EDUCAÇÃO': { label: t('benefits.categories.education'), class: 'bg-[#00f3ff]/10 text-[#00f3ff] border border-[#00f3ff]/20' },
+  'TECH': { label: t('benefits.categories.tech'), class: 'bg-blue-400/10 text-blue-400 border border-blue-400/20' },
+  'SERVIÇOS': { label: t('benefits.categories.services'), class: 'bg-purple-400/10 text-purple-400 border border-purple-400/20' },
+  'EVENTOS': { label: t('benefits.categories.events'), class: 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' },
+  'FINANÇAS': { label: t('benefits.categories.finance'), class: 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20' },
+  'COWORKING': { label: t('benefits.categories.coworking'), class: 'bg-orange-400/10 text-orange-400 border border-orange-400/20' },
+  'VIAGEM': { label: t('benefits.categories.travel'), class: 'bg-sky-400/10 text-sky-400 border border-sky-400/20' },
+  'JURÍDICO': { label: t('benefits.categories.legal'), class: 'bg-indigo-400/10 text-indigo-400 border border-indigo-400/20' },
   
   // Fallbacks por tipo (mantendo compatibilidade)
-  'fixo': { label: 'PARCEIRO', class: 'bg-[#f425f4]/10 text-[#f425f4] border border-[#f425f4]/20' },
-  'mensal': { label: 'MENSAL', class: 'bg-[#00f3ff]/10 text-[#00f3ff] border border-[#00f3ff]/20' },
-  'plano': { label: 'PLANO', class: 'bg-white/10 text-white border border-white/20' }
-}
+  'fixo': { label: t('benefits.categories.partner'), class: 'bg-[#f425f4]/10 text-[#f425f4] border border-[#f425f4]/20' },
+  'mensal': { label: t('benefits.categories.monthly'), class: 'bg-[#00f3ff]/10 text-[#00f3ff] border border-[#00f3ff]/20' },
+  'plano': { label: t('benefits.categories.plan'), class: 'bg-white/10 text-white border border-white/20' }
+}))
 
 const categoryLabel = computed(() => {
-  if (props.benefit.categoria) return props.benefit.categoria.toUpperCase()
-  return categoryBadgeMap[props.benefit.tipo]?.label || props.benefit.tipo.toUpperCase()
+  if (props.benefit.categoria) {
+    const key = `benefits.categories.${props.benefit.categoria.toLowerCase()}`
+    const translated = t(key)
+    return translated === key ? props.benefit.categoria.toUpperCase() : translated.toUpperCase()
+  }
+  return categoryBadgeMap.value[props.benefit.tipo]?.label || props.benefit.tipo.toUpperCase()
 })
 
 const categoryBadgeClass = computed(() => {
-  if (props.benefit.categoria && categoryBadgeMap[props.benefit.categoria]) {
-    return categoryBadgeMap[props.benefit.categoria].class
+  if (props.benefit.categoria && categoryBadgeMap.value[props.benefit.categoria]) {
+    return categoryBadgeMap.value[props.benefit.categoria].class
   }
-  return categoryBadgeMap[props.benefit.tipo]?.class || 'bg-gray-500/10 text-gray-400 border border-gray-500/20'
+  return categoryBadgeMap.value[props.benefit.tipo]?.class || 'bg-gray-500/10 text-gray-400 border border-gray-500/20'
 })
 </script>

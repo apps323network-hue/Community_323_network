@@ -23,17 +23,17 @@
           <!-- Badge -->
           <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/30 w-fit backdrop-blur-sm">
             <span class="material-symbols-outlined text-secondary text-[16px]">verified</span>
-            <span class="text-[11px] font-bold text-secondary tracking-wider uppercase">Exclusivo para Membros</span>
+            <span class="text-[11px] font-bold text-secondary tracking-wider uppercase">{{ t('benefits.exclusiveForMembers') }}</span>
           </div>
           
           <!-- Título -->
           <h1 class="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
-            <span class="text-white">Benefícios que<br/>impulsionam </span><span class="bg-gradient-to-r from-[#b845f4] via-[#c855ff] to-[#d865ff] bg-clip-text text-transparent">seu<br/>sucesso.</span>
+            <span class="text-white">{{ t('benefits.heroTitle1') }}<br/></span><span class="bg-gradient-to-r from-[#b845f4] via-[#c855ff] to-[#d865ff] bg-clip-text text-transparent">{{ t('benefits.heroTitle2') }}</span>
           </h1>
           
           <!-- Descrição -->
           <p class="text-gray-400 text-base md:text-lg font-normal leading-relaxed max-w-lg">
-            Desbloqueie descontos em softwares, acessos a coworkings e consultorias exclusivas para brasileiros nos EUA.
+            {{ t('benefits.description') }}
           </p>
           
           <!-- Botões -->
@@ -42,7 +42,7 @@
               @click="scrollToBenefits"
               class="flex items-center justify-center gap-2 rounded-lg bg-transparent hover:bg-white/5 border border-white/20 hover:border-white/40 transition-all h-12 px-8 text-white text-base font-medium group"
             >
-              <span>Ver todos</span>
+              <span>{{ t('common.seeAll') }}</span>
               <span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </button>
           </div>
@@ -79,7 +79,7 @@
           </button>
         </div>
         <div class="text-sm text-text-secondary">
-          Mostrando <span class="text-white font-bold">{{ filteredBenefits.length }}</span> benefícios
+          {{ t('benefits.showingBenefits', { count: filteredBenefits.length }) }}
         </div>
       </div>
 
@@ -93,7 +93,7 @@
         <section v-if="featuredBenefits.length > 0">
           <div class="flex items-center gap-3 mb-6">
             <span class="material-symbols-outlined text-secondary drop-shadow-[0_0_8px_rgba(0,243,255,0.8)]">star</span>
-            <h3 class="text-2xl font-bold text-white tracking-tight">Parceiros em Destaque</h3>
+            <h3 class="text-2xl font-bold text-white tracking-tight">{{ t('benefits.featuredPartners') }}</h3>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -110,9 +110,9 @@
         <!-- Todos os Benefícios (grid 4 colunas, sem imagem) -->
         <section>
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-2xl font-bold text-white tracking-tight">Todos os Benefícios</h3>
+            <h3 class="text-2xl font-bold text-white tracking-tight">{{ t('benefits.allBenefits') }}</h3>
             <div class="hidden md:flex items-center gap-2 text-sm text-text-secondary cursor-pointer hover:text-white transition-colors">
-              <span>Ordenar por: <span class="text-secondary font-medium">Mais Recentes</span></span>
+              <span>{{ t('benefits.sortBy') }} <span class="text-secondary font-medium">{{ t('benefits.latest') }}</span></span>
               <span class="material-symbols-outlined text-secondary">expand_more</span>
             </div>
           </div>
@@ -146,23 +146,23 @@
           
           <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
             <div class="flex flex-col gap-4 max-w-xl">
-              <h2 class="text-3xl font-black text-white leading-tight">Você tem um negócio nos EUA?</h2>
+              <h2 class="text-3xl font-black text-white leading-tight">{{ t('benefits.businessOwnerTitle') }}</h2>
               <p class="text-gray-300 text-lg">
-                Torne-se um parceiro da <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary font-bold">323 Network</span> e ofereça benefícios para nossa comunidade exclusiva de brasileiros.
+                {{ t('benefits.businessOwnerDescription') }}
               </p>
               <ul class="flex flex-col sm:flex-row justify-center md:justify-start gap-4 mt-2">
                 <li class="flex items-center gap-2 text-sm text-gray-300 bg-background-dark/50 px-3 py-1.5 rounded-full border border-border-dark">
                   <span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
-                  Visibilidade de Marca
+                  {{ t('benefits.brandVisibility') }}
                 </li>
                 <li class="flex items-center gap-2 text-sm text-gray-300 bg-background-dark/50 px-3 py-1.5 rounded-full border border-border-dark">
                   <span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span>
-                  Networking Qualificado
+                  {{ t('benefits.qualifiedNetworking') }}
                 </li>
               </ul>
             </div>
             <button class="shrink-0 rounded-lg bg-white text-background-dark hover:bg-gray-100 px-8 py-4 font-bold text-lg shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-transform hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.4)]">
-              Quero ser Parceiro
+              {{ t('benefits.beAPartner') }}
             </button>
           </div>
         </section>
@@ -174,16 +174,16 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import BenefitCard from '@/components/features/benefits/BenefitCard.vue'
 import BenefitCardFeatured from '@/components/features/benefits/BenefitCardFeatured.vue'
-import Modal from '@/components/ui/Modal.vue'
 import InteractiveGridPattern from '@/components/ui/InteractiveGridPattern.vue'
 import { useBenefits } from '@/composables/useBenefits'
 import { toast } from 'vue-sonner'
 
 const { benefits, loading, fetchBenefits, fetchUserBenefits, claimBenefit, isBenefitClaimed } = useBenefits()
+const { t } = useI18n()
 const activeFilter = ref('all')
 const benefitsSection = ref<HTMLElement | null>(null)
 
@@ -196,13 +196,13 @@ function scrollToBenefits() {
   }
 }
 
-const filters = [
-  { id: 'all', label: 'Todos', icon: '' },
-  { id: 'business', label: 'Negócios', icon: 'business_center' },
-  { id: 'lifestyle', label: 'Lifestyle', icon: 'flight_takeoff' },
-  { id: 'events', label: 'Eventos', icon: 'event_seat' },
-  { id: 'health', label: 'Saúde', icon: 'health_and_safety' }
-]
+const filters = computed(() => [
+  { id: 'all', label: t('navigation.allCategories'), icon: '' },
+  { id: 'business', label: t('benefits.filterBusiness'), icon: 'business_center' },
+  { id: 'lifestyle', label: t('benefits.filterLifestyle'), icon: 'flight_takeoff' },
+  { id: 'events', label: t('benefits.filterEvents'), icon: 'event_seat' },
+  { id: 'health', label: t('benefits.filterHealth'), icon: 'health_and_safety' }
+])
 
 const filteredBenefits = computed(() => {
   if (activeFilter.value === 'all') return benefits.value
@@ -220,9 +220,9 @@ const otherBenefits = computed(() => {
 async function handleClaimBenefit(benefitId: string) {
   const success = await claimBenefit(benefitId)
   if (success) {
-    toast.success('Benefício resgatado com sucesso! Nossa equipe entrará em contato em breve.')
+    toast.success(t('benefits.claimSuccess'))
   } else {
-    toast.error('Erro ao resgatar benefício. Tente novamente.')
+    toast.error(t('benefits.claimError'))
   }
 }
 

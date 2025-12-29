@@ -26,7 +26,7 @@
           v-else
           class="text-xs font-bold bg-emerald-500/20 border border-emerald-500 text-emerald-400 px-3 py-1 rounded-full"
         >
-          Resgatado
+          {{ t('benefits.claimed') }}
         </span>
       </div>
       
@@ -40,7 +40,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Benefit } from '@/types/benefits'
+
+const { t } = useI18n()
 
 interface Props {
   benefit: Benefit
@@ -56,9 +59,13 @@ defineEmits<{
 }>()
 
 const badgeText = computed(() => {
-  if (props.benefit.categoria) return props.benefit.categoria.toUpperCase()
-  if (props.benefit.tipo === 'mensal') return 'MÊS ATUAL'
-  return 'DESTAQUE'
+  if (props.benefit.categoria) {
+    const key = `benefits.categories.${props.benefit.categoria.toLowerCase()}`
+    const translated = t(key)
+    return translated === key ? props.benefit.categoria.toUpperCase() : translated.toUpperCase()
+  }
+  if (props.benefit.tipo === 'mensal') return t('benefits.currentMonth')
+  return t('benefits.featured')
 })
 </script>
 
