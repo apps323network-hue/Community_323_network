@@ -3,13 +3,13 @@
     <!-- Search Bar -->
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-        <span class="material-symbols-outlined text-gray-400 text-[20px]">search</span>
+        <span class="material-symbols-outlined text-slate-400 dark:text-gray-400 text-[20px]">search</span>
       </div>
       <input
         v-model="searchQuery"
         type="text"
-        placeholder="Buscar por nome, área ou cidade..."
-        class="block w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 border border-white/10 rounded-lg sm:rounded-xl bg-surface-dark text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+        :placeholder="t('members.searchPlaceholder')"
+        class="block w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 border border-slate-200 dark:border-white/10 rounded-lg sm:rounded-xl bg-white dark:bg-surface-dark text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
         @input="debouncedSearch"
       />
     </div>
@@ -19,10 +19,10 @@
       <!-- Area Filter -->
       <select
         v-model="filters.area_atuacao"
-        class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-white/10 bg-surface-dark text-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all flex-1 sm:flex-none min-w-[140px]"
+        class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-700 dark:text-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all flex-1 sm:flex-none min-w-[140px]"
         @change="emitFilters"
       >
-        <option value="">Todas as áreas</option>
+        <option value="">{{ t('members.allAreas') }}</option>
         <option v-for="area in AREAS_ATUACAO" :key="area" :value="area">
           {{ area }}
         </option>
@@ -32,18 +32,18 @@
       <input
         v-model="filters.cidade"
         type="text"
-        placeholder="Cidade"
-        class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-white/10 bg-surface-dark text-gray-300 text-xs sm:text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all w-28 sm:w-32 flex-1 sm:flex-none"
+        :placeholder="t('profile.city')"
+        class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-gray-300 text-xs sm:text-sm placeholder-slate-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all w-28 sm:w-32 flex-1 sm:flex-none"
         @input="debouncedSearch"
       />
 
       <!-- Objetivo Filter -->
       <select
         v-model="filters.objetivo"
-        class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-white/10 bg-surface-dark text-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all flex-1 sm:flex-none min-w-[140px]"
+        class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-700 dark:text-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all flex-1 sm:flex-none min-w-[140px]"
         @change="emitFilters"
       >
-        <option value="">Todos os objetivos</option>
+        <option value="">{{ t('members.allGoals') }}</option>
         <option v-for="obj in OBJETIVOS" :key="obj" :value="obj">
           {{ obj }}
         </option>
@@ -52,10 +52,10 @@
       <!-- Plan Filter -->
       <select
         v-model="filters.plano"
-        class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-white/10 bg-surface-dark text-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all flex-1 sm:flex-none min-w-[120px]"
+        class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-700 dark:text-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all flex-1 sm:flex-none min-w-[120px]"
         @change="emitFilters"
       >
-        <option value="">Todos os planos</option>
+        <option value="">{{ t('members.allPlans') }}</option>
         <option value="Free">Free</option>
         <option value="Member">Member</option>
         <option value="Premium">Premium</option>
@@ -65,13 +65,13 @@
       <div class="flex-1"></div>
 
       <!-- View Toggle -->
-      <div class="flex items-center gap-1 bg-surface-lighter rounded-lg p-1">
+      <div class="flex items-center gap-1 bg-slate-100 dark:bg-surface-lighter rounded-lg p-1">
         <button
           :class="[
             'p-2 rounded-md transition-all',
             viewMode === 'grid'
-              ? 'bg-surface-dark text-primary shadow-sm'
-              : 'text-gray-400 hover:text-gray-200',
+              ? 'bg-white dark:bg-surface-dark text-primary shadow-sm'
+              : 'text-slate-400 dark:text-gray-400 hover:text-slate-600 dark:hover:text-gray-200',
           ]"
           @click="$emit('update:viewMode', 'grid')"
         >
@@ -81,8 +81,8 @@
           :class="[
             'p-2 rounded-md transition-all',
             viewMode === 'list'
-              ? 'bg-surface-dark text-primary shadow-sm'
-              : 'text-gray-400 hover:text-gray-200',
+              ? 'bg-white dark:bg-surface-dark text-primary shadow-sm'
+              : 'text-slate-400 dark:text-gray-400 hover:text-slate-600 dark:hover:text-gray-200',
           ]"
           @click="$emit('update:viewMode', 'list')"
         >
@@ -96,7 +96,7 @@
         class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-red-500/30 text-red-500 text-xs sm:text-sm font-medium hover:bg-red-500/10 transition-all w-full sm:w-auto"
         @click="clearFilters"
       >
-        Limpar filtros
+        {{ t('common.clearFilters') }}
       </button>
     </div>
   </div>
@@ -104,6 +104,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { AREAS_ATUACAO, OBJETIVOS } from '@/types/members'
 import type { MemberFilters } from '@/types/members'
 
@@ -120,6 +121,8 @@ const emit = defineEmits<{
   'update:modelValue': [filters: MemberFilters]
   'update:viewMode': [mode: 'grid' | 'list']
 }>()
+
+const { t } = useI18n()
 
 const searchQuery = ref(props.modelValue.search || '')
 const filters = ref<MemberFilters>({

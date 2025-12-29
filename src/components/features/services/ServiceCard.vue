@@ -6,7 +6,7 @@
       class="absolute top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 z-10 opacity-100 group-hover:opacity-0 transition-opacity"
     >
       <span class="bg-primary/20 text-primary text-[8px] sm:text-[9px] md:text-[10px] font-bold px-1 sm:px-1.5 md:px-2 py-0.5 rounded uppercase tracking-wide border border-primary/20 shadow-[0_0_10px_rgba(244,37,244,0.3)]">
-        Destaque
+        {{ t('services.featured') }}
       </span>
     </div>
 
@@ -41,7 +41,7 @@
       <div v-if="service.beneficio_membro" class="flex flex-col gap-1 sm:gap-1.5 p-2 sm:p-2.5 md:p-3 rounded-lg bg-secondary/5 border border-secondary/20 group-hover:bg-secondary/10 transition-colors">
         <div class="flex items-center gap-1 sm:gap-1.5 text-secondary">
           <span class="material-symbols-outlined text-sm sm:text-base md:text-[18px]">workspace_premium</span>
-          <span class="text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider">Benefício Membro</span>
+          <span class="text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider">{{ t('services.memberBenefit') }}</span>
         </div>
         <p class="text-gray-300 text-[10px] sm:text-[11px] md:text-xs font-medium leading-relaxed">
           {{ service.beneficio_membro }}
@@ -57,12 +57,16 @@
         : 'border border-secondary/50 bg-transparent text-secondary group-hover:bg-secondary group-hover:text-black hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]'"
       @click="$emit('request-service', service)"
     >
-      {{ service.preco ? 'Contratar Serviço' : 'Solicitar Atendimento' }}
+      {{ service.preco ? t('services.contractService') : t('services.requestSupport') }}
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 interface Service {
   id: string
   nome: string

@@ -26,7 +26,7 @@ const cardClasses = computed(() => {
     default: 'bg-white dark:bg-surface-dark border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none',
     dark: 'bg-surface-dark border-white/10',
     glass: 'bg-surface-dark/80 backdrop-blur border-white/10',
-    white: 'bg-white border-slate-200 shadow-sm',
+    white: 'bg-white dark:bg-surface-dark border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none',
   }
 
   const glows = {

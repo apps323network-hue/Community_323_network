@@ -24,8 +24,8 @@
       <!-- Empty State -->
       <EmptyState
         v-else-if="!loading && posts.length === 0"
-        title="Nenhum post ainda"
-        description="Seja o primeiro a compartilhar algo na comunidade!"
+        :title="t('posts.noPostsYet')"
+        :description="t('posts.beTheFirst')"
         icon="chat_bubble_outline"
       />
 
@@ -54,9 +54,9 @@
             variant="outline"
             @click="loadMore"
           >
-            Carregar mais
+            {{ t('common.loadMore') }}
           </Button>
-          <div v-else class="text-slate-400 text-sm">Carregando...</div>
+          <div v-else class="text-slate-400 text-sm">{{ t('common.loading') }}</div>
         </div>
       </div>
     </div>
@@ -66,6 +66,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { usePosts } from '@/composables/usePosts'
 import { supabase } from '@/lib/supabase'
 import HomeLayout from '@/components/layout/HomeLayout.vue'
@@ -87,6 +88,7 @@ const {
 } = usePosts()
 
 const router = useRouter()
+const { t } = useI18n()
 const expandedComments = ref(new Set<string>())
 const loadMoreRef = ref<HTMLElement | null>(null)
 const filters = ref<PostFiltersType>({ sortBy: 'recent' })
@@ -168,7 +170,7 @@ async function handleShare(postId: string) {
     } else {
       // Fallback: copy to clipboard
       await navigator.clipboard.writeText(url)
-      toast.success('Link copiado para a área de transferência!')
+      toast.success(t('posts.linkCopied'))
     }
   } catch (error: any) {
     // User cancelled or error occurred
@@ -176,7 +178,7 @@ async function handleShare(postId: string) {
       // Fallback: copy to clipboard
       try {
         await navigator.clipboard.writeText(url)
-        toast.success('Link copiado para a área de transferência!')
+        toast.success(t('posts.linkCopied'))
       } catch (clipboardError) {
         console.error('Error copying to clipboard:', clipboardError)
       }
@@ -192,10 +194,10 @@ async function handleEditComment(commentId: string) {
 async function handleDeleteComment(commentId: string) {
   try {
     await removeComment(commentId)
-    toast.success('Comentário deletado.')
+    toast.success(t('posts.deletePost'))
   } catch (error) {
     console.error('Error deleting comment:', error)
-    toast.error('Erro ao deletar comentário.')
+    toast.error(t('errors.genericError'))
   }
 }
 

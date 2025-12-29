@@ -4,8 +4,8 @@
       <!-- Header -->
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 class="text-3xl font-bold text-white mb-2">Minha Rede</h1>
-          <p class="text-gray-400">Gerencie suas conexões e solicitações pendentes.</p>
+          <h1 class="text-3xl font-bold text-white mb-2">{{ t('connections.title') }}</h1>
+          <p class="text-gray-400">{{ t('connections.subtitle') }}</p>
         </div>
         <div class="flex bg-surface-dark p-1 rounded-xl border border-white/5">
           <button 
@@ -35,8 +35,8 @@
         <div v-if="activeTab === 'requests'" class="space-y-4">
           <div v-if="pendingRequests.length === 0" class="text-center py-20 bg-surface-dark rounded-2xl border border-dashed border-white/10">
             <span class="material-icons-outlined text-6xl text-gray-700 mb-4">person_search</span>
-            <p class="text-gray-500 text-lg">Nenhuma solicitação pendente no momento.</p>
-            <RouterLink to="/membros" class="text-secondary hover:underline mt-2 block">Explorar novos membros</RouterLink>
+            <p class="text-gray-500 text-lg">{{ t('connections.emptyRequests') }}</p>
+            <RouterLink to="/membros" class="text-secondary hover:underline mt-2 block">{{ t('connections.exploreMembers') }}</RouterLink>
           </div>
 
           <div 
@@ -53,8 +53,8 @@
               />
               <div>
                 <h3 class="font-bold text-white text-lg">{{ request.profiles.nome }}</h3>
-                <p class="text-secondary text-sm font-medium">{{ request.profiles.area_atuacao || 'Membro' }}</p>
-                <p class="text-xs text-gray-500 mt-1">Solicitado em {{ formatDate(request.created_at) }}</p>
+                <p class="text-secondary text-sm font-medium">{{ request.profiles.area_atuacao || t('connections.member') }}</p>
+                <p class="text-xs text-gray-500 mt-1">{{ t('connections.requestedOn', { date: formatDate(request.created_at) }) }}</p>
               </div>
             </div>
 
@@ -64,7 +64,7 @@
                 :disabled="actionLoading === request.id"
                 class="px-4 py-2 rounded-lg border border-gray-700 text-gray-400 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/50 transition-all text-sm font-bold"
               >
-                Recusar
+                {{ t('connections.decline') }}
               </button>
               <button 
                 @click="handleStatusUpdate(request.id, 'accepted')"
@@ -72,7 +72,7 @@
                 class="px-4 py-2 rounded-lg bg-secondary text-black hover:bg-secondary-light transition-all text-sm font-bold flex items-center gap-2"
               >
                 <div v-if="actionLoading === request.id" class="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                Aceitar
+                {{ t('connections.accept') }}
               </button>
             </div>
           </div>
@@ -82,8 +82,8 @@
         <div v-if="activeTab === 'connections'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div v-if="connections.length === 0" class="col-span-full text-center py-20 bg-surface-dark rounded-2xl border border-dashed border-white/10">
             <span class="material-icons-outlined text-6xl text-gray-700 mb-4">groups</span>
-            <p class="text-gray-500 text-lg">Você ainda não possui conexões.</p>
-            <p class="text-sm text-gray-600">Conecte-se com membros para expandir sua rede.</p>
+            <p class="text-gray-500 text-lg">{{ t('connections.emptyConnections') }}</p>
+            <p class="text-sm text-gray-600">{{ t('connections.expandNetwork') }}</p>
           </div>
 
           <div 
@@ -100,7 +100,7 @@
               />
               <div class="min-w-0">
                 <h3 class="font-bold text-white truncate">{{ getOtherMember(conn).nome }}</h3>
-                <p class="text-gray-500 text-xs truncate">{{ getOtherMember(conn).area_atuacao || 'Membro' }}</p>
+                <p class="text-gray-500 text-xs truncate">{{ getOtherMember(conn).area_atuacao || t('connections.member') }}</p>
               </div>
             </div>
             <span class="material-icons-outlined text-gray-700 group-hover:text-secondary transition-colors">chevron_right</span>
@@ -112,8 +112,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useConnections } from '@/composables/useConnections'
 import { supabase } from '@/lib/supabase'
@@ -123,13 +124,14 @@ import { toast } from 'vue-sonner'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { t, locale } = useI18n()
 const { fetchPendingRequests, updateConnectionStatus, loading } = useConnections()
 
 const activeTab = ref('requests')
-const tabs = [
-  { id: 'requests', label: 'Solicitações Recebidas' },
-  { id: 'connections', label: 'Minhas Conexões' }
-]
+const tabs = computed(() => [
+  { id: 'requests', label: t('connections.tabs.receivedRequests') },
+  { id: 'connections', label: t('connections.tabs.myConnections') }
+])
 
 const pendingRequests = ref<any[]>([])
 const connections = ref<any[]>([])
@@ -172,16 +174,16 @@ async function handleStatusUpdate(connectionId: string, status: 'accepted' | 're
   const { success, error } = await updateConnectionStatus(connectionId, status)
   
   if (success) {
-    toast.success(status === 'accepted' ? 'Conexão aceita!' : 'Solicitação removida.')
+    toast.success(status === 'accepted' ? t('connections.acceptedSuccess') : t('connections.rejectedSuccess'))
     await loadData()
   } else {
-    toast.error('Erro ao processar solicitação: ' + error)
+    toast.error(t('connections.processError') + error)
   }
   actionLoading.value = null
 }
 
 function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('pt-BR', {
+  return new Date(dateString).toLocaleDateString(locale.value, {
     day: '2-digit',
     month: 'short'
   })

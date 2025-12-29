@@ -6,7 +6,7 @@
         <input
           v-model="content"
           class="w-full bg-slate-50 dark:bg-surface-lighter border border-slate-200 dark:border-gray-700/50 rounded-full px-5 py-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent dark:text-white placeholder-gray-500 dark:placeholder-gray-500 transition-all"
-          placeholder="Compartilhe uma novidade, evento ou projeto..."
+          :placeholder="t('posts.placeholder')"
           type="text"
         />
       </div>
@@ -36,14 +36,14 @@
             @change="handleImageSelect"
           />
           <span class="material-icons-outlined text-xl group-hover:scale-110 transition-transform text-secondary">image</span>
-          Mídia
+          {{ t('posts.media') }}
         </label>
         <button
           class="flex items-center gap-2 text-gray-400 dark:text-gray-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors group"
           @click="showEventModal = true"
         >
           <span class="material-icons-outlined text-xl group-hover:scale-110 transition-transform text-primary">calendar_today</span>
-          Evento
+          {{ t('posts.event') }}
         </button>
       </div>
       <button
@@ -51,8 +51,8 @@
         :disabled="!content.trim() || loading"
         @click="handleSubmit"
       >
-        <span v-if="loading">Publicando...</span>
-        <span v-else>Publicar</span>
+        <span v-if="loading">{{ t('common.loading') }}</span>
+        <span v-else>{{ t('posts.post') }}</span>
       </button>
     </div>
 
@@ -62,7 +62,7 @@
     </div>
 
     <!-- Modal de Evento -->
-    <Modal v-model="showEventModal" title="Criar Evento" size="lg">
+    <Modal v-model="showEventModal" :title="t('events.createEvent')" size="lg">
       <div class="space-y-4">
         <div>
           <label class="block text-sm font-semibold text-gray-300 mb-2">Título do Evento</label>
@@ -74,7 +74,7 @@
           />
         </div>
         <div>
-          <label class="block text-sm font-semibold text-gray-300 mb-2">Descrição</label>
+          <label class="block text-sm font-semibold text-gray-300 mb-2">{{ t('common.description') }}</label>
           <textarea
             v-model="eventForm.descricao"
             rows="3"
@@ -83,7 +83,7 @@
           ></textarea>
         </div>
         <div>
-          <label class="block text-sm font-semibold text-gray-300 mb-2">Banner do Evento</label>
+          <label class="block text-sm font-semibold text-gray-300 mb-2">{{ t('events.eventBanner') }}</label>
           <div class="space-y-3">
             <label class="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-slate-700 rounded-xl bg-slate-900/30 hover:border-secondary transition-colors cursor-pointer group">
               <input
@@ -95,7 +95,7 @@
               <div class="flex flex-col items-center gap-2">
                 <span class="material-icons-outlined text-secondary group-hover:scale-110 transition-transform">image</span>
                 <span class="text-sm text-gray-400 group-hover:text-secondary transition-colors">
-                  {{ eventImageFile ? 'Trocar imagem' : 'Adicionar banner' }}
+                  {{ eventImageFile ? t('events.changeImage') : t('events.addBanner') }}
                 </span>
               </div>
             </label>
@@ -113,7 +113,7 @@
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-semibold text-gray-300 mb-2">Data e Hora</label>
+            <label class="block text-sm font-semibold text-gray-300 mb-2">{{ t('events.dateTime') }}</label>
             <input
               v-model="eventForm.data_hora"
               type="datetime-local"
@@ -121,18 +121,18 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-300 mb-2">Tipo</label>
+            <label class="block text-sm font-semibold text-gray-300 mb-2">{{ t('events.eventType') }}</label>
             <select
               v-model="eventForm.tipo"
               class="w-full px-3 py-2 border border-slate-700 rounded-xl bg-slate-900/50 text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
             >
-              <option value="presencial">Presencial</option>
-              <option value="webinar">Webinar</option>
+              <option value="presencial">{{ t('events.inPerson') }}</option>
+              <option value="webinar">{{ t('events.webinar') }}</option>
             </select>
           </div>
         </div>
         <div v-if="eventForm.tipo === 'presencial'">
-          <label class="block text-sm font-semibold text-gray-300 mb-2">Local</label>
+          <label class="block text-sm font-semibold text-gray-300 mb-2">{{ t('events.eventLocation') }}</label>
           <input
             v-model="eventForm.local"
             type="text"
@@ -143,9 +143,9 @@
       </div>
       <template #footer>
         <div class="flex gap-3">
-          <Button variant="outline" @click="showEventModal = false">Cancelar</Button>
+          <Button variant="outline" @click="showEventModal = false">{{ t('common.cancel') }}</Button>
           <Button variant="primary" :disabled="!eventForm.titulo || !eventForm.data_hora" @click="handleCreateEvent">
-            Criar Evento
+            {{ t('events.createEvent') }}
           </Button>
         </div>
       </template>
@@ -155,6 +155,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/user'
 import { usePosts } from '@/composables/usePosts'
@@ -169,6 +170,7 @@ import type { PostType } from '@/types/posts'
 const authStore = useAuthStore()
 const userStore = useUserStore()
 const { createPost } = usePosts()
+const { t } = useI18n()
 
 const content = ref('')
 const selectedType = ref<PostType>('networking')

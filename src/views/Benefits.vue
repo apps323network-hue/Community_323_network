@@ -23,30 +23,26 @@
           <!-- Badge -->
           <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/30 w-fit backdrop-blur-sm">
             <span class="material-symbols-outlined text-secondary text-[16px]">verified</span>
-            <span class="text-[11px] font-bold text-secondary tracking-wider uppercase">Exclusivo para Membros</span>
+            <span class="text-[11px] font-bold text-secondary tracking-wider uppercase">{{ t('benefits.exclusiveForMembers') }}</span>
           </div>
           
           <!-- Título -->
           <h1 class="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
-            <span class="text-white">Benefícios que<br/>impulsionam </span><span class="bg-gradient-to-r from-[#b845f4] via-[#c855ff] to-[#d865ff] bg-clip-text text-transparent">seu<br/>sucesso.</span>
+            <span class="text-white">{{ t('benefits.heroTitle1') }}<br/></span><span class="bg-gradient-to-r from-[#b845f4] via-[#c855ff] to-[#d865ff] bg-clip-text text-transparent">{{ t('benefits.heroTitle2') }}</span>
           </h1>
           
           <!-- Descrição -->
           <p class="text-gray-400 text-base md:text-lg font-normal leading-relaxed max-w-lg">
-            Desbloqueie descontos em softwares, acessos a coworkings e consultorias exclusivas para brasileiros nos EUA.
+            {{ t('benefits.description') }}
           </p>
           
           <!-- Botões -->
           <div class="flex flex-wrap gap-4 pt-2">
             <button 
-              @click="showUpgradeModal = true"
-              class="flex items-center justify-center gap-2 rounded-lg bg-[#f425f4] hover:brightness-110 transition-all h-12 px-8 text-white text-base font-bold"
+              @click="scrollToBenefits"
+              class="flex items-center justify-center gap-2 rounded-lg bg-transparent hover:bg-white/5 border border-white/20 hover:border-white/40 transition-all h-12 px-8 text-white text-base font-medium group"
             >
-              <span class="material-symbols-outlined text-[20px]">diamond</span>
-              <span>Tornar-se VIP</span>
-            </button>
-            <button class="flex items-center justify-center gap-2 rounded-lg bg-transparent hover:bg-white/5 border border-white/20 hover:border-white/40 transition-all h-12 px-8 text-white text-base font-medium group">
-              <span>Ver todos</span>
+              <span>{{ t('common.seeAll') }}</span>
               <span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </button>
           </div>
@@ -54,7 +50,7 @@
       </div>
 
       <!-- Filtros -->
-      <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b border-border-dark pb-6">
+      <div ref="benefitsSection" class="flex flex-col md:flex-row justify-between items-center gap-4 border-b border-border-dark pb-6">
         <div class="flex gap-3 overflow-x-auto pb-2 md:pb-0 max-w-full no-scrollbar">
           <button 
             v-for="filter in filters" 
@@ -83,7 +79,7 @@
           </button>
         </div>
         <div class="text-sm text-text-secondary">
-          Mostrando <span class="text-white font-bold">{{ filteredBenefits.length }}</span> benefícios
+          {{ t('benefits.showingBenefits', { count: filteredBenefits.length }) }}
         </div>
       </div>
 
@@ -97,7 +93,7 @@
         <section v-if="featuredBenefits.length > 0">
           <div class="flex items-center gap-3 mb-6">
             <span class="material-symbols-outlined text-secondary drop-shadow-[0_0_8px_rgba(0,243,255,0.8)]">star</span>
-            <h3 class="text-2xl font-bold text-white tracking-tight">Parceiros em Destaque</h3>
+            <h3 class="text-2xl font-bold text-white tracking-tight">{{ t('benefits.featuredPartners') }}</h3>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -106,9 +102,7 @@
               :key="benefit.id"
               :benefit="benefit"
               :is-claimed="isBenefitClaimed(benefit.id)"
-              :is-locked="!canClaimBenefit(benefit, userPlan)"
               @claim="handleClaimBenefit(benefit.id)"
-              @upgrade="showUpgradeModal = true"
             />
           </div>
         </section>
@@ -116,9 +110,9 @@
         <!-- Todos os Benefícios (grid 4 colunas, sem imagem) -->
         <section>
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-2xl font-bold text-white tracking-tight">Todos os Benefícios</h3>
+            <h3 class="text-2xl font-bold text-white tracking-tight">{{ t('benefits.allBenefits') }}</h3>
             <div class="hidden md:flex items-center gap-2 text-sm text-text-secondary cursor-pointer hover:text-white transition-colors">
-              <span>Ordenar por: <span class="text-secondary font-medium">Mais Recentes</span></span>
+              <span>{{ t('benefits.sortBy') }} <span class="text-secondary font-medium">{{ t('benefits.latest') }}</span></span>
               <span class="material-symbols-outlined text-secondary">expand_more</span>
             </div>
           </div>
@@ -129,13 +123,11 @@
               :key="benefit.id"
               :benefit="benefit"
               :is-claimed="isBenefitClaimed(benefit.id)"
-              :is-locked="!canClaimBenefit(benefit, userPlan)"
               @claim="handleClaimBenefit(benefit.id)"
-              @upgrade="showUpgradeModal = true"
             />
             
             <!-- Card "Sugerir Parceiro" -->
-            <div class="bg-[#1a0a1f] p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-colors flex flex-col items-center justify-center gap-4 group cursor-pointer text-center h-full">
+            <!-- <div class="bg-[#1a0a1f] p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-colors flex flex-col items-center justify-center gap-4 group cursor-pointer text-center h-full">
               <div class="size-16 rounded-full bg-[#6b1d6b]/30 flex items-center justify-center group-hover:bg-[#6b1d6b]/50 text-gray-300 group-hover:text-white transition-all duration-300">
                 <span class="material-symbols-outlined text-[32px]">add</span>
               </div>
@@ -143,7 +135,7 @@
                 <h5 class="text-lg font-bold text-white mb-1">Sugerir Parceiro</h5>
                 <p class="text-sm text-gray-500">Sentiu falta de algo? Indique uma empresa.</p>
               </div>
-            </div>
+            </div> -->
           </div>
         </section>
 
@@ -154,86 +146,63 @@
           
           <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
             <div class="flex flex-col gap-4 max-w-xl">
-              <h2 class="text-3xl font-black text-white leading-tight">Você tem um negócio nos EUA?</h2>
+              <h2 class="text-3xl font-black text-white leading-tight">{{ t('benefits.businessOwnerTitle') }}</h2>
               <p class="text-gray-300 text-lg">
-                Torne-se um parceiro da <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary font-bold">323 Network</span> e ofereça benefícios para nossa comunidade exclusiva de brasileiros.
+                {{ t('benefits.businessOwnerDescription') }}
               </p>
               <ul class="flex flex-col sm:flex-row justify-center md:justify-start gap-4 mt-2">
                 <li class="flex items-center gap-2 text-sm text-gray-300 bg-background-dark/50 px-3 py-1.5 rounded-full border border-border-dark">
                   <span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
-                  Visibilidade de Marca
+                  {{ t('benefits.brandVisibility') }}
                 </li>
                 <li class="flex items-center gap-2 text-sm text-gray-300 bg-background-dark/50 px-3 py-1.5 rounded-full border border-border-dark">
                   <span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span>
-                  Networking Qualificado
+                  {{ t('benefits.qualifiedNetworking') }}
                 </li>
               </ul>
             </div>
             <button class="shrink-0 rounded-lg bg-white text-background-dark hover:bg-gray-100 px-8 py-4 font-bold text-lg shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-transform hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.4)]">
-              Quero ser Parceiro
+              {{ t('benefits.beAPartner') }}
             </button>
           </div>
         </section>
       </template>
     </div>
 
-    <!-- Modal de Upgrade -->
-    <Modal v-model="showUpgradeModal" title="Desbloqueie Benefícios Premium">
-      <div class="space-y-6">
-        <p class="text-gray-300 text-sm">
-          Faça upgrade do seu plano para acessar benefícios exclusivos e impulsionar ainda mais sua jornada nos Estados Unidos.
-        </p>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Member Plan -->
-          <div class="p-6 rounded-xl bg-secondary/10 border border-secondary/20">
-            <h3 class="text-white font-bold text-lg mb-2">Plano Member</h3>
-            <p class="text-gray-400 text-sm mb-4">Acesso a benefícios curados e networking.</p>
-            <RouterLink to="/upgrade" class="block w-full py-2 text-center rounded-lg bg-secondary text-black font-bold text-sm hover:shadow-[0_0_15px_rgba(0,243,255,0.4)] transition-all">
-              Fazer Upgrade
-            </RouterLink>
-          </div>
-
-          <!-- Premium Plan -->
-          <div class="p-6 rounded-xl bg-primary/10 border border-primary/20">
-            <h3 class="text-white font-bold text-lg mb-2">Plano Premium</h3>
-            <p class="text-gray-400 text-sm mb-4">Todos os benefícios + acesso VIP.</p>
-            <RouterLink to="/upgrade" class="block w-full py-2 text-center rounded-lg bg-gradient-to-r from-primary to-secondary text-black font-bold text-sm hover:shadow-[0_0_20px_rgba(244,37,244,0.5)] transition-all">
-              Fazer Upgrade
-            </RouterLink>
-          </div>
-        </div>
-      </div>
-    </Modal>
   </AppLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import BenefitCard from '@/components/features/benefits/BenefitCard.vue'
 import BenefitCardFeatured from '@/components/features/benefits/BenefitCardFeatured.vue'
-import Modal from '@/components/ui/Modal.vue'
 import InteractiveGridPattern from '@/components/ui/InteractiveGridPattern.vue'
 import { useBenefits } from '@/composables/useBenefits'
-import { useUserStore } from '@/stores/user'
 import { toast } from 'vue-sonner'
 
-const { benefits, loading, fetchBenefits, fetchUserBenefits, claimBenefit, isBenefitClaimed, canClaimBenefit } = useBenefits()
-const userStore = useUserStore()
-const showUpgradeModal = ref(false)
+const { benefits, loading, fetchBenefits, fetchUserBenefits, claimBenefit, isBenefitClaimed } = useBenefits()
+const { t } = useI18n()
 const activeFilter = ref('all')
+const benefitsSection = ref<HTMLElement | null>(null)
 
-const userPlan = computed(() => userStore.profile?.plano || 'Free')
+function scrollToBenefits() {
+  if (benefitsSection.value) {
+    benefitsSection.value.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    })
+  }
+}
 
-const filters = [
-  { id: 'all', label: 'Todos', icon: '' },
-  { id: 'business', label: 'Negócios', icon: 'business_center' },
-  { id: 'lifestyle', label: 'Lifestyle', icon: 'flight_takeoff' },
-  { id: 'events', label: 'Eventos', icon: 'event_seat' },
-  { id: 'health', label: 'Saúde', icon: 'health_and_safety' }
-]
+const filters = computed(() => [
+  { id: 'all', label: t('navigation.allCategories'), icon: '' },
+  { id: 'business', label: t('benefits.filterBusiness'), icon: 'business_center' },
+  { id: 'lifestyle', label: t('benefits.filterLifestyle'), icon: 'flight_takeoff' },
+  { id: 'events', label: t('benefits.filterEvents'), icon: 'event_seat' },
+  { id: 'health', label: t('benefits.filterHealth'), icon: 'health_and_safety' }
+])
 
 const filteredBenefits = computed(() => {
   if (activeFilter.value === 'all') return benefits.value
@@ -251,9 +220,9 @@ const otherBenefits = computed(() => {
 async function handleClaimBenefit(benefitId: string) {
   const success = await claimBenefit(benefitId)
   if (success) {
-    toast.success('Benefício resgatado com sucesso! Nossa equipe entrará em contato em breve.')
+    toast.success(t('benefits.claimSuccess'))
   } else {
-    toast.error('Erro ao resgatar benefício. Tente novamente.')
+    toast.error(t('benefits.claimError'))
   }
 }
 

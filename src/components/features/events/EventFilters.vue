@@ -18,6 +18,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
 interface Filter {
   id: string
   label: string
@@ -28,18 +31,19 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const { t } = useI18n()
 
 defineEmits<{
   'filter-change': [filter: string]
 }>()
 
-const filters: Filter[] = [
-  { id: 'all', label: 'Todos' },
-  { id: 'networking', label: 'Networking' },
-  { id: 'showcase', label: 'Showcase' },
-  { id: 'workshop', label: 'Workshop' },
-  { id: 'social', label: 'Social' },
-]
+const filters = computed<Filter[]>(() => [
+  { id: 'all', label: t('events.filterAll') },
+  { id: 'networking', label: t('events.filterNetworking') },
+  { id: 'showcase', label: t('events.filterShowcase') },
+  { id: 'workshop', label: t('events.filterWorkshop') },
+  { id: 'social', label: t('events.filterSocial') },
+])
 
 function getButtonClass(filterId: string): string {
   if (filterId === props.activeFilter) {
