@@ -17,23 +17,16 @@
         
         <!-- Badge -->
         <span 
-          v-if="!isLocked && !isClaimed"
+          v-if="!isClaimed"
           class="text-xs font-bold bg-primary/20 border border-primary text-primary px-3 py-1 rounded-full shadow-[0_0_10px_rgba(244,37,244,0.3)]"
         >
           {{ badgeText }}
         </span>
         <span 
-          v-else-if="isClaimed"
+          v-else
           class="text-xs font-bold bg-emerald-500/20 border border-emerald-500 text-emerald-400 px-3 py-1 rounded-full"
         >
           Resgatado
-        </span>
-        <span 
-          v-else-if="isLocked"
-          class="text-xs font-bold bg-white/10 border border-white/20 text-white/60 px-3 py-1 rounded-full flex items-center gap-1"
-        >
-          <span class="material-symbols-outlined text-[14px]">lock</span>
-          {{ benefit.plano_requerido }}
         </span>
       </div>
       
@@ -41,22 +34,6 @@
         <h4 class="text-xl font-bold text-white group-hover:text-primary transition-colors">{{ benefit.nome }}</h4>
         <p class="text-sm text-gray-300 mt-1 line-clamp-2">{{ benefit.descricao }}</p>
       </div>
-      
-      <!-- Botão/Ação -->
-      <button
-        v-if="!isClaimed && !isLocked"
-        @click="$emit('claim')"
-        class="mt-2 w-full py-2 rounded-lg bg-primary/20 border border-primary/40 text-primary font-bold text-sm hover:bg-primary hover:text-white transition-all"
-      >
-        Resgatar Agora
-      </button>
-      <button
-        v-else-if="isLocked"
-        @click="$emit('upgrade')"
-        class="mt-2 w-full py-2 rounded-lg bg-white/5 border border-white/10 text-white/60 font-bold text-sm hover:bg-white/10 transition-all"
-      >
-        Fazer Upgrade
-      </button>
     </div>
   </div>
 </template>
@@ -68,17 +45,14 @@ import type { Benefit } from '@/types/benefits'
 interface Props {
   benefit: Benefit
   isClaimed?: boolean
-  isLocked?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  isClaimed: false,
-  isLocked: false
+  isClaimed: false
 })
 
 defineEmits<{
   claim: []
-  upgrade: []
 }>()
 
 const badgeText = computed(() => {

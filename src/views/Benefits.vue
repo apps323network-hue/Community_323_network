@@ -39,13 +39,9 @@
           <!-- Botões -->
           <div class="flex flex-wrap gap-4 pt-2">
             <button 
-              @click="showUpgradeModal = true"
-              class="flex items-center justify-center gap-2 rounded-lg bg-[#f425f4] hover:brightness-110 transition-all h-12 px-8 text-white text-base font-bold"
+              @click="scrollToBenefits"
+              class="flex items-center justify-center gap-2 rounded-lg bg-transparent hover:bg-white/5 border border-white/20 hover:border-white/40 transition-all h-12 px-8 text-white text-base font-medium group"
             >
-              <span class="material-symbols-outlined text-[20px]">diamond</span>
-              <span>Tornar-se VIP</span>
-            </button>
-            <button class="flex items-center justify-center gap-2 rounded-lg bg-transparent hover:bg-white/5 border border-white/20 hover:border-white/40 transition-all h-12 px-8 text-white text-base font-medium group">
               <span>Ver todos</span>
               <span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </button>
@@ -54,7 +50,7 @@
       </div>
 
       <!-- Filtros -->
-      <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b border-border-dark pb-6">
+      <div ref="benefitsSection" class="flex flex-col md:flex-row justify-between items-center gap-4 border-b border-border-dark pb-6">
         <div class="flex gap-3 overflow-x-auto pb-2 md:pb-0 max-w-full no-scrollbar">
           <button 
             v-for="filter in filters" 
@@ -106,9 +102,7 @@
               :key="benefit.id"
               :benefit="benefit"
               :is-claimed="isBenefitClaimed(benefit.id)"
-              :is-locked="!canClaimBenefit(benefit, userPlan)"
               @claim="handleClaimBenefit(benefit.id)"
-              @upgrade="showUpgradeModal = true"
             />
           </div>
         </section>
@@ -129,13 +123,11 @@
               :key="benefit.id"
               :benefit="benefit"
               :is-claimed="isBenefitClaimed(benefit.id)"
-              :is-locked="!canClaimBenefit(benefit, userPlan)"
               @claim="handleClaimBenefit(benefit.id)"
-              @upgrade="showUpgradeModal = true"
             />
             
             <!-- Card "Sugerir Parceiro" -->
-            <div class="bg-[#1a0a1f] p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-colors flex flex-col items-center justify-center gap-4 group cursor-pointer text-center h-full">
+            <!-- <div class="bg-[#1a0a1f] p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-colors flex flex-col items-center justify-center gap-4 group cursor-pointer text-center h-full">
               <div class="size-16 rounded-full bg-[#6b1d6b]/30 flex items-center justify-center group-hover:bg-[#6b1d6b]/50 text-gray-300 group-hover:text-white transition-all duration-300">
                 <span class="material-symbols-outlined text-[32px]">add</span>
               </div>
@@ -143,7 +135,7 @@
                 <h5 class="text-lg font-bold text-white mb-1">Sugerir Parceiro</h5>
                 <p class="text-sm text-gray-500">Sentiu falta de algo? Indique uma empresa.</p>
               </div>
-            </div>
+            </div> -->
           </div>
         </section>
 
@@ -177,34 +169,6 @@
       </template>
     </div>
 
-    <!-- Modal de Upgrade -->
-    <Modal v-model="showUpgradeModal" title="Desbloqueie Benefícios Premium">
-      <div class="space-y-6">
-        <p class="text-gray-300 text-sm">
-          Faça upgrade do seu plano para acessar benefícios exclusivos e impulsionar ainda mais sua jornada nos Estados Unidos.
-        </p>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Member Plan -->
-          <div class="p-6 rounded-xl bg-secondary/10 border border-secondary/20">
-            <h3 class="text-white font-bold text-lg mb-2">Plano Member</h3>
-            <p class="text-gray-400 text-sm mb-4">Acesso a benefícios curados e networking.</p>
-            <RouterLink to="/upgrade" class="block w-full py-2 text-center rounded-lg bg-secondary text-black font-bold text-sm hover:shadow-[0_0_15px_rgba(0,243,255,0.4)] transition-all">
-              Fazer Upgrade
-            </RouterLink>
-          </div>
-
-          <!-- Premium Plan -->
-          <div class="p-6 rounded-xl bg-primary/10 border border-primary/20">
-            <h3 class="text-white font-bold text-lg mb-2">Plano Premium</h3>
-            <p class="text-gray-400 text-sm mb-4">Todos os benefícios + acesso VIP.</p>
-            <RouterLink to="/upgrade" class="block w-full py-2 text-center rounded-lg bg-gradient-to-r from-primary to-secondary text-black font-bold text-sm hover:shadow-[0_0_20px_rgba(244,37,244,0.5)] transition-all">
-              Fazer Upgrade
-            </RouterLink>
-          </div>
-        </div>
-      </div>
-    </Modal>
   </AppLayout>
 </template>
 
@@ -217,15 +181,20 @@ import BenefitCardFeatured from '@/components/features/benefits/BenefitCardFeatu
 import Modal from '@/components/ui/Modal.vue'
 import InteractiveGridPattern from '@/components/ui/InteractiveGridPattern.vue'
 import { useBenefits } from '@/composables/useBenefits'
-import { useUserStore } from '@/stores/user'
 import { toast } from 'vue-sonner'
 
-const { benefits, loading, fetchBenefits, fetchUserBenefits, claimBenefit, isBenefitClaimed, canClaimBenefit } = useBenefits()
-const userStore = useUserStore()
-const showUpgradeModal = ref(false)
+const { benefits, loading, fetchBenefits, fetchUserBenefits, claimBenefit, isBenefitClaimed } = useBenefits()
 const activeFilter = ref('all')
+const benefitsSection = ref<HTMLElement | null>(null)
 
-const userPlan = computed(() => userStore.profile?.plano || 'Free')
+function scrollToBenefits() {
+  if (benefitsSection.value) {
+    benefitsSection.value.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    })
+  }
+}
 
 const filters = [
   { id: 'all', label: 'Todos', icon: '' },

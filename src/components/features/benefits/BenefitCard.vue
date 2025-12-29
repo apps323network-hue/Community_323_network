@@ -27,24 +27,6 @@
         Resgatado
       </div>
       
-      <!-- Bloqueado -->
-      <button
-        v-else-if="isLocked"
-        @click="$emit('upgrade')"
-        class="mt-auto w-full py-2.5 rounded-lg bg-[#0f0515] border border-white/10 text-sm font-bold text-gray-400 hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all flex items-center justify-center gap-1"
-      >
-        <span class="material-symbols-outlined text-[16px]">lock</span>
-        Plano {{ benefit.plano_requerido }}
-      </button>
-      
-      <!-- Disponível -->
-      <button
-        v-else
-        @click="$emit('claim')"
-        class="mt-auto w-full py-2.5 rounded-lg bg-[#0f0515] border border-white/10 text-sm font-bold text-white group-hover:bg-primary group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(244,37,244,0.3)] transition-all"
-      >
-        Ver Detalhes
-      </button>
     </div>
   </div>
 </template>
@@ -56,17 +38,14 @@ import type { Benefit } from '@/types/benefits'
 interface Props {
   benefit: Benefit
   isClaimed?: boolean
-  isLocked?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  isClaimed: false,
-  isLocked: false
+  isClaimed: false
 })
 
 defineEmits<{
   claim: []
-  upgrade: []
 }>()
 
 // Map de ícones por tipo/categoria
