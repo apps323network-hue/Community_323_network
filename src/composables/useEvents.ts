@@ -12,6 +12,7 @@ export function useEvents() {
   const loading = computed(() => eventStore.loading)
   const error = computed(() => eventStore.error)
   const filters = computed(() => eventStore.filters)
+  const hasMore = computed(() => eventStore.hasMore)
   const upcomingEvents = computed(() => eventStore.upcomingEvents)
   const pastEvents = computed(() => eventStore.pastEvents)
 
@@ -56,6 +57,7 @@ export function useEvents() {
     loading,
     error,
     filters,
+    hasMore,
     upcomingEvents,
     pastEvents,
     // Actions

@@ -1,27 +1,27 @@
 <template>
   <AppLayout>
     <div v-if="loading && !event" class="flex justify-center items-center min-h-[60vh]">
-      <div class="text-white">Carregando evento...</div>
+      <div class="text-white">{{ t('common.loading') }}</div>
     </div>
 
     <div v-else-if="!event" class="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-      <h2 class="text-white text-2xl font-bold">Evento não encontrado</h2>
+      <h2 class="text-white text-2xl font-bold">{{ t('events.notFound') }}</h2>
       <button
         class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
         @click="router.push('/eventos')"
       >
-        Voltar para Eventos
+        {{ t('events.backToEvents') }}
       </button>
     </div>
 
-    <div v-else class="mx-auto max-w-4xl px-4 lg:px-10 py-6 space-y-8">
+    <div v-else class="mx-auto max-w-7xl px-4 lg:px-10 py-6 space-y-8">
       <!-- Back Button -->
       <button
         class="flex items-center gap-2 text-white/70 hover:text-white transition-colors"
         @click="router.push('/eventos')"
       >
         <span class="material-symbols-outlined">arrow_back</span>
-        Voltar para Eventos
+        {{ t('events.backToEvents') }}
       </button>
 
       <!-- Event Header -->
@@ -42,7 +42,7 @@
           <div class="inline-flex items-center gap-2 bg-black/40 backdrop-blur-md border border-secondary/50 rounded-full px-4 py-1 shadow-[0_0_10px_rgba(0,240,255,0.2)] mb-6">
             <span class="w-2 h-2 rounded-full bg-secondary animate-pulse shadow-[0_0_5px_#00f0ff]"></span>
             <span class="text-secondary text-xs font-bold uppercase tracking-wider">
-              {{ isPastEvent ? 'Evento Realizado' : 'Próximo Evento' }}
+              {{ isPastEvent ? t('events.eventFinished') : t('events.upcomingEvent') }}
             </span>
           </div>
           
@@ -82,7 +82,7 @@
               @click="handleConfirm"
             >
               <span class="material-symbols-outlined mr-2">check_circle</span>
-              Confirmar Presença
+              {{ t('events.confirmPresence') }}
             </button>
             <button
               v-else
@@ -90,11 +90,11 @@
               @click="handleCancel"
             >
               <span class="material-symbols-outlined mr-2">cancel</span>
-              Cancelar Confirmação
+              {{ t('events.cancelConfirmation') }}
             </button>
             <div class="flex items-center gap-2 text-white/60 text-sm">
               <span class="material-symbols-outlined">people</span>
-              <span>{{ event.confirmations_count || 0 }} confirmados</span>
+              <span>{{ event.confirmations_count || 0 }} {{ t('events.confirmed_count') }}</span>
             </div>
           </div>
 
@@ -107,7 +107,7 @@
               class="inline-flex items-center gap-2 px-6 py-3 bg-secondary/20 hover:bg-secondary/30 text-secondary border border-secondary rounded-lg font-bold transition-all"
             >
               <span class="material-symbols-outlined">play_circle</span>
-              Assistir Gravação
+              {{ t('events.watchRecording') }}
             </a>
           </div>
         </div>
@@ -115,38 +115,38 @@
 
       <!-- Event Information -->
       <div class="bg-surface-card rounded-xl p-8 border border-white/5">
-        <h2 class="text-white text-2xl font-bold mb-6">Informações do Evento</h2>
+        <h2 class="text-white text-2xl font-bold mb-6">{{ t('events.eventInfo') }}</h2>
         
         <div class="space-y-4">
           <div>
-            <h3 class="text-white/80 text-sm font-semibold mb-2">Data e Hora</h3>
+            <h3 class="text-white/80 text-sm font-semibold mb-2">{{ t('events.dateTimeLabel') }}</h3>
             <p class="text-white">{{ formattedFullDate }}</p>
           </div>
           
           <div v-if="event.local">
-            <h3 class="text-white/80 text-sm font-semibold mb-2">Local</h3>
+            <h3 class="text-white/80 text-sm font-semibold mb-2">{{ t('events.locationLabel') }}</h3>
             <p class="text-white">{{ event.local }}</p>
           </div>
           
           <div v-if="event.tipo === 'webinar'">
-            <h3 class="text-white/80 text-sm font-semibold mb-2">Formato</h3>
+            <h3 class="text-white/80 text-sm font-semibold mb-2">{{ t('events.formatLabel') }}</h3>
             <p class="text-white">Webinar Online (Zoom)</p>
           </div>
           
           <div v-if="event.descricao">
-            <h3 class="text-white/80 text-sm font-semibold mb-2">Descrição</h3>
+            <h3 class="text-white/80 text-sm font-semibold mb-2">{{ t('events.descriptionLabel') }}</h3>
             <p class="text-white leading-relaxed whitespace-pre-line">{{ event.descricao }}</p>
           </div>
         </div>
       </div>
 
-      <!-- Confirmed Attendees (Optional - can be expanded later) -->
+      <!-- Confirmed Attendees -->
       <div v-if="event.confirmations_count && event.confirmations_count > 0" class="bg-surface-card rounded-xl p-8 border border-white/5">
         <h2 class="text-white text-2xl font-bold mb-4">
-          Confirmados ({{ event.confirmations_count }})
+          {{ t('events.confirmedLabel') }} ({{ event.confirmations_count }})
         </h2>
         <p class="text-white/60">
-          {{ event.confirmations_count }} pessoa{{ event.confirmations_count !== 1 ? 's' : '' }} confirmou{{ event.confirmations_count !== 1 ? 'ram' : '' }} presença neste evento.
+          {{ event.confirmations_count }} {{ event.confirmations_count === 1 ? t('events.personConfirmed') : t('events.peopleConfirmed') }}
         </p>
       </div>
 
@@ -168,10 +168,10 @@
                 </div>
               </div>
               <h2 class="text-white text-3xl lg:text-4xl font-black mb-4">
-                Continue sua <span class="bg-clip-text text-transparent bg-neon-gradient">Jornada</span>
+                {{ t('events.continueYour') }} <span class="neon-text-gradient">{{ t('events.journey') }}</span>
               </h2>
               <p class="text-white/80 text-lg leading-relaxed max-w-2xl mb-6">
-                O evento terminou, mas sua jornada continua! Explore nossos serviços exclusivos para membros e acelere seu crescimento nos EUA.
+                {{ t('events.postEventMessage') }}
               </p>
               <div class="flex flex-wrap gap-4 justify-center lg:justify-start">
                 <button
@@ -179,14 +179,14 @@
                   class="flex items-center justify-center gap-2 px-8 py-4 bg-neon-gradient hover:bg-neon-gradient-hover text-black text-base font-black rounded-lg transition-all shadow-[0_0_20px_rgba(244,37,244,0.4)] hover:shadow-[0_0_30px_rgba(0,240,255,0.6)] transform hover:-translate-y-1"
                 >
                   <span class="material-symbols-outlined">explore</span>
-                  Explorar Serviços
+                  {{ t('events.exploreServices') }}
                 </button>
                 <button
                   @click="router.push('/eventos')"
                   class="flex items-center justify-center gap-2 px-8 py-4 bg-surface-card hover:bg-surface-highlight text-white border border-white/10 hover:border-secondary rounded-lg font-bold transition-all"
                 >
                   <span class="material-symbols-outlined">event</span>
-                  Ver Próximos Eventos
+                  {{ t('events.viewUpcoming') }}
                 </button>
               </div>
             </div>
@@ -206,10 +206,10 @@
                     </div>
                     <div class="flex-1">
                       <h3 class="text-white font-bold text-sm mb-1 group-hover:text-primary transition-colors">
-                        {{ service.title }}
+                        {{ t(service.titleKey || '') }}
                       </h3>
                       <p class="text-white/60 text-xs line-clamp-2">
-                        {{ service.description }}
+                        {{ t(service.descriptionKey || '') }}
                       </p>
                     </div>
                   </div>
@@ -226,11 +226,13 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useEvents } from '@/composables/useEvents'
 import AppLayout from '@/components/layout/AppLayout.vue'
 
 const route = useRoute()
 const router = useRouter()
+const { t, locale } = useI18n()
 const { currentEvent, loading, getEventById, confirmEvent, cancelConfirmation } = useEvents()
 
 const event = computed(() => currentEvent.value)
@@ -240,26 +242,26 @@ const eventId = computed(() => route.params.id as string)
 const featuredServices = [
   {
     id: 1,
-    title: 'Abertura de Empresa',
-    description: 'Registre seu negócio nos EUA de forma legal e rápida.',
+    titleKey: 'services.businessOpening',
+    descriptionKey: 'services.businessOpeningDesc',
     icon: 'domain',
   },
   {
     id: 2,
-    title: 'Conta Bancária',
-    description: 'Abra sua conta Business 100% digital.',
+    titleKey: 'services.bankAccount',
+    descriptionKey: 'services.bankAccountDesc',
     icon: 'account_balance',
   },
   {
     id: 3,
-    title: 'Mentoria de Vistos',
-    description: 'Consultoria especializada com advogados.',
+    titleKey: 'services.visaMentorship',
+    descriptionKey: 'services.visaMentorshipDesc',
     icon: 'badge',
   },
   {
     id: 4,
-    title: 'Personal Branding',
-    description: 'Construa sua autoridade no mercado americano.',
+    titleKey: 'services.personalBranding',
+    descriptionKey: 'services.personalBrandingDesc',
     icon: 'fingerprint',
   },
 ]
@@ -272,7 +274,7 @@ const isPastEvent = computed(() => {
 const formattedDate = computed(() => {
   if (!event.value) return ''
   const date = new Date(event.value.data_hora)
-  return date.toLocaleDateString('pt-BR', {
+  return date.toLocaleDateString(locale.value, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -291,7 +293,7 @@ const formattedTime = computed(() => {
 const formattedFullDate = computed(() => {
   if (!event.value) return ''
   const date = new Date(event.value.data_hora)
-  return date.toLocaleString('pt-BR', {
+  return date.toLocaleString(locale.value, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -308,7 +310,7 @@ async function handleConfirm() {
     await getEventById(eventId.value)
   } catch (error) {
     console.error('Error confirming event:', error)
-    alert('Erro ao confirmar presença. Tente novamente.')
+    alert(t('errors.genericError'))
   }
 }
 
@@ -319,7 +321,7 @@ async function handleCancel() {
     await getEventById(eventId.value)
   } catch (error) {
     console.error('Error canceling confirmation:', error)
-    alert('Erro ao cancelar confirmação. Tente novamente.')
+    alert(t('errors.genericError'))
   }
 }
 
@@ -337,6 +339,13 @@ onMounted(async () => {
 
 .bg-neon-gradient-hover {
   background: linear-gradient(135deg, #d914d9 0%, #00cce6 100%);
+}
+
+.neon-text-gradient {
+  background: linear-gradient(135deg, #f425f4 0%, #00f0ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 </style>
 
