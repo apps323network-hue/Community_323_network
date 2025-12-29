@@ -31,6 +31,12 @@
         {{ service.descricao }}
       </p>
 
+      <!-- Price Section -->
+      <div v-if="service.preco" class="flex items-baseline gap-2 mb-4">
+        <span class="text-2xl font-bold text-white">{{ formatPrice(service.preco, service.moeda) }}</span>
+        <span class="text-xs text-gray-500 uppercase">{{ service.moeda || 'USD' }}</span>
+      </div>
+
       <!-- Benefit Section -->
       <div v-if="service.beneficio_membro" class="flex flex-col gap-1 sm:gap-1.5 p-2 sm:p-2.5 md:p-3 rounded-lg bg-secondary/5 border border-secondary/20 group-hover:bg-secondary/10 transition-colors">
         <div class="flex items-center gap-1 sm:gap-1.5 text-secondary">
@@ -45,10 +51,13 @@
 
     <!-- Button -->
     <button
-      class="mt-2 w-full rounded-lg border border-secondary/50 bg-transparent py-1.5 sm:py-2 md:py-2.5 text-center text-[10px] sm:text-xs md:text-sm font-bold text-secondary transition-all duration-300 group-hover:bg-secondary group-hover:text-black hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]"
+      class="mt-2 w-full rounded-lg py-2.5 text-center text-sm font-bold transition-all duration-300"
+      :class="service.preco 
+        ? 'bg-gradient-to-r from-primary to-secondary text-black hover:shadow-[0_0_20px_rgba(244,37,244,0.4)]' 
+        : 'border border-secondary/50 bg-transparent text-secondary group-hover:bg-secondary group-hover:text-black hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]'"
       @click="$emit('request-service', service)"
     >
-      Solicitar Atendimento
+      {{ service.preco ? 'Contratar Serviço' : 'Solicitar Atendimento' }}
     </button>
   </div>
 </template>
@@ -62,6 +71,8 @@ interface Service {
   beneficio_membro: string
   destaque: boolean
   parceiro_id: string
+  preco?: number
+  moeda?: string
 }
 
 defineProps<{
@@ -80,5 +91,13 @@ function getIcon(category: string) {
     case 'marketing': return 'campaign'
     default: return 'hub'
   }
+}
+
+function formatPrice(cents: number, currency: string = 'USD'): string {
+  const amount = cents / 100
+  if (currency === 'BRL') {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount)
+  }
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
 }
 </script>

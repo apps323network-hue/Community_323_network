@@ -37,6 +37,8 @@ export interface EventFilters {
   sortBy?: 'recent' | 'upcoming'
 }
 
+export type EventFilterType = 'all' | 'networking' | 'showcase' | 'workshop' | 'social'
+
 export interface EventCreateInput {
   titulo: string
   descricao?: string
