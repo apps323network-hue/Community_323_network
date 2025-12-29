@@ -8,11 +8,11 @@
             <span
               class="bg-clip-text text-transparent bg-gradient-to-r pl-1 from-blue-700 to-indigo-800 dark:from-secondary dark:to-blue-500"
             >
-              Comunidade
+              {{ t('members.title') }}
             </span>
           </h1>
           <p class="text-slate-600 pl-1 dark:text-gray-400 max-w-xl text-xs sm:text-sm md:text-base lg:text-lg">
-            Conecte-se com artistas, empreendedores e visionários brasileiros nos EUA.
+            {{ t('members.description') }}
           </p>
         </div>
         <div class="w-full lg:w-auto flex flex-row gap-3 sm:gap-4">
@@ -26,7 +26,7 @@
             <input
               v-model="searchQuery"
               class="block w-full  mt-1.5 pl-10 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 border border-slate-200 dark:border-secondary/50 rounded-lg sm:rounded-xl leading-5 bg-white dark:bg-[#0a040f] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] transition-all duration-300"
-              placeholder="Buscar por nome, área ou cidade..."
+              :placeholder="t('members.searchPlaceholder')"
               type="text"
               @input="handleSearch"
             />
@@ -38,7 +38,7 @@
             <span class="material-icons text-base sm:text-lg text-secondary group-hover:animate-pulse"
               >tune</span
             >
-            Filtros
+            {{ t('common.filters') }}
           </button>
         </div>
       </div>
@@ -60,12 +60,12 @@
         <div class="flex items-center justify-between mb-4 sm:mb-6 lg:mb-8">
           <h2 class="text-lg sm:text-xl md:text-2xl font-bold flex items-center gap-2 sm:gap-3 text-slate-900 dark:text-white">
             <span class="material-icons text-secondary text-base sm:text-lg md:text-xl">local_fire_department</span>
-            <span class="truncate">Em destaque</span>
+            <span class="truncate">{{ t('members.featuredMembers') }}</span>
           </h2>
           <a
             class="text-primary text-xs sm:text-sm font-semibold hover:text-slate-900 dark:hover:text-white hover:shadow-neon-blue transition-all px-2 sm:px-3 py-1 rounded-lg hover:bg-primary/20 cursor-pointer whitespace-nowrap flex-shrink-0"
           >
-            Ver todos
+            {{ t('members.seeFullCommunity') }}
           </a>
         </div>
 
@@ -90,7 +90,7 @@
         <!-- Empty State for Featured -->
         <div v-else class="text-center py-6 sm:py-8 lg:py-12">
           <p class="text-gray-400 text-xs sm:text-sm">
-            Nenhum membro em destaque ainda. Marque membros como favoritos para vê-los aqui!
+            {{ t('members.noMembersFoundDesc') }}
           </p>
         </div>
       </section>
@@ -99,7 +99,7 @@
       <section>
         <div class="flex items-center justify-between mb-4 sm:mb-6 gap-2">
           <h2 class="text-base sm:text-lg md:text-xl font-bold text-slate-900 dark:text-white tracking-tight truncate">
-            Todos os membros
+            {{ t('members.allMembers') }}
           </h2>
           <div class="flex gap-1 sm:gap-2 flex-shrink-0">
             <button
@@ -156,8 +156,8 @@
         <EmptyState
           v-if="!loading && allMembers.length === 0"
           icon="people"
-          title="Nenhum membro encontrado"
-          description="Tente ajustar os filtros de busca para encontrar mais membros."
+          :title="t('members.noMembersFound')"
+          :description="t('members.noMembersFoundDesc')"
         />
 
         <!-- Load More Button -->
@@ -166,7 +166,7 @@
             class="px-6 sm:px-8 py-3 sm:py-4 rounded-xl border border-white/10 text-gray-400 hover:border-primary hover:text-primary hover:bg-primary/5 hover:shadow-neon-blue transition-all duration-300 text-xs sm:text-sm font-bold tracking-wide uppercase"
             @click="loadMore"
           >
-            Carregar mais membros
+            {{ t('common.loadMore') }}
           </button>
         </div>
       </section>
@@ -177,6 +177,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import MemberFilters from '@/components/features/members/MemberFilters.vue'
 import MemberCard from '@/components/features/members/MemberCard.vue'
@@ -186,6 +187,7 @@ import { useBookmarks } from '@/composables/useBookmarks'
 import type { MemberFilters as MemberFiltersType, Member } from '@/types/members'
 
 const router = useRouter()
+const { t } = useI18n()
 const { members, loading, pagination, totalPages, fetchMembers } = useMembers()
 const { fetchBookmarkedMembers, fetchBookmarks } = useBookmarks()
 

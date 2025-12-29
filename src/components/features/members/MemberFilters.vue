@@ -8,7 +8,7 @@
       <input
         v-model="searchQuery"
         type="text"
-        placeholder="Buscar por nome, área ou cidade..."
+        :placeholder="t('members.searchPlaceholder')"
         class="block w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 border border-slate-200 dark:border-white/10 rounded-lg sm:rounded-xl bg-white dark:bg-surface-dark text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
         @input="debouncedSearch"
       />
@@ -22,7 +22,7 @@
         class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-700 dark:text-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all flex-1 sm:flex-none min-w-[140px]"
         @change="emitFilters"
       >
-        <option value="">Todas as áreas</option>
+        <option value="">{{ t('members.allAreas') }}</option>
         <option v-for="area in AREAS_ATUACAO" :key="area" :value="area">
           {{ area }}
         </option>
@@ -32,7 +32,7 @@
       <input
         v-model="filters.cidade"
         type="text"
-        placeholder="Cidade"
+        :placeholder="t('profile.city')"
         class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-gray-300 text-xs sm:text-sm placeholder-slate-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all w-28 sm:w-32 flex-1 sm:flex-none"
         @input="debouncedSearch"
       />
@@ -43,7 +43,7 @@
         class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-700 dark:text-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all flex-1 sm:flex-none min-w-[140px]"
         @change="emitFilters"
       >
-        <option value="">Todos os objetivos</option>
+        <option value="">{{ t('members.allGoals') }}</option>
         <option v-for="obj in OBJETIVOS" :key="obj" :value="obj">
           {{ obj }}
         </option>
@@ -55,7 +55,7 @@
         class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-700 dark:text-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all flex-1 sm:flex-none min-w-[120px]"
         @change="emitFilters"
       >
-        <option value="">Todos os planos</option>
+        <option value="">{{ t('members.allPlans') }}</option>
         <option value="Free">Free</option>
         <option value="Member">Member</option>
         <option value="Premium">Premium</option>
@@ -96,7 +96,7 @@
         class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-red-500/30 text-red-500 text-xs sm:text-sm font-medium hover:bg-red-500/10 transition-all w-full sm:w-auto"
         @click="clearFilters"
       >
-        Limpar filtros
+        {{ t('common.clearFilters') }}
       </button>
     </div>
   </div>
@@ -104,6 +104,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { AREAS_ATUACAO, OBJETIVOS } from '@/types/members'
 import type { MemberFilters } from '@/types/members'
 
@@ -120,6 +121,8 @@ const emit = defineEmits<{
   'update:modelValue': [filters: MemberFilters]
   'update:viewMode': [mode: 'grid' | 'list']
 }>()
+
+const { t } = useI18n()
 
 const searchQuery = ref(props.modelValue.search || '')
 const filters = ref<MemberFilters>({

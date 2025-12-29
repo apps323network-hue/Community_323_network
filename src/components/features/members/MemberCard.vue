@@ -43,7 +43,7 @@
         {{ member.nome }}
       </h3>
       <p class="text-xs sm:text-sm text-slate-500 dark:text-gray-400 truncate">
-        {{ member.area_atuacao || 'Membro' }} • {{ [member.cidade, member.pais].filter(Boolean).join(', ') }}
+        {{ member.area_atuacao || t('members.member') }} • {{ [member.cidade, member.pais].filter(Boolean).join(', ') }}
       </p>
     </div>
 
@@ -63,7 +63,7 @@
       >
         <div v-if="requesting" class="w-3 h-3 sm:w-4 sm:h-4 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div>
         <template v-else>
-          {{ connectionStatus === 'accepted' ? 'Conectado' : connectionStatus === 'pending' ? 'Pendente' : 'Conectar' }}
+          {{ connectionStatus === 'accepted' ? t('members.connected') : connectionStatus === 'pending' ? t('members.pending') : t('members.connect') }}
         </template>
       </button>
       <button
@@ -134,7 +134,7 @@
 
         <!-- Area/Role -->
         <p class="text-xs sm:text-sm text-secondary font-bold tracking-wide uppercase mb-2 sm:mb-3">
-          {{ member.area_atuacao || 'Membro' }}
+          {{ member.area_atuacao || t('members.member') }}
         </p>
 
         <!-- Description/Bio -->
@@ -174,7 +174,7 @@
             <template v-else>
                <span class="material-icons text-sm mr-1" v-if="connectionStatus === 'accepted'">check</span>
                <span class="material-icons text-sm mr-1" v-if="connectionStatus === 'pending'">schedule</span>
-               {{ connectionStatus === 'accepted' ? 'Conectado' : connectionStatus === 'pending' ? 'Pendente' : 'Conectar' }}
+               {{ connectionStatus === 'accepted' ? t('members.connected') : connectionStatus === 'pending' ? t('members.pending') : t('members.connect') }}
             </template>
           </button>
         </div>
@@ -185,6 +185,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Avatar from '@/components/ui/Avatar.vue'
 import BadgeDisplay from '@/components/ui/BadgeDisplay.vue'
 import { useBookmarks } from '@/composables/useBookmarks'
@@ -211,6 +212,7 @@ const emit = defineEmits<{
 
 const { isBookmarked, toggleBookmark, fetchBookmarks, loading: bookmarkLoading } = useBookmarks()
 const { sendConnectionRequest, getConnectionStatus } = useConnections()
+const { t } = useI18n()
 const authStore = useAuthStore()
 
 const connectionStatus = ref<string | null>(null)
@@ -237,7 +239,7 @@ async function handleToggleBookmark() {
 
 async function handleConnect() {
   if (!authStore.user) {
-    toast.error('Você precisa estar logado para conectar.')
+    toast.error(t('members.mustBeLoggedIn'))
     return
   }
   
@@ -254,8 +256,8 @@ async function handleConnect() {
       await supabase.from('notifications').insert({
         user_id: props.member.id,
         type: 'connection_request',
-        title: 'Nova solicitação de conexão',
-        content: `${authStore.user.user_metadata?.nome || 'Um membro'} quer se conectar com você.`,
+        title: t('members.newConnectionRequest'),
+        content: `${authStore.user.user_metadata?.nome || t('members.someMember')} ${t('members.wantsToConnect')}`,
         metadata: { requester_id: authStore.user.id }
       })
 
@@ -278,23 +280,23 @@ async function handleConnect() {
       if (memberEmail) {
         await sendConnectionRequestEmail(
           memberEmail,
-          props.member.nome || 'Membro',
-          authStore.user.user_metadata?.nome || 'Um membro'
+          props.member.nome || t('members.member'),
+          authStore.user.user_metadata?.nome || t('members.someMember')
         )
       }
 
-      toast.success('Solicitação de conexão enviada!')
+      toast.success(t('members.connectionRequestSent'))
     } else {
       if (error === 'Request already exists') {
         connectionStatus.value = 'pending'
-        toast.info('Solicitação já enviada anteriormente.')
+        toast.info(t('members.alreadySent'))
       } else {
-        toast.error('Erro ao conectar. Tente novamente.')
+        toast.error(t('members.errorConnecting'))
       }
     }
   } catch (err) {
     console.error(err)
-    toast.error('Erro ao processar solicitação.')
+    toast.error(t('members.errorProcessing'))
   } finally {
     requesting.value = false
   }
