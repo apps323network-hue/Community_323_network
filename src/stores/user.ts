@@ -43,31 +43,49 @@ export const useUserStore = defineStore('user', () => {
       const queryStartTime = performance.now()
       console.log('[USER] Executando query no Supabase...')
 
-      // Adicionar timeout de 5 segundos para evitar travamento
-      const queryPromise = supabase
+      // Verificar se o Supabase está configurado
+      if (!supabase) {
+        throw new Error('Cliente Supabase não está inicializado. Verifique as variáveis de ambiente.')
+      }
+
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single()
 
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout: fetchProfile demorou mais de 5 segundos')), 5000)
-      )
-
-      const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any
-
       const queryEndTime = performance.now()
       console.log(`[USER] Query completou em ${(queryEndTime - queryStartTime).toFixed(2)}ms`)
 
-      if (error) throw error
+      if (error) {
+        // Melhorar mensagem de erro
+        if (error.message?.includes('Failed to fetch')) {
+          console.error('[USER] Erro de conexão com Supabase:', {
+            message: error.message,
+            hint: 'Verifique: 1) URL do Supabase está correta? 2) Conexão com internet? 3) CORS configurado?',
+            code: error.code,
+          })
+          throw new Error('Erro de conexão com o servidor. Verifique sua conexão com a internet e as configurações do Supabase.')
+        }
+        throw error
+      }
 
       profile.value = data
       const fetchEndTime = performance.now()
       console.log(`[USER] fetchProfile completou em ${(fetchEndTime - fetchStartTime).toFixed(2)}ms`)
-    } catch (error) {
+    } catch (error: any) {
       const fetchErrorTime = performance.now()
-      console.error(`[USER] fetchProfile erro após ${(fetchErrorTime - fetchStartTime).toFixed(2)}ms:`, error)
+      const errorDetails = {
+        message: error?.message || 'Erro desconhecido',
+        details: error?.stack || error?.toString(),
+        hint: error?.hint || '',
+        code: error?.code || '',
+      }
+      console.error(`[USER] fetchProfile erro após ${(fetchErrorTime - fetchStartTime).toFixed(2)}ms:`, errorDetails)
+      
       // Não bloquear se houver erro - apenas logar
+      // Mas definir profile como null para evitar estados inconsistentes
+      profile.value = null
     } finally {
       loading.value = false
     }

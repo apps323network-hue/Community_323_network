@@ -74,5 +74,98 @@ export interface PostStats {
   removedToday: number
 }
 
+export interface AdminService {
+  id: string
+  nome: string
+  descricao?: string
+  parceiro_id?: string
+  categoria?: string
+  beneficio_membro?: string
+  destaque: boolean
+  ativo: boolean
+  preco?: number
+  moeda?: 'USD' | 'BRL'
+  created_at: string
+  updated_at?: string
+  partner_name?: string
+}
+
+export interface ServiceStats {
+  total: number
+  active: number
+  inactive: number
+  featured: number
+}
+
+export interface BannedWord {
+  id: string
+  word: string
+  category: 'spam' | 'ofensivo' | 'outro'
+  action: 'block' | 'warn' | 'replace'
+  created_by: string
+  created_at: string
+  updated_at?: string
+}
+
+export interface BannedWordStats {
+  total: number
+  byCategory: Record<string, number>
+  byAction: Record<string, number>
+}
+
+export interface BannedWordCheck {
+  found: boolean
+  words: Array<{ word: string; category: string; action: string }>
+  action: 'block' | 'warn' | 'replace' | null
+  sanitizedContent?: string
+}
+
+export type ReportReason = 'spam' | 'inappropriate' | 'harassment' | 'fake_news' | 'other'
+export type ReportStatus = 'pending' | 'reviewed' | 'resolved' | 'dismissed'
+export type ReportItemType = 'post' | 'comment' | 'user'
+
+export interface Report {
+  id: string
+  reported_by: string
+  reported_item_type: ReportItemType
+  reported_item_id: string
+  reason: ReportReason
+  description?: string
+  status: ReportStatus
+  resolved_by?: string
+  resolved_at?: string
+  created_at: string
+  updated_at?: string
+  // Joined data
+  reporter_name?: string
+  reporter_email?: string
+  resolver_name?: string
+  reported_item?: any // Post, Comment ou User dependendo do tipo
+}
+
+export interface ReportStats {
+  total: number
+  pending: number
+  reviewed: number
+  resolved: number
+  dismissed: number
+  byType: Record<ReportItemType, number>
+  byReason: Record<ReportReason, number>
+  resolvedToday: number
+}
+
+export interface ReportCreateInput {
+  reported_item_type: ReportItemType
+  reported_item_id: string
+  reason: ReportReason
+  description?: string
+}
+
+export interface ReportResolveInput {
+  action: 'remove_content' | 'suspend_user' | 'ban_user' | 'add_strike' | 'dismiss'
+  details?: string
+  add_strike?: boolean
+}
+
 
 

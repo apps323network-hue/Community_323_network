@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from './auth'
-import type { AdminEvent, EventStats, EventApprovalAction, AdminUser, UserStats, UserStatus, AdminPost, PostStats } from '@/types/admin'
+import { checkBannedWords, invalidateBannedWordsCache } from '@/lib/bannedWords'
+import type { AdminEvent, EventStats, EventApprovalAction, AdminUser, UserStats, UserStatus, AdminPost, PostStats, AdminService, ServiceStats, BannedWord, BannedWordStats, Report, ReportStats, ReportCreateInput, ReportResolveInput, ReportStatus, ReportItemType } from '@/types/admin'
 import type { EventStatus } from '@/types/events'
 import type { PostStatus } from '@/types/posts'
 
@@ -36,6 +37,30 @@ export const useAdminStore = defineStore('admin', () => {
     spam: 0,
     removedToday: 0,
   })
+  const allServices = ref<AdminService[]>([])
+  const serviceStats = ref<ServiceStats>({
+    total: 0,
+    active: 0,
+    inactive: 0,
+    featured: 0,
+  })
+  const bannedWords = ref<BannedWord[]>([])
+  const bannedWordStats = ref<BannedWordStats>({
+    total: 0,
+    byCategory: {},
+    byAction: {},
+  })
+  const reports = ref<Report[]>([])
+  const reportStats = ref<ReportStats>({
+    total: 0,
+    pending: 0,
+    reviewed: 0,
+    resolved: 0,
+    dismissed: 0,
+    byType: { post: 0, comment: 0, user: 0 },
+    byReason: { spam: 0, inappropriate: 0, harassment: 0, fake_news: 0, other: 0 },
+    resolvedToday: 0,
+  })
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -65,22 +90,44 @@ export const useAdminStore = defineStore('admin', () => {
     error.value = null
 
     try {
-      const { data, error: queryError } = await supabase
+      // Buscar eventos pendentes
+      const { data: eventsData, error: queryError } = await supabase
         .from('events')
-        .select(`
-          *,
-          creator:profiles!created_by(id, nome)
-        `)
+        .select('*')
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
 
       if (queryError) throw queryError
 
-      pendingEvents.value = (data || []).map((event: any) => ({
-        ...event,
-        creator_name: event.creator?.nome || 'Usuário',
-        partner_name: event.partner?.nome,
-      }))
+      if (!eventsData || eventsData.length === 0) {
+        pendingEvents.value = []
+        return
+      }
+
+      // Buscar profiles dos criadores
+      const creatorIds = [...new Set(eventsData.map((e: any) => e.created_by).filter(Boolean))]
+      let creatorsMap = new Map<string, any>()
+      
+      if (creatorIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, nome')
+          .in('id', creatorIds)
+
+        profilesData?.forEach((profile: any) => {
+          creatorsMap.set(profile.id, profile)
+        })
+      }
+
+      // Combinar eventos com profiles
+      pendingEvents.value = eventsData.map((event: any) => {
+        const creator = event.created_by ? creatorsMap.get(event.created_by) : null
+        return {
+          ...event,
+          creator_name: creator?.nome || 'Usuário',
+          partner_name: event.partner?.nome,
+        }
+      })
     } catch (err: any) {
       error.value = err.message
       console.error('Error fetching pending events:', err)
@@ -95,27 +142,49 @@ export const useAdminStore = defineStore('admin', () => {
     error.value = null
 
     try {
+      // Buscar eventos
       let query = supabase
         .from('events')
-        .select(`
-          *,
-          creator:profiles!created_by(id, nome)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
 
       if (statusFilter) {
         query = query.eq('status', statusFilter)
       }
 
-      const { data, error: queryError } = await query
+      const { data: eventsData, error: queryError } = await query
 
       if (queryError) throw queryError
 
-      allEvents.value = (data || []).map((event: any) => ({
-        ...event,
-        creator_name: event.creator?.nome || 'Usuário',
-        partner_name: event.partner?.nome,
-      }))
+      if (!eventsData || eventsData.length === 0) {
+        allEvents.value = []
+        return
+      }
+
+      // Buscar profiles dos criadores
+      const creatorIds = [...new Set(eventsData.map((e: any) => e.created_by).filter(Boolean))]
+      let creatorsMap = new Map<string, any>()
+      
+      if (creatorIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, nome')
+          .in('id', creatorIds)
+
+        profilesData?.forEach((profile: any) => {
+          creatorsMap.set(profile.id, profile)
+        })
+      }
+
+      // Combinar eventos com profiles
+      allEvents.value = eventsData.map((event: any) => {
+        const creator = event.created_by ? creatorsMap.get(event.created_by) : null
+        return {
+          ...event,
+          creator_name: creator?.nome || 'Usuário',
+          partner_name: event.partner?.nome,
+        }
+      })
     } catch (err: any) {
       error.value = err.message
       console.error('Error fetching all events:', err)
@@ -210,6 +279,49 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
+  // Criar novo evento (admin)
+  async function createEvent(eventData: { titulo: string; descricao?: string; data_hora: string; tipo: string; local?: string; status?: EventStatus; image_url?: string; partner_id?: string }) {
+    if (!authStore.user) {
+      throw new Error('Usuário não autenticado')
+    }
+
+    loading.value = true
+    error.value = null
+
+    try {
+      const { data, error: insertError } = await supabase
+        .from('events')
+        .insert({
+          titulo: eventData.titulo,
+          descricao: eventData.descricao || null,
+          data_hora: eventData.data_hora,
+          tipo: eventData.tipo,
+          local: eventData.local || null,
+          image_url: eventData.image_url || null,
+          status: eventData.status || 'approved', // Admin pode criar já aprovado
+          created_by: authStore.user.id,
+          partner_id: eventData.partner_id || null,
+        })
+        .select()
+        .single()
+
+      if (insertError) throw insertError
+
+      // Recarregar listas
+      await fetchPendingEvents()
+      await fetchAllEvents()
+      await fetchEventStats()
+
+      return data
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error creating event:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   // Buscar estatísticas de eventos
   async function fetchEventStats() {
     try {
@@ -254,13 +366,22 @@ export const useAdminStore = defineStore('admin', () => {
     error.value = null
 
     try {
+      console.log('[ADMIN] Buscando usuários pendentes...')
       const { data, error: queryError } = await supabase
         .from('profiles')
         .select('*')
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
 
-      if (queryError) throw queryError
+      if (queryError) {
+        console.error('[ADMIN] Erro ao buscar usuários pendentes:', queryError)
+        throw queryError
+      }
+
+      console.log(`[ADMIN] Usuários pendentes encontrados: ${data?.length || 0}`)
+      if (data && data.length > 0) {
+        console.log('[ADMIN] IDs dos usuários pendentes:', data.map((u: any) => ({ id: u.id, nome: u.nome, status: u.status })))
+      }
 
       pendingUsers.value = (data || []).map((profile: any) => ({
         ...profile,
@@ -319,6 +440,8 @@ export const useAdminStore = defineStore('admin', () => {
     error.value = null
 
     try {
+      console.log('[ADMIN] Aprovando usuário:', userId)
+      
       const { data, error: updateError } = await supabase
         .from('profiles')
         .update({
@@ -331,13 +454,15 @@ export const useAdminStore = defineStore('admin', () => {
         .select()
         .single()
 
-      if (updateError) throw updateError
-
-      // Atualizar lista local
-      const index = pendingUsers.value.findIndex(u => u.id === userId)
-      if (index !== -1) {
-        pendingUsers.value.splice(index, 1)
+      if (updateError) {
+        console.error('[ADMIN] Erro ao atualizar perfil:', updateError)
+        throw updateError
       }
+
+      console.log('[ADMIN] Usuário aprovado com sucesso:', data)
+
+      // Recarregar lista de pendentes para garantir sincronização
+      await fetchPendingUsers()
 
       // Atualizar stats
       await fetchUserStats()
@@ -441,23 +566,55 @@ export const useAdminStore = defineStore('admin', () => {
     error.value = null
 
     try {
-      const { data, error: queryError } = await supabase
+      // Buscar posts pendentes
+      const { data: postsData, error: queryError } = await supabase
         .from('posts')
-        .select(`
-          *,
-          author:profiles!user_id(id, nome, area_atuacao, avatar_url)
-        `)
+        .select('*')
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
 
-      if (queryError) throw queryError
+      if (queryError) {
+        console.error('[ADMIN] Erro ao buscar posts pendentes:', queryError)
+        throw queryError
+      }
 
-      pendingPosts.value = (data || []).map((post: any) => ({
-        ...post,
-        status: post.status || 'pending',
-        author_name: post.author?.nome || 'Usuário',
-        author_email: '',
-      })) as AdminPost[]
+      console.log('[ADMIN] Posts pendentes encontrados:', postsData?.length || 0)
+
+      if (!postsData || postsData.length === 0) {
+        pendingPosts.value = []
+        return
+      }
+
+      // Buscar profiles dos autores
+      const userIds = [...new Set(postsData.map((p: any) => p.user_id))]
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, nome, area_atuacao, avatar_url')
+        .in('id', userIds)
+
+      if (profilesError) {
+        console.error('[ADMIN] Erro ao buscar profiles:', profilesError)
+      }
+
+      // Criar mapa de profiles
+      const profilesMap = new Map<string, any>()
+      profilesData?.forEach((profile: any) => {
+        profilesMap.set(profile.id, profile)
+      })
+
+      // Combinar posts com profiles
+      pendingPosts.value = postsData.map((post: any) => {
+        const author = profilesMap.get(post.user_id)
+        return {
+          ...post,
+          status: post.status || 'pending',
+          author_name: author?.nome || 'Usuário',
+          author_email: '',
+          author: author || null,
+        } as AdminPost
+      })
+
+      console.log('[ADMIN] Posts pendentes processados:', pendingPosts.value.length)
     } catch (err: any) {
       error.value = err.message
       console.error('Error fetching pending posts:', err)
@@ -472,28 +629,49 @@ export const useAdminStore = defineStore('admin', () => {
     error.value = null
 
     try {
+      // Buscar posts
       let query = supabase
         .from('posts')
-        .select(`
-          *,
-          author:profiles!user_id(id, nome, area_atuacao, avatar_url)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
 
       if (statusFilter) {
         query = query.eq('status', statusFilter)
       }
 
-      const { data, error: queryError } = await query
+      const { data: postsData, error: queryError } = await query
 
       if (queryError) throw queryError
 
-      allPosts.value = (data || []).map((post: any) => ({
-        ...post,
-        status: post.status || 'pending',
-        author_name: post.author?.nome || 'Usuário',
-        author_email: '',
-      })) as AdminPost[]
+      if (!postsData || postsData.length === 0) {
+        allPosts.value = []
+        return
+      }
+
+      // Buscar profiles dos autores
+      const userIds = [...new Set(postsData.map((p: any) => p.user_id))]
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, nome, area_atuacao, avatar_url')
+        .in('id', userIds)
+
+      // Criar mapa de profiles
+      const profilesMap = new Map<string, any>()
+      profilesData?.forEach((profile: any) => {
+        profilesMap.set(profile.id, profile)
+      })
+
+      // Combinar posts com profiles
+      allPosts.value = postsData.map((post: any) => {
+        const author = profilesMap.get(post.user_id)
+        return {
+          ...post,
+          status: post.status || 'pending',
+          author_name: author?.nome || 'Usuário',
+          author_email: '',
+          author: author || null,
+        } as AdminPost
+      })
     } catch (err: any) {
       error.value = err.message
       console.error('Error fetching all posts:', err)
@@ -739,6 +917,65 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
+  // Criar novo post (admin)
+  async function createPost(postData: { conteudo: string; tipo: string; status?: PostStatus; image_url?: string }) {
+    if (!authStore.user) {
+      throw new Error('Usuário não autenticado')
+    }
+
+    const wasLoading = loading.value
+    loading.value = true
+    error.value = null
+
+    try {
+      console.log('[ADMIN] Criando post:', { tipo: postData.tipo, status: postData.status, hasImage: !!postData.image_url })
+      
+      // Verificar palavras proibidas (admins podem criar mesmo assim, mas vamos avisar)
+      const bannedCheck = await checkBannedWords(postData.conteudo)
+      if (bannedCheck.found && bannedCheck.action === 'replace' && bannedCheck.sanitizedContent) {
+        // Se for replace, usar conteúdo sanitizado
+        postData.conteudo = bannedCheck.sanitizedContent
+      }
+      // Admins podem criar posts mesmo com palavras proibidas (não bloqueamos)
+      
+      const { data, error: insertError } = await supabase
+        .from('posts')
+        .insert({
+          user_id: authStore.user.id,
+          conteudo: postData.conteudo,
+          tipo: postData.tipo,
+          status: postData.status || 'approved', // Admin pode criar já aprovado
+          image_url: postData.image_url || null,
+        })
+        .select()
+        .single()
+
+      if (insertError) {
+        console.error('[ADMIN] Erro ao inserir post:', insertError)
+        throw insertError
+      }
+
+      console.log('[ADMIN] Post criado com sucesso, recarregando listas...')
+
+      // Recarregar listas em paralelo para ser mais rápido
+      await Promise.all([
+        fetchPendingPosts(),
+        fetchAllPosts(),
+        fetchPostStats()
+      ])
+
+      console.log('[ADMIN] Listas recarregadas com sucesso')
+
+      return data
+    } catch (err: any) {
+      error.value = err.message
+      console.error('[ADMIN] Error creating post:', err)
+      throw err
+    } finally {
+      loading.value = wasLoading
+    }
+  }
+
   // Buscar estatísticas de posts
   async function fetchPostStats() {
     try {
@@ -778,6 +1015,811 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
+  // ============================================
+  // FUNÇÕES DE GESTÃO DE SERVIÇOS
+  // ============================================
+
+  // Buscar todos os serviços
+  async function fetchAllServices() {
+    loading.value = true
+    error.value = null
+
+    try {
+      const { data: servicesData, error: queryError } = await supabase
+        .from('services')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (queryError) throw queryError
+
+      if (!servicesData || servicesData.length === 0) {
+        allServices.value = []
+        return
+      }
+
+      // Buscar nomes dos parceiros se houver
+      const partnerIds = [...new Set(servicesData.map((s: any) => s.parceiro_id).filter(Boolean))]
+      let partnersMap = new Map<string, any>()
+      
+      if (partnerIds.length > 0) {
+        const { data: partnersData } = await supabase
+          .from('partners')
+          .select('id, nome')
+          .in('id', partnerIds)
+
+        partnersData?.forEach((partner: any) => {
+          partnersMap.set(partner.id, partner)
+        })
+      }
+
+      // Combinar serviços com nomes dos parceiros
+      allServices.value = servicesData.map((service: any) => {
+        const partner = service.parceiro_id ? partnersMap.get(service.parceiro_id) : null
+        return {
+          ...service,
+          partner_name: partner?.nome,
+        } as AdminService
+      })
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error fetching services:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Criar serviço
+  async function createService(serviceData: Partial<AdminService>) {
+    if (!authStore.user) {
+      throw new Error('Usuário não autenticado')
+    }
+
+    loading.value = true
+    error.value = null
+
+    try {
+      // Clean up empty strings and convert to null
+      const cleanData: any = {
+        nome: serviceData.nome,
+        descricao: serviceData.descricao && serviceData.descricao.trim() ? serviceData.descricao : null,
+        parceiro_id: serviceData.parceiro_id && serviceData.parceiro_id.trim() ? serviceData.parceiro_id : null,
+        categoria: serviceData.categoria && serviceData.categoria.trim() ? serviceData.categoria : null,
+        beneficio_membro: serviceData.beneficio_membro && serviceData.beneficio_membro.trim() ? serviceData.beneficio_membro : null,
+        destaque: serviceData.destaque || false,
+        ativo: serviceData.ativo !== undefined ? serviceData.ativo : true,
+        preco: serviceData.preco && serviceData.preco > 0 ? serviceData.preco : null,
+        moeda: serviceData.moeda && (serviceData.moeda === 'USD' || serviceData.moeda === 'BRL') ? serviceData.moeda : 'USD',
+      }
+
+      const { data, error: insertError } = await supabase
+        .from('services')
+        .insert(cleanData)
+        .select()
+        .single()
+
+      if (insertError) {
+        console.error('[ADMIN] Erro ao criar serviço:', insertError)
+        throw insertError
+      }
+
+      // Atualizar lista
+      await fetchAllServices()
+      await fetchServiceStats()
+
+      return data
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error creating service:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Atualizar serviço
+  async function updateService(serviceId: string, updates: Partial<AdminService>) {
+    if (!authStore.user) {
+      throw new Error('Usuário não autenticado')
+    }
+
+    loading.value = true
+    error.value = null
+
+    try {
+      // Clean up empty strings and convert to null
+      const cleanData: any = {
+        updated_at: new Date().toISOString(),
+      }
+      
+      if (updates.nome !== undefined) cleanData.nome = updates.nome
+      if (updates.descricao !== undefined) {
+        cleanData.descricao = updates.descricao && updates.descricao.trim() ? updates.descricao : null
+      }
+      if (updates.parceiro_id !== undefined) {
+        cleanData.parceiro_id = updates.parceiro_id && updates.parceiro_id.trim() ? updates.parceiro_id : null
+      }
+      if (updates.categoria !== undefined) {
+        cleanData.categoria = updates.categoria && updates.categoria.trim() ? updates.categoria : null
+      }
+      if (updates.beneficio_membro !== undefined) {
+        cleanData.beneficio_membro = updates.beneficio_membro && updates.beneficio_membro.trim() ? updates.beneficio_membro : null
+      }
+      if (updates.destaque !== undefined) cleanData.destaque = updates.destaque
+      if (updates.ativo !== undefined) cleanData.ativo = updates.ativo
+      if (updates.preco !== undefined) {
+        cleanData.preco = updates.preco && updates.preco > 0 ? updates.preco : null
+      }
+      if (updates.moeda !== undefined) {
+        cleanData.moeda = updates.moeda && (updates.moeda === 'USD' || updates.moeda === 'BRL') ? updates.moeda : 'USD'
+      }
+
+      const { data, error: updateError } = await supabase
+        .from('services')
+        .update(cleanData)
+        .eq('id', serviceId)
+        .select()
+        .single()
+
+      if (updateError) {
+        console.error('[ADMIN] Erro ao atualizar serviço:', updateError)
+        throw updateError
+      }
+
+      // Atualizar lista
+      await fetchAllServices()
+      await fetchServiceStats()
+
+      return data
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error updating service:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Deletar serviço
+  async function deleteService(serviceId: string) {
+    if (!authStore.user) {
+      throw new Error('Usuário não autenticado')
+    }
+
+    loading.value = true
+    error.value = null
+
+    try {
+      const { error: deleteError } = await supabase
+        .from('services')
+        .delete()
+        .eq('id', serviceId)
+
+      if (deleteError) throw deleteError
+
+      // Atualizar lista
+      await fetchAllServices()
+      await fetchServiceStats()
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error deleting service:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Buscar estatísticas de serviços
+  async function fetchServiceStats() {
+    try {
+      const { data, error: queryError } = await supabase
+        .from('services')
+        .select('ativo, destaque')
+
+      if (queryError) throw queryError
+
+      const total = data?.length || 0
+      const active = data?.filter(s => s.ativo).length || 0
+      const inactive = data?.filter(s => !s.ativo).length || 0
+      const featured = data?.filter(s => s.destaque).length || 0
+
+      serviceStats.value = {
+        total,
+        active,
+        inactive,
+        featured,
+      }
+    } catch (err: any) {
+      console.error('Error fetching service stats:', err)
+    }
+  }
+
+  // ============================================
+  // BANNED WORDS MANAGEMENT
+  // ============================================
+
+  // Buscar todas as palavras proibidas
+  async function fetchBannedWords() {
+    loading.value = true
+    error.value = null
+
+    try {
+      const { data, error: queryError } = await supabase
+        .from('banned_words')
+        .select('*')
+        .order('word', { ascending: true })
+
+      if (queryError) throw queryError
+
+      bannedWords.value = data || []
+      
+      // Calcular estatísticas
+      const stats: BannedWordStats = {
+        total: data?.length || 0,
+        byCategory: {},
+        byAction: {},
+      }
+
+      data?.forEach(word => {
+        stats.byCategory[word.category] = (stats.byCategory[word.category] || 0) + 1
+        stats.byAction[word.action] = (stats.byAction[word.action] || 0) + 1
+      })
+
+      bannedWordStats.value = stats
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error fetching banned words:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Criar nova palavra proibida
+  async function createBannedWord(wordData: { word: string; category: 'spam' | 'ofensivo' | 'outro'; action: 'block' | 'warn' | 'replace' }) {
+    if (!authStore.user) {
+      throw new Error('Usuário não autenticado')
+    }
+
+    loading.value = true
+    error.value = null
+
+    try {
+      // Validar que palavra não está vazia
+      if (!wordData.word || !wordData.word.trim()) {
+        throw new Error('A palavra não pode estar vazia')
+      }
+
+      const { data, error: insertError } = await supabase
+        .from('banned_words')
+        .insert({
+          word: wordData.word.trim(),
+          category: wordData.category,
+          action: wordData.action,
+          created_by: authStore.user.id,
+        })
+        .select()
+        .single()
+
+      if (insertError) {
+        if (insertError.code === '23505') { // Unique violation
+          throw new Error('Esta palavra já está cadastrada')
+        }
+        throw insertError
+      }
+
+      // Invalidar cache
+      invalidateBannedWordsCache()
+
+      // Recarregar lista
+      await fetchBannedWords()
+
+      return data
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error creating banned word:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Atualizar palavra proibida
+  async function updateBannedWord(id: string, wordData: { word: string; category: 'spam' | 'ofensivo' | 'outro'; action: 'block' | 'warn' | 'replace' }) {
+    if (!authStore.user) {
+      throw new Error('Usuário não autenticado')
+    }
+
+    loading.value = true
+    error.value = null
+
+    try {
+      if (!wordData.word || !wordData.word.trim()) {
+        throw new Error('A palavra não pode estar vazia')
+      }
+
+      const { data, error: updateError } = await supabase
+        .from('banned_words')
+        .update({
+          word: wordData.word.trim(),
+          category: wordData.category,
+          action: wordData.action,
+        })
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (updateError) {
+        if (updateError.code === '23505') {
+          throw new Error('Esta palavra já está cadastrada')
+        }
+        throw updateError
+      }
+
+      // Invalidar cache
+      invalidateBannedWordsCache()
+
+      // Recarregar lista
+      await fetchBannedWords()
+
+      return data
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error updating banned word:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Deletar palavra proibida
+  async function deleteBannedWord(id: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const { error: deleteError } = await supabase
+        .from('banned_words')
+        .delete()
+        .eq('id', id)
+
+      if (deleteError) throw deleteError
+
+      // Invalidar cache
+      invalidateBannedWordsCache()
+
+      // Recarregar lista
+      await fetchBannedWords()
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error deleting banned word:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // ============================================
+  // REPORTS MANAGEMENT
+  // ============================================
+
+  // Buscar reports com filtros
+  async function fetchReports(filters?: { status?: ReportStatus; itemType?: ReportItemType; reason?: string }) {
+    loading.value = true
+    error.value = null
+
+    try {
+      let query = supabase
+        .from('reports')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (filters?.status) {
+        query = query.eq('status', filters.status)
+      }
+
+      if (filters?.itemType) {
+        query = query.eq('reported_item_type', filters.itemType)
+      }
+
+      if (filters?.reason) {
+        query = query.eq('reason', filters.reason)
+      }
+
+      const { data, error: queryError } = await query
+
+      if (queryError) throw queryError
+
+      if (!data || data.length === 0) {
+        reports.value = []
+        return
+      }
+
+      // Buscar informações dos reportadores e resolvedores
+      const reporterIds = [...new Set(data.map((r: any) => r.reported_by).filter(Boolean))]
+      const resolverIds = [...new Set(data.map((r: any) => r.resolved_by).filter(Boolean))]
+      const allUserIds = [...new Set([...reporterIds, ...resolverIds])]
+
+      let usersMap = new Map<string, any>()
+
+      if (allUserIds.length > 0) {
+        const { data: usersData } = await supabase
+          .from('profiles')
+          .select('id, nome, email')
+          .in('id', allUserIds)
+
+        if (usersData) {
+          usersData.forEach((user: any) => {
+            usersMap.set(user.id, user)
+          })
+        }
+      }
+
+      // Enriquecer reports com dados dos usuários
+      const enrichedReports: Report[] = data.map((report: any) => {
+        const reporter = usersMap.get(report.reported_by)
+        const resolver = report.resolved_by ? usersMap.get(report.resolved_by) : null
+
+        return {
+          ...report,
+          reporter_name: reporter?.nome || null,
+          reporter_email: reporter?.email || null,
+          resolver_name: resolver?.nome || null,
+        }
+      })
+
+      reports.value = enrichedReports
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error fetching reports:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Buscar report específico
+  async function fetchReportById(id: string): Promise<Report | null> {
+    loading.value = true
+    error.value = null
+
+    try {
+      const { data, error: queryError } = await supabase
+        .from('reports')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+      if (queryError) throw queryError
+
+      if (!data) return null
+
+      // Buscar informações dos usuários
+      const reporterId = data.reported_by
+      const resolverId = data.resolved_by
+
+      const userIds = [reporterId, resolverId].filter(Boolean) as string[]
+
+      let usersMap = new Map<string, any>()
+
+      if (userIds.length > 0) {
+        const { data: usersData } = await supabase
+          .from('profiles')
+          .select('id, nome, email')
+          .in('id', userIds)
+
+        if (usersData) {
+          usersData.forEach((user: any) => {
+            usersMap.set(user.id, user)
+          })
+        }
+      }
+
+      // Buscar item reportado
+      let reportedItem = null
+      if (data.reported_item_type === 'post') {
+        const { data: postData } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('id', data.reported_item_id)
+          .single()
+        reportedItem = postData
+      } else if (data.reported_item_type === 'comment') {
+        const { data: commentData } = await supabase
+          .from('post_comments')
+          .select('*')
+          .eq('id', data.reported_item_id)
+          .single()
+        reportedItem = commentData
+      } else if (data.reported_item_type === 'user') {
+        const { data: userData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', data.reported_item_id)
+          .single()
+        reportedItem = userData
+      }
+
+      const reporter = usersMap.get(reporterId)
+      const resolver = resolverId ? usersMap.get(resolverId) : null
+
+      return {
+        ...data,
+        reporter_name: reporter?.nome || null,
+        reporter_email: reporter?.email || null,
+        resolver_name: resolver?.nome || null,
+        reported_item: reportedItem,
+      }
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error fetching report:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Criar report
+  async function createReport(input: ReportCreateInput): Promise<Report> {
+    if (!authStore.user) {
+      throw new Error('Usuário não autenticado')
+    }
+
+    loading.value = true
+    error.value = null
+
+    try {
+      // Verificar se usuário já reportou este item
+      const { data: existingReport } = await supabase
+        .from('reports')
+        .select('id')
+        .eq('reported_by', authStore.user.id)
+        .eq('reported_item_type', input.reported_item_type)
+        .eq('reported_item_id', input.reported_item_id)
+        .eq('status', 'pending')
+        .single()
+
+      if (existingReport) {
+        throw new Error('Você já reportou este item. Aguarde a análise do administrador.')
+      }
+
+      const { data, error: insertError } = await supabase
+        .from('reports')
+        .insert({
+          reported_by: authStore.user.id,
+          reported_item_type: input.reported_item_type,
+          reported_item_id: input.reported_item_id,
+          reason: input.reason,
+          description: input.description || null,
+          status: 'pending',
+        })
+        .select()
+        .single()
+
+      if (insertError) throw insertError
+
+      // Recarregar lista se estiver em contexto admin
+      if (await checkIsAdmin()) {
+        await fetchReports()
+        await fetchReportStats()
+      }
+
+      return data
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error creating report:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Resolver report
+  async function resolveReport(id: string, input: ReportResolveInput): Promise<void> {
+    if (!authStore.user) {
+      throw new Error('Usuário não autenticado')
+    }
+
+    if (!(await checkIsAdmin())) {
+      throw new Error('Apenas admins podem resolver reports')
+    }
+
+    loading.value = true
+    error.value = null
+
+    try {
+      // Buscar report
+      const report = await fetchReportById(id)
+      if (!report) {
+        throw new Error('Report não encontrado')
+      }
+
+      // Executar ação baseada no tipo
+      if (input.action === 'remove_content') {
+        if (report.reported_item_type === 'post') {
+          await removePost(report.reported_item_id, input.details || 'Removido por report', input.add_strike || false)
+        } else if (report.reported_item_type === 'comment') {
+          // Remover comentário
+          const { error: deleteError } = await supabase
+            .from('post_comments')
+            .delete()
+            .eq('id', report.reported_item_id)
+
+          if (deleteError) throw deleteError
+
+          if (input.add_strike && report.reported_item) {
+            const commentUserId = (report.reported_item as any).user_id
+            if (commentUserId) {
+              await addStrikeToUser(commentUserId, input.details || 'Comentário removido por report')
+            }
+          }
+        }
+      } else if (input.action === 'suspend_user') {
+        const userId = report.reported_item_type === 'user' 
+          ? report.reported_item_id 
+          : (report.reported_item as any)?.user_id
+
+        if (userId) {
+          // Suspender por 7 dias por padrão
+          const suspendUntil = new Date()
+          suspendUntil.setDate(suspendUntil.getDate() + 7)
+          
+          await supabase
+            .from('profiles')
+            .update({
+              status: 'suspended',
+              suspended_until: suspendUntil.toISOString(),
+            })
+            .eq('id', userId)
+        }
+      } else if (input.action === 'ban_user') {
+        const userId = report.reported_item_type === 'user' 
+          ? report.reported_item_id 
+          : (report.reported_item as any)?.user_id
+
+        if (userId) {
+          await supabase
+            .from('profiles')
+            .update({
+              status: 'banned',
+            })
+            .eq('id', userId)
+        }
+      } else if (input.action === 'add_strike') {
+        const userId = report.reported_item_type === 'user' 
+          ? report.reported_item_id 
+          : (report.reported_item as any)?.user_id
+
+        if (userId) {
+          await addStrikeToUser(userId, input.details || 'Strike adicionado por report')
+        }
+      }
+
+      // Atualizar status do report
+      const { error: updateError } = await supabase
+        .from('reports')
+        .update({
+          status: 'resolved',
+          resolved_by: authStore.user.id,
+          resolved_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+
+      if (updateError) throw updateError
+
+      // Recarregar lista e estatísticas
+      await fetchReports()
+      await fetchReportStats()
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error resolving report:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Descartar report
+  async function dismissReport(id: string, reason?: string): Promise<void> {
+    if (!authStore.user) {
+      throw new Error('Usuário não autenticado')
+    }
+
+    if (!(await checkIsAdmin())) {
+      throw new Error('Apenas admins podem descartar reports')
+    }
+
+    loading.value = true
+    error.value = null
+
+    try {
+      const { error: updateError } = await supabase
+        .from('reports')
+        .update({
+          status: 'dismissed',
+          resolved_by: authStore.user.id,
+          resolved_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+
+      if (updateError) throw updateError
+
+      // Recarregar lista e estatísticas
+      await fetchReports()
+      await fetchReportStats()
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error dismissing report:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Buscar estatísticas de reports
+  async function fetchReportStats() {
+    loading.value = true
+    error.value = null
+
+    try {
+      const { data, error: queryError } = await supabase
+        .from('reports')
+        .select('*')
+
+      if (queryError) throw queryError
+
+      const stats: ReportStats = {
+        total: data?.length || 0,
+        pending: 0,
+        reviewed: 0,
+        resolved: 0,
+        dismissed: 0,
+        byType: { post: 0, comment: 0, user: 0 },
+        byReason: { spam: 0, inappropriate: 0, harassment: 0, fake_news: 0, other: 0 },
+        resolvedToday: 0,
+      }
+
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+
+      data?.forEach((report: any) => {
+        // Por status
+        if (report.status === 'pending') stats.pending++
+        else if (report.status === 'reviewed') stats.reviewed++
+        else if (report.status === 'resolved') {
+          stats.resolved++
+          // Resolvidos hoje
+          if (report.resolved_at) {
+            const resolvedDate = new Date(report.resolved_at)
+            if (resolvedDate >= today) {
+              stats.resolvedToday++
+            }
+          }
+        }
+        else if (report.status === 'dismissed') stats.dismissed++
+
+        // Por tipo
+        if (report.reported_item_type === 'post') stats.byType.post++
+        else if (report.reported_item_type === 'comment') stats.byType.comment++
+        else if (report.reported_item_type === 'user') stats.byType.user++
+
+        // Por motivo
+        if (report.reason === 'spam') stats.byReason.spam++
+        else if (report.reason === 'inappropriate') stats.byReason.inappropriate++
+        else if (report.reason === 'harassment') stats.byReason.harassment++
+        else if (report.reason === 'fake_news') stats.byReason.fake_news++
+        else if (report.reason === 'other') stats.byReason.other++
+      })
+
+      reportStats.value = stats
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error fetching report stats:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     pendingEvents,
     allEvents,
@@ -788,11 +1830,18 @@ export const useAdminStore = defineStore('admin', () => {
     pendingPosts,
     allPosts,
     postStats,
+    allServices,
+    serviceStats,
+    bannedWords,
+    bannedWordStats,
+    reports,
+    reportStats,
     loading,
     error,
     checkIsAdmin,
     fetchPendingEvents,
     fetchAllEvents,
+    createEvent,
     approveEvent,
     rejectEvent,
     fetchEventStats,
@@ -804,11 +1853,27 @@ export const useAdminStore = defineStore('admin', () => {
     fetchUserStats,
     fetchPendingPosts,
     fetchAllPosts,
+    createPost,
     approvePost,
     hidePost,
     removePost,
     markAsSpam,
     fetchPostStats,
+    fetchAllServices,
+    createService,
+    updateService,
+    deleteService,
+    fetchServiceStats,
+    fetchBannedWords,
+    createBannedWord,
+    updateBannedWord,
+    deleteBannedWord,
+    fetchReports,
+    fetchReportById,
+    createReport,
+    resolveReport,
+    dismissReport,
+    fetchReportStats,
   }
 })
 

@@ -64,6 +64,7 @@
             class="absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-surface-dark border border-slate-200 dark:border-white/10 shadow-2xl z-50 overflow-hidden"
             @click.stop
           >
+            <!-- Botão Deletar (apenas para posts próprios) -->
             <button
               v-if="isOwnPost"
               class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left"
@@ -72,9 +73,15 @@
               <span class="material-icons-outlined text-[20px]">delete</span>
               Deletar Post
             </button>
-            <div v-else class="px-4 py-2 text-xs text-gray-400">
-              Apenas o autor pode deletar
-            </div>
+            <!-- Botão Reportar (apenas para posts de outros usuários) -->
+            <button
+              v-if="!isOwnPost"
+              class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-500/10 transition-colors text-left"
+              @click="handleReport"
+            >
+              <span class="material-icons-outlined text-[20px]">report</span>
+              Reportar
+            </button>
           </div>
         </Transition>
       </div>
@@ -97,14 +104,31 @@
     </div>
 
     <!-- Post Image -->
-    <div v-if="post.image_url" class="mt-2 relative h-72 bg-gray-900 group overflow-hidden rounded-xl">
+    <div
+      v-if="post.image_url"
+      class="mt-2 relative h-72 bg-gray-900 group overflow-hidden rounded-xl cursor-pointer"
+      @click="showImageLightbox = true"
+    >
       <img
         :alt="'Imagem do post'"
         :src="post.image_url"
         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
       />
       <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+      <!-- Zoom Icon Overlay -->
+      <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <div class="bg-black/50 backdrop-blur-sm rounded-full p-3">
+          <span class="material-symbols-outlined text-white text-2xl">zoom_in</span>
+        </div>
+      </div>
     </div>
+
+    <!-- Image Lightbox -->
+    <ImageLightbox
+      v-model="showImageLightbox"
+      :image-url="post.image_url"
+      :alt="`Imagem do post de ${authorName}`"
+    />
 
     <!-- Post Actions -->
     <div class="px-6 py-4 border-t border-slate-200 dark:border-gray-800 flex justify-between items-center text-gray-400">
@@ -132,6 +156,14 @@
       </button>
     </div>
 
+    <!-- Report Modal -->
+    <ReportModal
+      v-model="showReportModal"
+      :item-type="'post'"
+      :item-id="post.id"
+      @reported="handleReportSubmitted"
+    />
+
     <!-- Comments Section -->
     <div v-if="showCommentsSection" class="border-t border-slate-200 dark:border-gray-800 bg-slate-50 dark:bg-surface-lighter">
       <div v-if="post.comments && post.comments.length > 0" class="px-6 pt-4 pb-2">
@@ -156,6 +188,8 @@ import Card from '@/components/ui/Card.vue'
 import Avatar from '@/components/ui/Avatar.vue'
 import Badge from '@/components/ui/Badge.vue'
 import PostComment from './PostComment.vue'
+import ImageLightbox from '@/components/ui/ImageLightbox.vue'
+import ReportModal from './ReportModal.vue'
 import { toast } from 'vue-sonner'
 import type { Post } from '@/types/posts'
 
@@ -182,21 +216,33 @@ const commentsLoaded = ref(false)
 const showCommentsSection = ref(props.showComments)
 const showMenu = ref(false)
 const menuContainer = ref<HTMLElement | null>(null)
+const showImageLightbox = ref(false)
+const showReportModal = ref(false)
 
-const isOwnPost = computed(() => authStore.user?.id === props.post.user_id)
+const isOwnPost = computed(() => {
+  const userId = authStore.user?.id
+  const postUserId = props.post.user_id
+  
+  // Garantir que ambos sejam strings e fazer comparação estrita
+  const result = userId && postUserId && String(userId).trim() === String(postUserId).trim()
+  
+  // Debug temporário - remover depois
+  if (showMenu.value) {
+    console.log('[PostCard] Menu aberto - Debug:', {
+      userId,
+      postUserId,
+      isOwnPost: result,
+      shouldShowReport: !result,
+      postId: props.post.id
+    })
+  }
+  
+  return result || false
+})
 
 // Debug: verificar status do post
 const isPendingPost = computed(() => {
   const result = isOwnPost.value && props.post.status === 'pending'
-  // Log temporário para debug
-  if (isOwnPost.value) {
-    console.log('[PostCard] Post do próprio usuário:', {
-      postId: props.post.id,
-      status: props.post.status,
-      isOwnPost: isOwnPost.value,
-      shouldShowBadge: result
-    })
-  }
   return result
 })
 
@@ -260,6 +306,15 @@ async function handleDelete() {
     console.error('Error deleting post:', error)
     toast.error('Erro ao deletar post. Tente novamente.')
   }
+}
+
+function handleReport() {
+  showReportModal.value = true
+  showMenu.value = false
+}
+
+function handleReportSubmitted() {
+  showReportModal.value = false
 }
 
 function handleClickOutside(event: MouseEvent) {

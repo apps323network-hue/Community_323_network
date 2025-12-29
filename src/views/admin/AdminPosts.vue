@@ -14,6 +14,17 @@
       <!-- Stats -->
       <PostStats :stats="postStats" />
 
+      <!-- Actions -->
+      <div class="flex justify-end mb-4">
+        <button
+          @click="showCreateModal = true"
+          class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-black font-bold rounded-lg hover:shadow-lg hover:shadow-primary/30 transition-all"
+        >
+          <span class="material-symbols-outlined">add</span>
+          <span class="hidden sm:inline">Novo Post</span>
+        </button>
+      </div>
+
       <!-- Tabs -->
       <div class="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar pb-1 border-b border-white/10">
         <button
@@ -81,6 +92,111 @@
           @spam="handleSpamFromView"
         />
       </Modal>
+
+      <!-- Create Post Modal -->
+      <Modal
+        v-model="showCreateModal"
+        title="Criar Novo Post"
+        size="lg"
+      >
+        <form @submit.prevent="handleCreatePost" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-white mb-2">Tipo *</label>
+            <select
+              v-model="newPostData.tipo"
+              required
+              class="w-full rounded-lg border border-white/10 bg-surface-dark p-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+            >
+              <option value="">Selecione...</option>
+              <option value="networking">Networking</option>
+              <option value="ofereco_servico">Ofereço Serviço</option>
+              <option value="procuro_ajuda">Procuro Ajuda</option>
+              <option value="oportunidade">Oportunidade</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-white mb-2">Conteúdo *</label>
+            <textarea
+              v-model="newPostData.conteudo"
+              rows="6"
+              required
+              class="w-full rounded-lg border border-white/10 bg-surface-dark p-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+              placeholder="Escreva o conteúdo do post..."
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-white mb-2">Imagem (Opcional)</label>
+            
+            <!-- Preview da imagem -->
+            <div v-if="imagePreview" class="mb-3 relative">
+              <img
+                :src="imagePreview"
+                alt="Preview"
+                class="w-full h-48 object-cover rounded-lg border border-white/10"
+              />
+              <button
+                type="button"
+                @click="removeImage"
+                class="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 rounded-full text-white transition-all"
+              >
+                <span class="material-symbols-outlined text-sm">close</span>
+              </button>
+            </div>
+
+            <!-- Input de arquivo -->
+            <label
+              v-if="!imagePreview"
+              class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/20 rounded-lg cursor-pointer bg-surface-dark hover:bg-surface-highlight hover:border-primary transition-all"
+            >
+              <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                <span class="material-symbols-outlined text-4xl text-white/60 mb-2">cloud_upload</span>
+                <p class="mb-2 text-sm text-white/60">
+                  <span class="font-semibold">Clique para fazer upload</span> ou arraste e solte
+                </p>
+                <p class="text-xs text-white/40">PNG, JPG ou WEBP (máx. 20MB)</p>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                class="hidden"
+                @change="handleImageSelect"
+              />
+            </label>
+          </div>
+
+          <div>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input
+                v-model="newPostData.status"
+                type="checkbox"
+                :true-value="'approved'"
+                :false-value="'pending'"
+                class="w-4 h-4 rounded border-white/10 bg-surface-dark text-primary focus:ring-primary"
+              />
+              <span class="text-sm text-white">Criar já aprovado</span>
+            </label>
+          </div>
+
+          <div class="flex gap-3 pt-4">
+            <button
+              type="submit"
+              :disabled="submitting"
+              class="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-black font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50"
+            >
+              {{ submitting ? 'Criando...' : 'Criar Post' }}
+            </button>
+            <button
+              type="button"
+              @click="showCreateModal = false"
+              class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white font-medium transition-all"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
     </AdminLayout>
 </template>
@@ -89,6 +205,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAdminStore } from '@/stores/admin'
+import { useAuthStore } from '@/stores/auth'
+import { supabase } from '@/lib/supabase'
 import AdminLayout from '@/components/layout/admin/AdminLayout.vue'
 import PostStats from '@/components/admin/PostStats.vue'
 import AdminPendingPostsList from '@/components/admin/AdminPendingPostsList.vue'
@@ -97,16 +215,31 @@ import PostModerationModal from '@/components/admin/PostModerationModal.vue'
 import AdminPostView from '@/components/admin/AdminPostView.vue'
 import Modal from '@/components/ui/Modal.vue'
 import type { AdminPost } from '@/types/admin'
+import type { PostStatus } from '@/types/posts'
 import { toast } from 'vue-sonner'
 
 const router = useRouter()
 const adminStore = useAdminStore()
+const authStore = useAuthStore()
 
 const activeTab = ref<'pending' | 'all' | 'hidden' | 'removed' | 'spam'>('pending')
 const showModerationModal = ref(false)
 const showPostViewModal = ref(false)
+const showCreateModal = ref(false)
+const submitting = ref(false)
 const selectedPost = ref<AdminPost | null>(null)
 const viewedPost = ref<AdminPost | null>(null)
+
+const newPostData = ref({
+  conteudo: '',
+  tipo: '',
+  status: 'approved' as PostStatus,
+  image_url: '',
+})
+
+const selectedImageFile = ref<File | null>(null)
+const imagePreview = ref<string | null>(null)
+const uploadingImage = ref(false)
 
 const tabs = computed(() => [
   {
@@ -289,6 +422,129 @@ function handleRemoveFromView(postId: string) {
 function handleSpamFromView(postId: string) {
   showPostViewModal.value = false
   handleSpam(postId)
+}
+
+function handleImageSelect(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  
+  if (!file) return
+
+  // Validar tipo de arquivo
+  if (!file.type.startsWith('image/')) {
+    toast.error('Por favor, selecione apenas arquivos de imagem')
+    return
+  }
+
+  // Validar tamanho (máximo 20MB)
+  if (file.size > 20 * 1024 * 1024) {
+    toast.error('A imagem deve ter no máximo 20MB')
+    return
+  }
+
+  selectedImageFile.value = file
+  
+  // Criar preview
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    imagePreview.value = e.target?.result as string
+  }
+  reader.readAsDataURL(file)
+}
+
+function removeImage() {
+  selectedImageFile.value = null
+  imagePreview.value = null
+  newPostData.value.image_url = ''
+}
+
+async function uploadImage(): Promise<string | null> {
+  if (!selectedImageFile.value || !authStore.user) return null
+
+  uploadingImage.value = true
+  try {
+    const fileExt = selectedImageFile.value.name.split('.').pop()
+    const fileName = `admin-${authStore.user.id}-${Date.now()}.${fileExt}`
+    const filePath = `posts/${fileName}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('post-images')
+      .upload(filePath, selectedImageFile.value, {
+        cacheControl: '3600',
+        upsert: false
+      })
+
+    if (uploadError) throw uploadError
+
+    // Obter URL pública
+    const { data: { publicUrl } } = supabase.storage
+      .from('post-images')
+      .getPublicUrl(filePath)
+
+    return publicUrl
+  } catch (err: any) {
+    console.error('Error uploading image:', err)
+    toast.error('Erro ao fazer upload da imagem. Tente novamente.')
+    return null
+  } finally {
+    uploadingImage.value = false
+  }
+}
+
+async function handleCreatePost() {
+  try {
+    submitting.value = true
+    console.log('[AdminPosts] Iniciando criação de post...')
+
+    // Upload da imagem se houver
+    let imageUrl: string | null = null
+    if (selectedImageFile.value) {
+      console.log('[AdminPosts] Fazendo upload da imagem...')
+      imageUrl = await uploadImage()
+      if (!imageUrl) {
+        console.error('[AdminPosts] Upload da imagem falhou')
+        submitting.value = false
+        return
+      }
+      console.log('[AdminPosts] Upload da imagem concluído:', imageUrl)
+    } else if (newPostData.value.image_url) {
+      // Se tiver URL manual, usar ela
+      imageUrl = newPostData.value.image_url
+    }
+
+    console.log('[AdminPosts] Criando post no store...', {
+      conteudo: newPostData.value.conteudo.substring(0, 50) + '...',
+      tipo: newPostData.value.tipo,
+      status: newPostData.value.status,
+      hasImage: !!imageUrl
+    })
+
+    const createdPost = await adminStore.createPost({
+      ...newPostData.value,
+      image_url: imageUrl || undefined,
+    })
+    
+    console.log('[AdminPosts] Post criado com sucesso:', createdPost?.id)
+    
+    toast.success('Post criado com sucesso!')
+    showCreateModal.value = false
+    
+    // Reset form
+    newPostData.value = {
+      conteudo: '',
+      tipo: '',
+      status: 'approved',
+      image_url: '',
+    }
+    selectedImageFile.value = null
+    imagePreview.value = null
+  } catch (error: any) {
+    console.error('[AdminPosts] Erro ao criar post:', error)
+    toast.error(error.message || 'Erro ao criar post')
+  } finally {
+    submitting.value = false
+    console.log('[AdminPosts] Finalizando criação de post')
+  }
 }
 
 onMounted(async () => {

@@ -19,6 +19,7 @@ DROP POLICY IF EXISTS "Users can delete own posts" ON public.posts;
 -- - Criador pode ver seu próprio post mesmo se 'pending' ou 'hidden'
 -- - Admins podem ver todos os posts
 -- - Posts 'removed' não são visíveis para ninguém (exceto admin)
+-- - Usuários autenticados podem ver posts aprovados (mesmo sem status='active' no perfil)
 CREATE POLICY "Posts viewable based on status"
   ON public.posts FOR SELECT
   USING (
@@ -32,8 +33,9 @@ CREATE POLICY "Posts viewable based on status"
     )
     OR
     (
-      -- Usuário ativo pode ver apenas posts aprovados
-      (SELECT status FROM public.profiles WHERE id = auth.uid()) = 'active'
+      -- Usuário autenticado pode ver posts aprovados
+      -- Não requer status='active' no perfil, apenas estar autenticado
+      auth.uid() IS NOT NULL
       AND status = 'approved'
     )
   );

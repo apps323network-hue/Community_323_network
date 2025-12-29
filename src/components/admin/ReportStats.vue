@@ -4,11 +4,11 @@
       <div class="flex items-center justify-between mb-4">
         <span class="text-white/70 text-sm font-medium">Total</span>
         <div class="p-2 bg-white/5 rounded-lg">
-          <span class="material-symbols-outlined text-white/50 text-xl">article</span>
+          <span class="material-symbols-outlined text-white/50 text-xl">report</span>
         </div>
       </div>
       <div class="text-4xl font-black text-white mb-1">{{ stats.total }}</div>
-      <div class="text-xs text-white/40">Posts publicados</div>
+      <div class="text-xs text-white/40">Reports recebidos</div>
     </div>
 
     <div class="bg-surface-dark rounded-xl p-6 border border-white/10 hover:border-white/20 transition-all group">
@@ -25,33 +25,33 @@
 
     <div class="bg-surface-dark rounded-xl p-6 border border-white/10 hover:border-white/20 transition-all group">
       <div class="flex items-center justify-between mb-4">
-        <span class="text-white/70 text-sm font-medium">Ocultos</span>
+        <span class="text-white/70 text-sm font-medium">Resolvidos Hoje</span>
         <div class="p-2 bg-white/5 rounded-lg">
-          <span class="material-symbols-outlined text-white/50 text-xl">visibility_off</span>
+          <span class="material-symbols-outlined text-white/50 text-xl">check_circle</span>
         </div>
       </div>
-      <div class="text-4xl font-black text-white mb-1">{{ stats.hidden }}</div>
-      <div class="text-xs text-white/40">Posts ocultos</div>
+      <div class="text-4xl font-black text-white mb-1">{{ stats.resolvedToday }}</div>
+      <div class="text-xs text-white/40">Resolvidos hoje</div>
     </div>
 
     <div class="bg-surface-dark rounded-xl p-6 border border-white/10 hover:border-white/20 transition-all group">
       <div class="flex items-center justify-between mb-4">
-        <span class="text-white/70 text-sm font-medium">Spam</span>
+        <span class="text-white/70 text-sm font-medium">Resolvidos</span>
         <div class="p-2 bg-white/5 rounded-lg">
-          <span class="material-symbols-outlined text-white/50 text-xl">report</span>
+          <span class="material-symbols-outlined text-white/50 text-xl">done_all</span>
         </div>
       </div>
-      <div class="text-4xl font-black text-white mb-1">{{ stats.spam }}</div>
-      <div class="text-xs text-white/40">Marcados como spam</div>
+      <div class="text-4xl font-black text-white mb-1">{{ stats.resolved }}</div>
+      <div class="text-xs text-white/40">Total resolvidos</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { PostStats } from '@/types/admin'
+import type { ReportStats } from '@/types/admin'
 
 interface Props {
-  stats: PostStats
+  stats: ReportStats
 }
 
 defineProps<Props>()

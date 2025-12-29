@@ -160,6 +160,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/user'
 import { usePosts } from '@/composables/usePosts'
 import { supabase } from '@/lib/supabase'
+import { checkBannedWords } from '@/lib/bannedWords'
 import Card from '@/components/ui/Card.vue'
 import Avatar from '@/components/ui/Avatar.vue'
 import Modal from '@/components/ui/Modal.vue'
@@ -276,7 +277,7 @@ async function uploadEventImage(): Promise<string | null> {
     const filePath = `events/${fileName}`
 
     const { error: uploadError } = await supabase.storage
-      .from('post-images')
+      .from('event-images')
       .upload(filePath, eventImageFile.value, {
         cacheControl: '3600',
         upsert: false
@@ -286,7 +287,7 @@ async function uploadEventImage(): Promise<string | null> {
 
     // Obter URL pública
     const { data: { publicUrl } } = supabase.storage
-      .from('post-images')
+      .from('event-images')
       .getPublicUrl(filePath)
 
     return publicUrl
@@ -388,6 +389,26 @@ async function handleCreateEvent() {
   error.value = null
 
   try {
+    // Verificar palavras proibidas em título e descrição
+    const titleCheck = await checkBannedWords(eventForm.value.titulo)
+    const descCheck = eventForm.value.descricao ? await checkBannedWords(eventForm.value.descricao) : { found: false, action: null, words: [] }
+    
+    // Bloquear qualquer palavra ofensiva encontrada
+    if (titleCheck.found) {
+      error.value = 'O título do evento contém palavras ofensivas. Por favor, revise o conteúdo.'
+      loading.value = false
+      return
+    }
+    
+    if (descCheck.found) {
+      error.value = 'A descrição do evento contém palavras ofensivas. Por favor, revise o conteúdo.'
+      loading.value = false
+      return
+    }
+    
+    let finalTitulo = eventForm.value.titulo
+    let finalDescricao = eventForm.value.descricao
+
     // Upload da imagem do evento se houver
     let eventImageUrl: string | null = null
     if (eventImageFile.value) {
@@ -401,8 +422,8 @@ async function handleCreateEvent() {
     const { data, error: eventError } = await supabase
       .from('events')
       .insert({
-        titulo: eventForm.value.titulo,
-        descricao: eventForm.value.descricao || null,
+        titulo: finalTitulo,
+        descricao: finalDescricao || null,
         data_hora: eventForm.value.data_hora,
         tipo: eventForm.value.tipo,
         local: eventForm.value.tipo === 'presencial' ? eventForm.value.local : null,

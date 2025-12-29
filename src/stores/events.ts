@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from './auth'
+import { checkBannedWords } from '@/lib/bannedWords'
 import type { Event, EventFilters, EventCreateInput } from '@/types/events'
 
 export const useEventStore = defineStore('events', () => {
@@ -422,11 +423,24 @@ export const useEventStore = defineStore('events', () => {
     error.value = null
 
     try {
+      // Verificar palavras proibidas em título e descrição
+      const titleCheck = await checkBannedWords(input.titulo)
+      const descCheck = input.descricao ? await checkBannedWords(input.descricao) : { found: false, action: null, words: [] }
+      
+      // Bloquear qualquer palavra ofensiva encontrada
+      if (titleCheck.found) {
+        throw new Error('O título do evento contém palavras ofensivas. Por favor, revise o conteúdo.')
+      }
+      
+      if (descCheck.found) {
+        throw new Error('A descrição do evento contém palavras ofensivas. Por favor, revise o conteúdo.')
+      }
+
       const { data, error: insertError } = await supabase
         .from('events')
         .insert({
-          titulo: input.titulo,
-          descricao: input.descricao || null,
+          titulo: finalTitulo,
+          descricao: finalDescricao || null,
           data_hora: input.data_hora,
           tipo: input.tipo,
           local: input.local || null,

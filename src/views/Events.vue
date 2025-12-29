@@ -177,8 +177,8 @@ async function handleEventClick(eventId: string) {
 async function handleConfirm(eventId: string) {
   try {
     await confirmEvent(eventId)
-    // Reload events to update confirmation counts
-    await loadEvents(currentFilters.value, false)
+    // Reload events to update confirmation counts - use reset=true to replace, not append
+    await loadEvents(currentFilters.value, true)
   } catch (error) {
     console.error('Error confirming event:', error)
     alert(t('events.errorConfirming'))
@@ -188,8 +188,8 @@ async function handleConfirm(eventId: string) {
 async function handleCancel(eventId: string) {
   try {
     await cancelConfirmation(eventId)
-    // Reload events to update confirmation counts
-    await loadEvents(currentFilters.value, false)
+    // Reload events to update confirmation counts - use reset=true to replace, not append
+    await loadEvents(currentFilters.value, true)
   } catch (error) {
     console.error('Error canceling confirmation:', error)
     alert(t('events.errorCanceling'))
