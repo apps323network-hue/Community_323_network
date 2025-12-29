@@ -109,14 +109,6 @@
               <td class="px-4 py-4">
                 <div class="flex items-center justify-end gap-2">
                   <button
-                    v-if="user.status === 'active'"
-                    class="p-2 text-orange-400 hover:bg-orange-500/20 rounded-lg transition-all"
-                    title="Suspender"
-                    @click="$emit('suspend', user.id)"
-                  >
-                    <span class="material-symbols-outlined text-base sm:text-lg">block</span>
-                  </button>
-                  <button
                     v-if="user.status !== 'banned'"
                     class="p-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-all"
                     title="Banir"

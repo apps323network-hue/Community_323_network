@@ -1750,12 +1750,9 @@ export const useAdminStore = defineStore('admin', () => {
           : (report.reported_item as any)?.user_id
 
         if (userId) {
-          await supabase
-            .from('profiles')
-            .update({
-              status: 'banned',
-            })
-            .eq('id', userId)
+          // Usar a função banUser para garantir rastreamento completo
+          const reason = input.details || `Banido por violação reportada (Report #${id})`
+          await banUser(userId, reason)
         }
       } else if (input.action === 'add_strike') {
         const userId = report.reported_item_type === 'user'
@@ -1786,11 +1783,11 @@ export const useAdminStore = defineStore('admin', () => {
       // Se foi removido conteúdo, emitir evento para atualizar feed
       if (input.action === 'remove_content') {
         // Disparar evento customizado para atualizar o feed
-        window.dispatchEvent(new CustomEvent('post-removed', { 
-          detail: { 
+        window.dispatchEvent(new CustomEvent('post-removed', {
+          detail: {
             itemId: report.reported_item_id,
             itemType: report.reported_item_type
-          } 
+          }
         }))
       }
     } catch (err: any) {
