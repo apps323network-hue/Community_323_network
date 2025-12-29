@@ -47,6 +47,7 @@ onMounted(async () => {
   await adminStore.fetchUserStats()
   await adminStore.fetchPostStats()
   await adminStore.fetchReportStats()
+  await adminStore.fetchChallengeStats()
 })
 
 const menuItems = computed(() => [
@@ -98,6 +99,13 @@ const menuItems = computed(() => [
     icon: 'report',
     badge: adminStore.reportStats.pending > 0 ? adminStore.reportStats.pending : undefined,
     badgeClass: 'bg-yellow-500/20 text-yellow-400',
+  },
+  {
+    path: '/admin/desafios',
+    label: 'Desafios',
+    icon: 'emoji_events',
+    badge: undefined,
+    badgeClass: '',
   },
 ])
 

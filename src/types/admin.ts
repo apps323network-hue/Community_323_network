@@ -167,5 +167,81 @@ export interface ReportResolveInput {
   add_strike?: boolean
 }
 
+export type ChallengeType = 'post' | 'comment' | 'event' | 'connection' | 'engagement' | 'other'
+export type PointsOrigin = 'challenge' | 'post' | 'comment' | 'event' | 'connection' | 'manual' | 'other'
+
+export interface Challenge {
+  id: string
+  nome: string
+  descricao?: string
+  tipo: ChallengeType
+  pontos: number
+  prazo?: string
+  ativo: boolean
+  created_by: string
+  created_at: string
+  updated_at?: string
+  // Joined data
+  creator_name?: string
+  total_participants?: number
+  total_completed?: number
+}
+
+export interface UserChallenge {
+  id: string
+  user_id: string
+  challenge_id: string
+  progresso: number
+  completado: boolean
+  completado_em?: string
+  created_at: string
+  updated_at?: string
+  // Joined data
+  user_name?: string
+  challenge?: Challenge
+}
+
+export interface UserPoint {
+  id: string
+  user_id: string
+  pontos: number
+  origem: PointsOrigin
+  origem_id?: string
+  descricao?: string
+  created_by?: string
+  created_at: string
+  // Joined data
+  user_name?: string
+  creator_name?: string
+}
+
+export interface ChallengeStats {
+  total: number
+  active: number
+  inactive: number
+  byType: Record<ChallengeType, number>
+  totalParticipants: number
+  totalCompleted: number
+  averagePoints: number
+}
+
+export interface ChallengeCreateInput {
+  nome: string
+  descricao?: string
+  tipo: ChallengeType
+  pontos: number
+  prazo?: string
+  ativo?: boolean
+}
+
+export interface ChallengeUpdateInput {
+  nome?: string
+  descricao?: string
+  tipo?: ChallengeType
+  pontos?: number
+  prazo?: string
+  ativo?: boolean
+}
+
 
 

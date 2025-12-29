@@ -168,6 +168,12 @@ const routes: RouteRecordRaw[] = [
       component: () => import('@/views/admin/AdminReports.vue'),
       meta: { requiresAuth: true, requiresRole: 'admin' },
     },
+    {
+      path: '/admin/desafios',
+      name: 'AdminChallenges',
+      component: () => import('@/views/admin/AdminChallenges.vue'),
+      meta: { requiresAuth: true, requiresRole: 'admin' },
+    },
   {
     path: '/parceiro/eventos',
     name: 'PartnerEvents',
