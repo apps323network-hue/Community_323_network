@@ -3,7 +3,7 @@
     <div class="space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-10 overflow-x-hidden w-full max-w-full">
       <!-- Header -->
       <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 sm:gap-6 lg:gap-8 w-full overflow-hidden">
-        <div class="w-full lg:w-auto min-w-0">
+        <div class="w-full lg:flex-1 lg:max-w-2xl min-w-0">
           <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-2 sm:mb-3 tracking-tight">
             <span
               class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-400 to-secondary neon-text-blue"
@@ -15,8 +15,8 @@
             Conecte-se com artistas, empreendedores e visionários brasileiros nos EUA.
           </p>
         </div>
-        <div class="w-full flex flex-col gap-3 sm:gap-4">
-          <div class="relative group w-full">
+        <div class="w-full lg:w-auto flex flex-row gap-3 sm:gap-4">
+          <div class="relative group flex-1 lg:flex-initial lg:w-[300px]">
             <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
               <span
                 class="material-icons text-secondary/70 text-lg sm:text-xl group-focus-within:text-secondary transition-colors"
@@ -25,14 +25,14 @@
             </div>
             <input
               v-model="searchQuery"
-              class="block w-full pl-10 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 border border-secondary/50 rounded-lg sm:rounded-xl leading-5 bg-[#0a040f] text-white placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] transition-all duration-300"
+              class="block w-full  mt-1.5 pl-10 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 border border-secondary/50 rounded-lg sm:rounded-xl leading-5 bg-[#0a040f] text-white placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] transition-all duration-300"
               placeholder="Buscar por nome, área ou cidade..."
               type="text"
               @input="handleSearch"
             />
           </div>
           <button
-            class="group flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3.5 border border-secondary/50 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold text-gray-200 bg-[#0a040f] hover:bg-secondary/10 hover:border-secondary hover:shadow-[0_0_15px_rgba(244,37,244,0.3)] transition-all duration-300 w-full sm:w-auto"
+            class="group flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3.5 border border-secondary/50 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold text-gray-200 bg-[#0a040f] hover:bg-secondary/10 hover:border-secondary hover:shadow-[0_0_15px_rgba(244,37,244,0.3)] transition-all duration-300 whitespace-nowrap shrink-0"
             @click="showFilters = !showFilters"
           >
             <span class="material-icons text-base sm:text-lg text-secondary group-hover:animate-pulse"
