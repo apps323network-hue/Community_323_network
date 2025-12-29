@@ -5,7 +5,7 @@
       <div class="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full blur-xl"></div>
       <h3 class="font-bold text-slate-900 dark:text-white mb-5 flex items-center text-sm uppercase tracking-widest">
         <span class="material-icons-outlined mr-2 text-secondary-dark dark:text-secondary animate-pulse">event_available</span>
-        Próximos Eventos
+        {{ t('sidebar.upcomingEvents') }}
       </h3>
       <div class="space-y-5">
         <div 
@@ -31,14 +31,14 @@
         to="/eventos/calendario"
         class="w-full mt-6 py-2 text-xs font-bold text-center text-secondary-dark dark:text-secondary border border-slate-200 dark:border-gray-700 hover:border-secondary-dark dark:hover:border-secondary hover:bg-secondary/5 rounded-lg transition-all uppercase tracking-wider block"
       >
-        Ver Calendário
+        {{ t('events.viewFullCalendar') }}
       </RouterLink>
     </div>
 
     <!-- Membros em Destaque Card -->
     <div class="bg-white dark:bg-surface-dark rounded-xl p-5 shadow-xl border-t border-slate-200 dark:border-gray-800">
       <h3 class="font-bold text-slate-900 dark:text-white mb-4 text-sm uppercase tracking-widest border-l-4 border-primary pl-3">
-        Membros em Destaque
+        {{ t('members.featuredMembers') }}
       </h3>
       <div class="space-y-4">
         <div 
@@ -87,9 +87,9 @@
           v-if="featuredMembers.length === 0" 
           class="text-center py-4 text-xs text-gray-500"
         >
-          <p>Nenhum membro em destaque.</p>
+          <p>{{ t('sidebar.noFeaturedMembers') }}</p>
           <RouterLink to="/comunidade" class="text-primary hover:text-primary-hover mt-1 block">
-            Explorar comunidade
+            {{ t('sidebar.exploreCommunity') }}
           </RouterLink>
         </div>
       </div>
@@ -104,16 +104,16 @@
           <span class="material-icons-outlined">rocket_launch</span>
         </div>
         <h4 class="text-slate-900 dark:text-white font-bold text-xl mb-1 drop-shadow-md dark:drop-shadow-lg group-hover:text-primary transition-colors">
-          Seu Negócio Aqui
+          {{ t('sidebar.yourBusinessHere') }}
         </h4>
         <p class="text-slate-500 dark:text-gray-300 text-xs mb-4 drop-shadow-sm dark:drop-shadow-md">
-          Alcance milhares de brasileiros nos EUA.
+          {{ t('sidebar.reachThousands') }}
         </p>
         <button 
           class="bg-neon-gradient text-white font-bold text-xs px-5 py-2 rounded-full shadow-lg shadow-secondary/30 hover:shadow-secondary/60 hover:scale-105 transition-all transform"
           @click="handleBusinessClick"
         >
-          Saiba Mais
+          {{ t('events.learnMore') }}
         </button>
       </div>
     </div>
@@ -122,6 +122,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 import { supabase } from '@/lib/supabase'
 import Avatar from '@/components/ui/Avatar.vue'
@@ -149,6 +150,7 @@ interface Member {
   isOnline?: boolean
 }
 
+const { t } = useI18n()
 const upcomingEvents = ref<Event[]>([])
 const featuredMembers = ref<Member[]>([])
 

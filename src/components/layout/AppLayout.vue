@@ -32,7 +32,7 @@
       </div>
     </main>
 
-    <AppFooter />
+    <AppFooter v-if="$route.path === '/'" />
 
     <!-- Mobile Menu - Sempre visível -->
     <div

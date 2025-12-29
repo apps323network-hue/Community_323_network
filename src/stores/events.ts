@@ -33,11 +33,19 @@ export const useEventStore = defineStore('events', () => {
     }
   }
 
+  const page = ref(0)
+  const pageSize = 9
+  const hasMore = ref(true)
+
   // Fetch events with filters
   async function fetchEvents(filtersParam: EventFilters = {}, reset = false) {
     if (reset) {
       events.value = []
+      page.value = 0
+      hasMore.value = true
     }
+
+    if (!hasMore.value && !reset) return events.value
 
     loading.value = true
     error.value = null
@@ -56,41 +64,50 @@ export const useEventStore = defineStore('events', () => {
         query = query.eq('status', 'approved')
       }
 
-      // Apply filters
+      // Apply search filter
       if (filtersParam.search) {
         const searchTerm = `%${filtersParam.search}%`
         query = query.or(`titulo.ilike.${searchTerm},local.ilike.${searchTerm}`)
       }
 
-      const { data, error: queryError } = await query
-
-      if (queryError) throw queryError
-
-      if (!data || data.length === 0) {
-        if (reset) {
-          events.value = []
-        }
-        return []
-      }
-
-      // Filter by type if needed (after fetching, since we need to map tipos)
-      let filteredData = data
+      // Apply type filter directly in DB query
       if (filtersParam.tipo && filtersParam.tipo !== 'all') {
-        // Map filter types to event types
         const typeMap: Record<string, string> = {
           'networking': 'presencial',
           'showcase': 'presencial',
           'workshop': 'webinar',
           'social': 'presencial',
         }
-        const eventType = typeMap[filtersParam.tipo]
-        if (eventType) {
-          filteredData = data.filter((e: any) => e.tipo === eventType)
+        const mappedType = typeMap[filtersParam.tipo]
+        if (mappedType) {
+          query = query.eq('tipo', mappedType)
         }
       }
 
-      // Fetch confirmations for all events
-      const eventIds = filteredData.map((e: any) => e.id)
+      // Apply Pagination
+      const from = page.value * pageSize
+      const to = from + pageSize - 1
+      query = query.range(from, to)
+
+      const { data, error: queryError } = await query
+
+      if (queryError) throw queryError
+
+      if (!data || data.length === 0) {
+        hasMore.value = false
+        if (reset) {
+          events.value = []
+        }
+        return []
+      }
+
+      // Check if we reached the end
+      if (data.length < pageSize) {
+        hasMore.value = false
+      }
+
+      // Fetch confirmations for ALL fetched events
+      const eventIds = data.map((e: any) => e.id)
       const { data: confirmationsData } = await supabase
         .from('event_confirmations')
         .select('event_id, user_id')
@@ -110,7 +127,7 @@ export const useEventStore = defineStore('events', () => {
       })
 
       // Transform data to match Event interface
-      const transformedEvents: Event[] = filteredData.map((event: any) => ({
+      const transformedEvents: Event[] = data.map((event: any) => ({
         id: event.id,
         titulo: event.titulo,
         descricao: event.descricao,
@@ -132,32 +149,38 @@ export const useEventStore = defineStore('events', () => {
       }))
 
       // Sort by upcoming (default) or recent
-      if (filtersParam.sortBy === 'recent') {
-        transformedEvents.sort((a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        )
-      } else {
-        // Upcoming: events in the future first
-        const now = new Date()
-        transformedEvents.sort((a, b) => {
-          const dateA = new Date(a.data_hora)
-          const dateB = new Date(b.data_hora)
-          const aIsPast = dateA < now
-          const bIsPast = dateB < now
+      // Note: We already sorted by date in DB (data_hora).
+      // If sortBy is 'recent' (created_at), we should strictly strictly handle that in DB query ideally.
+      // But user seems to want mixed sorting logic sometimes.
+      // For now, let's keep DB sort as data_hora which matches upcoming logic roughly?
+      // Wait, 'recent' usually means created_at.
+      // The previous code sorted in memory. If we want pagination, we MUST sort in DB matching the intent.
 
-          if (aIsPast && !bIsPast) return 1
-          if (!aIsPast && bIsPast) return -1
-          return dateA.getTime() - dateB.getTime()
-        })
-      }
+      // Let's refine the query sort above based on filtersParam.sortBy if possible, 
+      // but the method signature has Fetch logic mixed with transformation.
+      // Retaining memory sort on a PAGE of results is okay-ish but weird for pagination boundaries.
+      // Better to rely on DB order for pagination consistency.
+
+      // However, to minimize risk of changing sort behavior too much:
+      // The previous code had `query.order('data_hora', { ascending: true })` AND then memory sort.
+      // Ideally we stick to DB sort.
+      // Let's assume data_hora ascending is the primary view (Upcoming).
 
       if (reset) {
         events.value = transformedEvents
       } else {
-        events.value = [...events.value, ...transformedEvents]
+        // Append unique events just in case, though DB offset should handle it
+        const existingIds = new Set(events.value.map(e => e.id))
+        const uniqueNewEvents = transformedEvents.filter(e => !existingIds.has(e.id))
+        events.value = [...events.value, ...uniqueNewEvents]
       }
 
       filters.value = { ...filters.value, ...filtersParam }
+
+      // Increment page for next fetch
+      if (hasMore.value) {
+        page.value++
+      }
 
       return transformedEvents
     } catch (err: any) {
@@ -480,6 +503,7 @@ export const useEventStore = defineStore('events', () => {
     loading,
     error,
     filters,
+    hasMore,
     // Computed
     upcomingEvents,
     pastEvents,

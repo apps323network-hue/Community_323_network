@@ -7,14 +7,14 @@
       <div class="absolute bottom-0 left-0 w-24 h-24 bg-secondary/10 blur-3xl rounded-full -ml-10 -mb-10 group-hover:bg-secondary/20 transition-all duration-500"></div>
       
       <div class="relative z-10">
-        <h2 class="text-xl font-bold mb-1 text-slate-900 dark:text-white">Olá, {{ userName }}!</h2>
-        <p class="text-sm text-slate-500 dark:text-gray-400 mb-6">Membro desde 2023</p>
+        <h2 class="text-xl font-bold mb-1 text-slate-900 dark:text-white">{{ t('common.hello') }}, {{ userName }}!</h2>
+        <p class="text-sm text-slate-500 dark:text-gray-400 mb-6">{{ t('profile.memberSince') }} 2023</p>
         
         <button
           class="w-full bg-transparent border border-secondary text-secondary hover:bg-secondary hover:text-black font-bold py-2.5 px-4 rounded-lg transition-all shadow-lg shadow-secondary/10 hover:shadow-secondary/40"
           @click="$emit('edit-profile')"
         >
-          Editar Perfil
+          {{ t('profile.editProfile') }}
         </button>
       </div>
     </div>
@@ -35,7 +35,7 @@
           >
             feed
           </span>
-          Feed Principal
+          {{ t('navigation.home') }}
         </RouterLink>
         <RouterLink
           to="/comunidade"
@@ -43,7 +43,7 @@
           :class="$route.path === '/membros' ? 'bg-slate-100 dark:bg-surface-lighter text-primary dark:text-white' : ''"
         >
           <span class="material-icons-outlined mr-3 text-gray-500 group-hover:text-secondary transition-colors">people_outline</span>
-          Explorar Membros
+          {{ t('navigation.community') }}
         </RouterLink>
         <RouterLink
           to="/conexoes"
@@ -58,21 +58,14 @@
           >
             groups
           </span>
-          Minha Rede
+          {{ t('navigation.myNetwork') }}
         </RouterLink>
         <RouterLink
           to="/eventos"
           class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-500 dark:text-gray-400 hover:bg-slate-50 dark:hover:bg-surface-lighter hover:text-slate-900 dark:hover:text-white group transition-all"
         >
           <span class="material-icons-outlined mr-3 text-gray-500 group-hover:text-primary transition-colors">event</span>
-          Eventos Salvos
-        </RouterLink>
-        <RouterLink
-          to="/vagas"
-          class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-500 dark:text-gray-400 hover:bg-slate-50 dark:hover:bg-surface-lighter hover:text-slate-900 dark:hover:text-white group transition-all"
-        >
-          <span class="material-icons-outlined mr-3 text-gray-500 group-hover:text-secondary transition-colors">business_center</span>
-          Oportunidades
+          {{ t('navigation.savedEvents') }}
         </RouterLink>
         <RouterLink
           to="/meus-pedidos"
@@ -82,7 +75,7 @@
             : 'text-slate-500 dark:text-gray-400 hover:bg-slate-50 dark:hover:bg-surface-lighter hover:text-slate-900 dark:hover:text-white group'"
         >
           <span class="material-icons-outlined mr-3 text-gray-500 group-hover:text-primary transition-colors">assignment</span>
-          Meus Pedidos
+          {{ t('navigation.myOrders') }}
         </RouterLink>
         <RouterLink
           to="/beneficios"
@@ -99,6 +92,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 
 defineEmits<{
@@ -106,6 +100,7 @@ defineEmits<{
 }>()
 
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 const userName = computed(() => authStore.user?.email?.split('@')[0] || 'Usuário')
 </script>

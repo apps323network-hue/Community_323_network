@@ -39,7 +39,7 @@
                   : 'text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary'
               "
             >
-              Home
+              {{ t('navigation.home') }}
               <span
                 v-if="route.path === '/'"
                 class="absolute bottom-0 left-0 w-full h-0.5 bg-primary dark:bg-secondary transform scale-x-100 transition-transform"
@@ -58,7 +58,7 @@
                   : 'text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary'
               "
             >
-              Comunidade
+              {{ t('navigation.community') }}
               <span
                 v-if="route.path === '/comunidade'"
                 class="absolute bottom-0 left-0 w-full h-0.5 bg-primary dark:bg-secondary transform scale-x-100 transition-transform"
@@ -77,7 +77,7 @@
                   : 'text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary'
               "
             >
-              Eventos
+              {{ t('navigation.events') }}
               <span
                 v-if="route.path === '/eventos'"
                 class="absolute bottom-0 left-0 w-full h-0.5 bg-primary dark:bg-secondary transform scale-x-100 transition-transform"
@@ -96,7 +96,7 @@
                   : 'text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary'
               "
             >
-              Serviços
+              {{ t('navigation.services') }}
               <span
                 v-if="route.path === '/servicos'"
                 class="absolute bottom-0 left-0 w-full h-0.5 bg-primary dark:bg-secondary transform scale-x-100 transition-transform"
@@ -115,7 +115,7 @@
                   : 'text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary'
               "
             >
-              Benefícios
+              {{ t('navigation.benefits') }}
               <span
                 v-if="route.path === '/beneficios'"
                 class="absolute bottom-0 left-0 w-full h-0.5 bg-primary dark:bg-secondary transform scale-x-100 transition-transform"
@@ -136,6 +136,53 @@
         <!-- User Menu -->
         <div class="hidden md:flex items-center gap-5">
           <AnimatedThemeToggler />
+          
+          <!-- Language Switcher -->
+          <div class="relative" ref="languageMenuContainer">
+            <button
+              @click.stop="toggleLanguageMenu"
+              class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-surface-lighter transition-colors"
+            >
+              <span class="text-lg">{{ currentLocaleData.flag }}</span>
+              <span class="hidden lg:block">{{ currentLocaleData.code.split('-')[0].toUpperCase() }}</span>
+              <span class="material-icons text-sm">expand_more</span>
+            </button>
+            
+            <!-- Language Dropdown -->
+            <Transition
+              enter-active-class="transition-all duration-200"
+              enter-from-class="opacity-0 scale-95 translate-y-2"
+              enter-to-class="opacity-100 scale-100 translate-y-0"
+              leave-active-class="transition-all duration-200"
+              leave-from-class="opacity-100 scale-100 translate-y-0"
+              leave-to-class="opacity-0 scale-95 translate-y-2"
+            >
+              <div
+                v-if="showLanguageMenu"
+                class="absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-surface-dark border border-slate-200 dark:border-white/10 shadow-2xl z-50 overflow-hidden"
+                @click.stop
+              >
+                <div class="p-2">
+                  <button
+                    v-for="locale in availableLocales"
+                    :key="locale.code"
+                    @click="handleLocaleChange(locale.code)"
+                    class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-medium transition-colors"
+                    :class="[
+                      currentLocale === locale.code
+                        ? 'bg-primary/10 text-primary dark:bg-secondary/10 dark:text-secondary'
+                        : 'text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-surface-lighter'
+                    ]"
+                  >
+                    <span class="text-lg">{{ locale.flag }}</span>
+                    <span>{{ locale.name }}</span>
+                    <span v-if="currentLocale === locale.code" class="material-icons text-sm ml-auto">check</span>
+                  </button>
+                </div>
+              </div>
+            </Transition>
+          </div>
+          
           <NotificationsDropdown />
           <div class="relative group cursor-pointer" ref="userMenuContainer">
             <div class="flex items-center gap-2 lg:gap-3" @click.stop="toggleUserMenu">
@@ -233,6 +280,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/user'
+import { useLocale } from '@/composables/useLocale'
 import Avatar from '@/components/ui/Avatar.vue'
 import AnimatedThemeToggler from '@/components/ui/AnimatedThemeToggler.vue'
 import NotificationsDropdown from '@/components/layout/NotificationsDropdown.vue'
@@ -240,10 +288,13 @@ import NotificationsDropdown from '@/components/layout/NotificationsDropdown.vue
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const { locale: currentLocale, setLocale, availableLocales, t } = useLocale()
 // Theme toggle is now handled by AnimatedThemeToggler component
 
 const showUserMenu = ref(false)
+const showLanguageMenu = ref(false)
 const userMenuContainer = ref<HTMLElement | null>(null)
+const languageMenuContainer = ref<HTMLElement | null>(null)
 
 const userStore = useUserStore()
 
@@ -257,7 +308,22 @@ const isAdmin = computed(() => userStore.profile?.role === 'admin')
 
 function toggleUserMenu() {
   showUserMenu.value = !showUserMenu.value
+  showLanguageMenu.value = false
 }
+
+function toggleLanguageMenu() {
+  showLanguageMenu.value = !showLanguageMenu.value
+  showUserMenu.value = false
+}
+
+function handleLocaleChange(newLocale: string) {
+  setLocale(newLocale)
+  showLanguageMenu.value = false
+}
+
+const currentLocaleData = computed(() => {
+  return availableLocales.find(l => l.code === currentLocale.value) || availableLocales[0]
+})
 
 const isLoggingOut = ref(false)
 
@@ -314,6 +380,9 @@ async function handleLogout() {
 function handleClickOutside(event: MouseEvent) {
   if (userMenuContainer.value && !userMenuContainer.value.contains(event.target as Node)) {
     showUserMenu.value = false
+  }
+  if (languageMenuContainer.value && !languageMenuContainer.value.contains(event.target as Node)) {
+    showLanguageMenu.value = false
   }
 }
 
