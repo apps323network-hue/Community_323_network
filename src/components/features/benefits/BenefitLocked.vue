@@ -4,19 +4,22 @@
       <span class="material-symbols-outlined text-primary text-[32px]">lock</span>
     </div>
     <div class="text-center">
-      <h4 class="text-white font-bold text-lg mb-2">Benefício Bloqueado</h4>
+      <h4 class="text-white font-bold text-lg mb-2">{{ t('benefits.benefitLocked') }}</h4>
       <p class="text-gray-400 text-sm mb-4">
-        Este benefício está disponível apenas para membros do plano <span class="text-primary font-bold">{{ requiredPlan }}</span>
+        {{ t('benefits.benefitLockedDesc', { plan: requiredPlan }) }}
       </p>
       <Button variant="primary" size="sm" @click="$emit('upgrade')">
-        Fazer Upgrade
+        {{ t('benefits.upgradeNow') }}
       </Button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import Button from '@/components/ui/Button.vue'
+
+const { t } = useI18n()
 
 interface Props {
   requiredPlan: 'Member' | 'Premium'

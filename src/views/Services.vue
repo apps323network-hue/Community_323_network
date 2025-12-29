@@ -20,22 +20,22 @@
           <div class="flex flex-col gap-2 sm:gap-3 max-w-2xl w-full">
             <div class="inline-flex items-center gap-1 sm:gap-1.5 sm:gap-2 self-center md:self-start px-2 sm:px-2.5 md:px-3 py-0.5 sm:py-1 rounded-full bg-secondary/10 border border-secondary/20 backdrop-blur-sm shadow-[0_0_15px_rgba(0,243,255,0.1)]">
               <span class="material-symbols-outlined text-secondary text-sm sm:text-base md:text-[18px]">verified</span>
-              <span class="text-secondary text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider">Exclusivo para Membros</span>
+              <span class="text-secondary text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider">{{ t('services.exclusiveForMembers') }}</span>
             </div>
             <h1 class="text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-extrabold leading-tight tracking-tight">
-              Eleve sua Carreira <br class="hidden sm:block"/>
-              <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary drop-shadow-[0_0_15px_rgba(244,37,244,0.3)]">nos Estados Unidos</span>
+              {{ t('services.heroTitle1') }} <br class="hidden sm:block"/>
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary drop-shadow-[0_0_15px_rgba(244,37,244,0.3)]">{{ t('services.heroTitle2') }}</span>
             </h1>
             <p class="text-gray-300 text-xs sm:text-sm md:text-base lg:text-lg font-medium leading-relaxed max-w-lg mt-1 sm:mt-2">
-              Acesse uma rede de serviços premium: burocracia simplificada, estratégias de marketing e conexões de alto nível para acelerar seu sucesso.
+              {{ t('services.heroDescription') }}
             </p>
           </div>
           <div class="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3 md:gap-4 justify-center md:justify-start mt-2 w-full sm:w-auto">
             <button class="flex items-center justify-center rounded-lg h-9 sm:h-10 md:h-12 px-3 sm:px-4 md:px-6 bg-gradient-to-r from-primary to-secondary text-black text-xs sm:text-sm md:text-base font-bold transition-all shadow-[0_0_20px_rgba(0,243,255,0.3)] hover:shadow-[0_0_40px_rgba(0,243,255,0.5)] hover:scale-105 w-full sm:w-auto" @click="exploreServices">
-              Explorar Serviços
+              {{ t('services.exploreServices') }}
             </button>
             <button class="flex items-center justify-center rounded-lg h-9 sm:h-10 md:h-12 px-3 sm:px-4 md:px-6 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs sm:text-sm md:text-base font-medium backdrop-blur-sm transition-colors w-full sm:w-auto" @click="howItWorks">
-              Como funciona
+              {{ t('services.howItWorks') }}
             </button>
           </div>
         </div>
@@ -65,7 +65,7 @@
         </div>
         <div v-else-if="filteredServices.length === 0" class="flex flex-col items-center justify-center py-8 sm:py-12 md:py-16 lg:py-20 bg-surface-dark/50 rounded-lg sm:rounded-xl md:rounded-2xl border border-white/10 backdrop-blur-sm px-3 sm:px-4">
           <span class="material-symbols-outlined text-gray-500 text-3xl sm:text-4xl md:text-5xl lg:text-[64px] mb-2 sm:mb-3 md:mb-4">search_off</span>
-          <p class="text-gray-400 font-medium text-xs sm:text-sm md:text-base text-center">Nenhum serviço encontrado nesta categoria.</p>
+          <p class="text-gray-400 font-medium text-xs sm:text-sm md:text-base text-center">{{ t('services.noServicesFound') }}</p>
         </div>
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           <ServiceCard
@@ -80,8 +80,8 @@
       <!-- Testimonials -->
       <div class="flex flex-col gap-3 sm:gap-4 md:gap-6 lg:gap-8 pt-3 sm:pt-4 md:pt-6 lg:pt-8">
         <div class="flex items-center justify-between border-b border-white/10 pb-2.5 sm:pb-3 md:pb-4 gap-2">
-          <h2 class="text-white text-base sm:text-lg md:text-xl lg:text-2xl font-bold tracking-tight truncate">O que nossos membros dizem</h2>
-          <a class="text-secondary text-[10px] sm:text-xs md:text-sm font-bold hover:underline hover:text-white transition-colors cursor-pointer whitespace-nowrap flex-shrink-0">Ver todos</a>
+          <h2 class="text-white text-base sm:text-lg md:text-xl lg:text-2xl font-bold tracking-tight truncate">{{ t('services.whatMembersSay') }}</h2>
+          <a class="text-secondary text-[10px] sm:text-xs md:text-sm font-bold hover:underline hover:text-white transition-colors cursor-pointer whitespace-nowrap flex-shrink-0">{{ t('common.seeAll') }}</a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           <TestimonialCard
@@ -95,12 +95,12 @@
       <!-- CTA Section -->
       <div class="bg-[#0a040f] border border-white/10 rounded-lg sm:rounded-xl md:rounded-2xl py-4 sm:py-6 md:py-8 lg:py-12 px-3 sm:px-4 md:px-6 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 md:gap-6 lg:gap-8">
         <div class="flex flex-col gap-1.5 sm:gap-2 text-center md:text-left w-full md:w-auto">
-          <h2 class="text-white text-lg sm:text-xl md:text-2xl font-bold">Precisa de algo personalizado?</h2>
-          <p class="text-gray-400 text-xs sm:text-sm md:text-base">Nossa equipe de concierge pode ajudar você a encontrar exatamente o que precisa.</p>
+          <h2 class="text-white text-lg sm:text-xl md:text-2xl font-bold">{{ t('services.needSomethingCustom') }}</h2>
+          <p class="text-gray-400 text-xs sm:text-sm md:text-base">{{ t('services.conciergeDescription') }}</p>
         </div>
         <button class="flex items-center gap-1.5 sm:gap-2 rounded-lg bg-transparent border border-secondary text-secondary hover:bg-secondary hover:text-black px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 text-xs sm:text-sm md:text-base font-bold transition-all duration-300 shadow-[0_0_15px_rgba(0,243,255,0.2)] hover:shadow-[0_0_25px_rgba(0,243,255,0.5)] w-full md:w-auto justify-center" @click="contactSupport">
           <span class="material-symbols-outlined text-base sm:text-lg md:text-[20px]">chat</span>
-          Falar com Suporte
+          {{ t('services.talkToSupport') }}
         </button>
       </div>
     </div>
@@ -109,17 +109,17 @@
     <Modal
       v-if="selectedService"
       v-model="showRequestModal"
-      :title="selectedService.preco ? 'Contratar ' + selectedService.nome : 'Solicitar ' + selectedService.nome"
+      :title="selectedService.preco ? t('services.contract') + ' ' + selectedService.nome : t('services.request') + ' ' + selectedService.nome"
     >
       <div class="flex flex-col gap-3 sm:gap-4">
         <!-- Descrição -->
         <p class="text-xs sm:text-sm text-gray-300">
           <template v-if="selectedService.preco">
-            Você está contratando <strong class="text-white">{{ selectedService.nome }}</strong>.
+            {{ t('services.contracting') }} <strong class="text-white">{{ selectedService.nome }}</strong>.
           </template>
           <template v-else>
-            Você está solicitando atendimento para <strong class="text-white">{{ selectedService.nome }}</strong>.
-            O parceiro responsável entrará em contato em breve.
+            {{ t('services.requesting') }} <strong class="text-white">{{ selectedService.nome }}</strong>.
+            {{ t('services.partnerContact') }}
           </template>
         </p>
 
@@ -128,19 +128,19 @@
           <!-- Breakdown de Valores -->
           <div class="p-3 sm:p-4 rounded-lg bg-white/5 border border-white/10 space-y-2">
             <div class="flex justify-between items-center text-sm">
-              <span class="text-gray-400">Valor do serviço</span>
+              <span class="text-gray-400">{{ t('services.serviceValue') }}</span>
               <span class="text-white font-medium">{{ formatPrice(selectedService.preco, selectedService.moeda) }}</span>
             </div>
             
             <div v-if="paymentMethod" class="flex justify-between items-center text-sm">
-              <span class="text-gray-400">Taxa Stripe ({{ paymentMethod === 'card' ? '3.9% + $0.30' : '~1.8%' }})</span>
+              <span class="text-gray-400">{{ t('services.stripeFee') }} ({{ paymentMethod === 'card' ? '3.9% + $0.30' : '~1.8%' }})</span>
               <span class="text-white font-medium">{{ formatPrice(calculateFee(selectedService.preco, paymentMethod), paymentMethod === 'pix' ? 'BRL' : selectedService.moeda) }}</span>
             </div>
             
             <div class="border-t border-white/10 pt-2 mt-2"></div>
             
             <div class="flex justify-between items-center">
-              <span class="text-gray-300 font-bold">Total a pagar</span>
+              <span class="text-gray-300 font-bold">{{ t('services.totalToPay') }}</span>
               <span class="text-2xl font-bold text-white">
                 {{ paymentMethod ? formatPrice(calculateTotal(selectedService.preco, paymentMethod), paymentMethod === 'pix' ? 'BRL' : selectedService.moeda) : formatPrice(selectedService.preco, selectedService.moeda) }}
               </span>
@@ -151,20 +151,20 @@
           <div v-if="paymentMethod === 'pix'" class="flex items-start gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
             <span class="material-symbols-outlined text-blue-400 text-base">info</span>
             <p class="text-xs text-blue-300">
-              Valor convertido de USD para BRL usando taxa de câmbio de R$ {{ exchangeRate.toFixed(2) }}.
+              {{ t('services.pixConversion', { rate: exchangeRate.toFixed(2) }) }}
             </p>
           </div>
         </div>
         
         <!-- Benefício Membro -->
         <div v-if="selectedService.beneficio_membro" class="p-4 rounded-lg bg-secondary/10 border border-secondary/20">
-          <p class="text-[10px] sm:text-xs font-bold text-secondary uppercase mb-1">Seu Benefício:</p>
+          <p class="text-[10px] sm:text-xs font-bold text-secondary uppercase mb-1">{{ t('services.memberBenefit') }}</p>
           <p class="text-xs sm:text-sm text-gray-300 font-medium">{{ selectedService.beneficio_membro }}</p>
         </div>
 
         <!-- Método de Pagamento (apenas para serviços pagos) -->
         <div v-if="selectedService.preco" class="space-y-3">
-          <label class="text-sm font-bold text-gray-300">Método de Pagamento</label>
+          <label class="text-sm font-bold text-gray-300">{{ t('services.paymentMethod') }}</label>
           <div class="grid grid-cols-2 gap-3">
             <button
               @click="paymentMethod = 'card'"
@@ -174,8 +174,8 @@
                 : 'border-white/10 hover:border-white/30 text-gray-400'"
             >
               <span class="material-symbols-outlined text-2xl">credit_card</span>
-              <span class="text-sm font-bold">Cartão</span>
-              <span class="text-[10px] text-gray-500">Débito ou Crédito</span>
+              <span class="text-sm font-bold">{{ t('services.card') }}</span>
+              <span class="text-[10px] text-gray-500">{{ t('services.debitOrCredit') }}</span>
             </button>
             <button
               @click="paymentMethod = 'pix'"
@@ -185,20 +185,20 @@
                 : 'border-white/10 hover:border-white/30 text-gray-400'"
             >
               <span class="material-symbols-outlined text-2xl">qr_code_2</span>
-              <span class="text-sm font-bold">PIX</span>
-              <span class="text-[10px] text-gray-500">Pagamento Instantâneo</span>
+              <span class="text-sm font-bold">{{ t('services.pix') }}</span>
+              <span class="text-[10px] text-gray-500">{{ t('services.instantPayment') }}</span>
             </button>
           </div>
         </div>
 
         <!-- Mensagem (para serviços gratuitos) -->
         <div v-if="!selectedService.preco" class="flex flex-col gap-1.5">
-          <label class="text-xs sm:text-sm font-bold text-gray-300">Mensagem Adicional (Opcional)</label>
+          <label class="text-xs sm:text-sm font-bold text-gray-300">{{ t('services.additionalMessage') }}</label>
           <textarea
             v-model="requestMessage"
             rows="4"
             class="w-full rounded-lg border border-white/10 bg-surface-dark p-2.5 sm:p-3 text-xs sm:text-sm text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
-            placeholder="Conte-nos um pouco sobre sua necessidade..."
+            :placeholder="t('services.requestPlaceholder')"
           ></textarea>
         </div>
 
@@ -211,49 +211,49 @@
           <template v-if="submitting">
             <span class="flex items-center justify-center gap-2">
               <span class="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
-              Processando...
+              {{ t('services.processing') }}
             </span>
           </template>
           <template v-else-if="selectedService.preco">
-            Pagar {{ formatPrice(selectedService.preco, selectedService.moeda) }}
+            {{ t('services.pay') }} {{ formatPrice(selectedService.preco, selectedService.moeda) }}
           </template>
           <template v-else>
-            Confirmar Solicitação
+            {{ t('services.confirmRequest') }}
           </template>
         </button>
 
         <!-- Segurança -->
         <p v-if="selectedService.preco" class="text-[10px] text-gray-500 text-center flex items-center justify-center gap-1">
           <span class="material-symbols-outlined text-[14px]">lock</span>
-          Pagamento seguro processado por Stripe
+          {{ t('services.securePayment') }}
         </p>
       </div>
     </Modal>
     <!-- Modal Como Funciona -->
     <Modal
       v-model="showHowItWorksModal"
-      title="Como Funciona o Concierge"
+      :title="t('services.howItWorksTitle')"
     >
       <div class="space-y-6 sm:space-y-8 py-2 sm:py-4">
         <!-- Step 1 -->
         <div class="relative pl-6 sm:pl-8 border-l-2 border-white/10 group">
           <div class="absolute -left-[7px] sm:-left-[9px] top-0 h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-surface-dark border-2 border-primary shadow-[0_0_10px_rgba(244,37,244,0.5)] group-hover:scale-125 transition-transform"></div>
-          <h3 class="text-white text-base sm:text-lg font-bold mb-1.5 sm:mb-2">1. Escolha o Serviço</h3>
-          <p class="text-gray-400 text-xs sm:text-sm">Navegue por nossa curadoria de serviços premium. De abertura de empresas a vistos e marketing, selecionamos apenas os melhores parceiros.</p>
+          <h3 class="text-white text-base sm:text-lg font-bold mb-1.5 sm:mb-2">{{ t('services.step1Title') }}</h3>
+          <p class="text-gray-400 text-xs sm:text-sm">{{ t('services.step1Desc') }}</p>
         </div>
 
         <!-- Step 2 -->
         <div class="relative pl-6 sm:pl-8 border-l-2 border-white/10 group">
           <div class="absolute -left-[7px] sm:-left-[9px] top-0 h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-surface-dark border-2 border-secondary shadow-[0_0_10px_rgba(0,243,255,0.5)] group-hover:scale-125 transition-transform"></div>
-          <h3 class="text-white text-base sm:text-lg font-bold mb-1.5 sm:mb-2">2. Solicite com um Clique</h3>
-          <p class="text-gray-400 text-xs sm:text-sm">Interessou? Clique em solicitar. Não cobramos nada antecipadamente. Nossa equipe conecta você diretamente ao especialista.</p>
+          <h3 class="text-white text-base sm:text-lg font-bold mb-1.5 sm:mb-2">{{ t('services.step2Title') }}</h3>
+          <p class="text-gray-400 text-xs sm:text-sm">{{ t('services.step2Desc') }}</p>
         </div>
 
         <!-- Step 3 -->
         <div class="relative pl-6 sm:pl-8 border-l-2 border-transparent group">
           <div class="absolute -left-[7px] sm:-left-[9px] top-0 h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-gradient-to-r from-primary to-secondary shadow-[0_0_15px_rgba(255,255,255,0.5)] group-hover:scale-125 transition-transform"></div>
-          <h3 class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary text-base sm:text-lg font-bold mb-1.5 sm:mb-2">3. Aproveite os Benefícios</h3>
-          <p class="text-gray-400 text-xs sm:text-sm">Como membro da 323 Network, você garante descontos exclusivos e atendimento prioritário VIP em todos os parceiros.</p>
+          <h3 class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary text-base sm:text-lg font-bold mb-1.5 sm:mb-2">{{ t('services.step3Title') }}</h3>
+          <p class="text-gray-400 text-xs sm:text-sm">{{ t('services.step3Desc') }}</p>
         </div>
 
         <div class="pt-3 sm:pt-4 flex justify-center">
@@ -261,7 +261,7 @@
             @click="showHowItWorksModal = false"
             class="px-6 sm:px-8 py-2 rounded-full border border-white/10 hover:bg-white/5 text-white text-xs sm:text-sm transition-colors"
           >
-            Entendi, vamos começar!
+            {{ t('services.gotIt') }}
           </button>
         </div>
       </div>
@@ -271,6 +271,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useSupabase } from '@/composables/useSupabase'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import ServiceCard from '@/components/features/services/ServiceCard.vue'
@@ -280,6 +281,7 @@ import FlickeringGrid from '@/components/ui/FlickeringGrid.vue'
 import { toast } from 'vue-sonner'
 
 const { supabase } = useSupabase()
+const { t } = useI18n()
 const loading = ref(true)
 const services = ref<any[]>([])
 const activeFilter = ref('all')
@@ -292,40 +294,40 @@ const submitting = ref(false)
 const paymentMethod = ref<'card' | 'pix' | null>(null)
 const exchangeRate = ref(5.90) // Taxa de câmbio USD → BRL
 
-const filters = [
-  { id: 'all', label: 'Todos' },
-  { id: 'legal', label: 'Legal & Burocracia' },
-  { id: 'marketing', label: 'Marketing & Brand' },
-  { id: 'finance', label: 'Finanças' },
-  { id: 'mentoring', label: 'Mentoria' },
-]
+const filters = computed(() => [
+  { id: 'all', label: t('navigation.allCategories') },
+  { id: 'legal', label: t('services.filterLegal') },
+  { id: 'marketing', label: t('services.filterMarketing') },
+  { id: 'finance', label: t('services.filterFinance') },
+  { id: 'mentoring', label: t('services.filterMentoring') },
+])
 
-const testimonials = [
+const testimonials = computed(() => [
   {
     id: 1,
     name: 'Lucas Mendes',
-    role: 'Designer em Miami',
-    text: '"A assessoria para abrir minha LLC foi impecável. Em 2 semanas eu já estava operando legalmente na Flórida."',
+    role: t('services.roleLucas'),
+    text: t('services.testimonialLucas'),
     rating: 5,
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop',
   },
   {
     id: 2,
     name: 'Amanda Silva',
-    role: 'Empresária em NY',
-    text: '"O networking VIP abriu portas que eu levaria anos para conseguir sozinho. Vale cada centavo."',
+    role: t('services.roleAmanda'),
+    text: t('services.testimonialAmanda'),
     rating: 5,
     avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&auto=format&fit=crop',
   },
   {
     id: 3,
     name: 'Beatriz Costa',
-    role: 'Arquiteta em Austin',
-    text: '"Consegui organizar minha estratégia de visto com a mentoria. Me senti muito mais segura para aplicar."',
+    role: t('services.roleBeatriz'),
+    text: t('services.testimonialBeatriz'),
     rating: 4.5,
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop',
   },
-]
+])
 
 function formatPrice(cents: number, currency: string = 'USD'): string {
   const amount = cents / 100
@@ -404,7 +406,7 @@ async function handleCheckout() {
     const { data: { session } } = await supabase.auth.getSession()
     
     if (!session) {
-      toast.error('Você precisa estar logado para contratar um serviço.')
+      toast.error(t('services.mustBeLoggedInToContract'))
       return
     }
 
@@ -426,7 +428,7 @@ async function handleCheckout() {
     }
   } catch (error: any) {
     console.error('Erro ao iniciar checkout:', error)
-    toast.error(error.message || 'Erro ao processar pagamento. Tente novamente.')
+    toast.error(error.message || t('services.checkoutError'))
   } finally {
     submitting.value = false
   }
@@ -440,7 +442,7 @@ async function submitRequest() {
     const { data: { user } } = await supabase.auth.getUser()
     
     if (!user) {
-      toast.error('Você precisa estar logado para solicitar um serviço.')
+      toast.error(t('services.mustBeLoggedInToRequest'))
       return
     }
 
@@ -455,12 +457,12 @@ async function submitRequest() {
 
     if (error) throw error
 
-    toast.success('Solicitação enviada com sucesso! O parceiro entrará em contato em breve.')
+    toast.success(t('services.requestSuccess'))
     showRequestModal.value = false
     requestMessage.value = ''
   } catch (error) {
     console.error('Erro ao enviar solicitação:', error)
-    toast.error('Erro ao enviar solicitação. Tente novamente mais tarde.')
+    toast.error(t('services.requestError'))
   } finally {
     submitting.value = false
   }

@@ -7,7 +7,7 @@
       <input
         v-model="searchQuery"
         class="w-full bg-transparent border-none text-white placeholder:text-white/30 focus:ring-0 text-xs sm:text-sm px-2 sm:px-3"
-        placeholder="Buscar eventos por nome ou cidade..."
+        :placeholder="t('events.searchPlaceholder')"
         type="text"
         @input="handleSearch"
       />
@@ -17,7 +17,9 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const searchQuery = ref('')
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
 

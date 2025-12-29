@@ -4,10 +4,10 @@
 
     <main
       :class="[
-        'mx-auto py-8 flex-1 pb-20 lg:pb-8 min-h-[calc(100vh-200px)]',
+        'mx-auto flex-1 pb-20 lg:pb-8 min-h-[calc(100vh-200px)]',
         hideSidebars 
-          ? 'w-full px-4 sm:px-6 lg:px-8' 
-          : 'max-w-7xl px-4 sm:px-6 lg:pl-0 lg:pr-8'
+          ? `w-full ${isEventsPage ? 'pt-0' : 'pt-8'} px-4 sm:px-6 lg:px-8` 
+          : 'max-w-7xl py-8 px-4 sm:px-6 lg:pl-0 lg:pr-8'
       ]"
     >
       <div :class="hideSidebars ? 'w-full' : 'grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12'">
@@ -19,7 +19,7 @@
         </div>
 
         <!-- Conteúdo Principal -->
-        <div :class="hideSidebars ? 'w-full max-w-[1400px] mx-auto' : 'lg:col-span-8'">
+        <div :class="hideSidebars ? `w-full max-w-[1400px] mx-auto ${isEventsPage ? 'pt-0' : ''}` : 'lg:col-span-8'">
           <slot />
         </div>
 
@@ -32,7 +32,7 @@
       </div>
     </main>
 
-    <AppFooter />
+    <AppFooter v-if="$route.path === '/'" />
 
     <!-- Mobile Menu - Sempre visível -->
     <div
@@ -81,10 +81,22 @@ const props = defineProps<{
 const router = useRouter()
 const route = useRoute()
 
-// Hide sidebars on Members, MemberProfile, Services, Benefits, and Profile pages
+// Hide sidebars on Members, MemberProfile, Services, Benefits, Events, and Profile pages
 // Also check if prop is passed
 const hideSidebars = computed(() => {
-  return props.hideSidebars || route.path === '/comunidade' || route.path.startsWith('/comunidade/') || route.path === '/servicos' || route.path === '/beneficios' || route.path === '/perfil'
+  return props.hideSidebars || 
+    route.path === '/comunidade' || 
+    route.path.startsWith('/comunidade/') || 
+    route.path === '/servicos' || 
+    route.path === '/beneficios' || 
+    route.path === '/eventos' || 
+    route.path.startsWith('/eventos/') ||
+    route.path === '/perfil'
+})
+
+// Remove top padding only for Events page
+const isEventsPage = computed(() => {
+  return route.path === '/eventos' || route.path.startsWith('/eventos/')
 })
 
 function handleEditProfile() {

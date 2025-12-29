@@ -2,13 +2,13 @@
   <AppLayout>
     <div class="w-full flex flex-col gap-8">
       <!-- Header -->
-      <div class="flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center">
+      <div class="flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center pt-8">
         <div>
           <h1 class="text-white text-3xl lg:text-4xl font-black mb-2">
-            Calendário de <span class="bg-clip-text text-transparent bg-neon-gradient">Eventos</span>
+            {{ t('calendar.title') }} <span class="neon-text-gradient">{{ t('calendar.titleHighlight') }}</span>
           </h1>
           <p class="text-white/60">
-            Visualize todos os eventos da 323 Network em formato de calendário
+            {{ t('calendar.subtitle') }}
           </p>
         </div>
         
@@ -19,7 +19,6 @@
       <!-- Calendar -->
       <div class="bg-surface-card rounded-xl p-4 lg:p-6 border border-white/5">
         <FullCalendar
-          ref="calendarRef"
           :options="calendarOptions"
           class="event-calendar"
         />
@@ -29,17 +28,62 @@
       <div class="flex flex-wrap gap-4 items-center justify-center lg:justify-start">
         <div class="flex items-center gap-2">
           <div class="w-4 h-4 rounded bg-primary/20 border border-primary"></div>
-          <span class="text-white/80 text-sm">Presencial</span>
+          <span class="text-white/80 text-sm">{{ t('calendar.legend.presencial') }}</span>
         </div>
         <div class="flex items-center gap-2">
           <div class="w-4 h-4 rounded bg-secondary/20 border border-secondary"></div>
-          <span class="text-white/80 text-sm">Webinar</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-4 h-4 rounded bg-neon-gradient border border-primary"></div>
-          <span class="text-white/80 text-sm">Evento Semanal</span>
+          <span class="text-white/80 text-sm">{{ t('calendar.legend.webinar') }}</span>
         </div>
       </div>
+
+      <!-- Event Details Modal -->
+      <Modal v-model="showDetailsModal" :title="selectedEvent?.isRecurring ? t('calendar.modal.recurringTitle') : t('calendar.modal.title')">
+        <div v-if="selectedEvent" class="space-y-4">
+          <div v-if="selectedEvent.isRecurring" class="p-4 rounded-xl bg-secondary/10 border border-secondary/30">
+            <p class="text-white text-sm leading-relaxed">
+              {{ t('calendar.modal.recurringMessage') }}
+            </p>
+          </div>
+          <div v-else class="space-y-3">
+            <div class="flex items-start gap-4">
+              <span class="material-symbols-outlined text-secondary shrink-0">event</span>
+              <div>
+                <p class="text-xs text-text-muted uppercase font-bold">{{ t('calendar.modal.date') }}</p>
+                <p class="text-white">{{ formatDate(selectedEvent.start) }}</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="material-symbols-outlined text-secondary shrink-0">location_on</span>
+              <div>
+                <p class="text-xs text-text-muted uppercase font-bold">{{ t('calendar.modal.location') }}</p>
+                <p class="text-white">{{ selectedEvent.local || '---' }}</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="material-symbols-outlined text-secondary shrink-0">info</span>
+              <div>
+                <p class="text-xs text-text-muted uppercase font-bold">{{ t('calendar.modal.type') }}</p>
+                <p class="text-white capitalize">{{ selectedEvent.tipo }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <template #footer>
+          <button 
+            @click="showDetailsModal = false"
+            class="px-6 py-2 rounded-xl border border-input-border text-white hover:bg-white/5 transition-colors"
+          >
+            {{ t('calendar.modal.close') }}
+          </button>
+          <button 
+            v-if="!selectedEvent?.isRecurring"
+            @click="goToEvent"
+            class="px-6 py-2 rounded-xl bg-neon-gradient text-black font-bold shadow-lg"
+          >
+            {{ t('calendar.modal.viewEvent') }}
+          </button>
+        </template>
+      </Modal>
     </div>
   </AppLayout>
 </template>
@@ -47,60 +91,31 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import ptBrLocale from '@fullcalendar/core/locales/pt-br'
+import enUsLocale from '@fullcalendar/core/locales/en-gb'
 import type { EventInput } from '@fullcalendar/core'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import EventFilters from '@/components/features/events/EventFilters.vue'
+import Modal from '@/components/ui/Modal.vue'
 import { useEvents } from '@/composables/useEvents'
 import type { EventFilterType } from '@/types/events'
 
 const router = useRouter()
+const { t, locale } = useI18n()
 const { events, loadEvents } = useEvents()
 
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null)
 const activeFilter = ref<EventFilterType>('all')
+const showDetailsModal = ref(false)
+const selectedEvent = ref<any>(null)
 
 // Weekly recurring event (MVP: 1 evento fixo semanal)
 // Quarta-feira às 18:00 (repetindo semanalmente)
 // Generate weekly events for the next 6 months
-function generateWeeklyEvents(): EventInput[] {
-  const events: EventInput[] = []
-  const today = new Date()
-  const nextWednesday = new Date(today)
-  const dayOfWeek = today.getDay() // 0 = Sunday, 3 = Wednesday
-  const daysUntilWednesday = (3 - dayOfWeek + 7) % 7 || 7
-  nextWednesday.setDate(today.getDate() + daysUntilWednesday)
-  nextWednesday.setHours(18, 0, 0, 0)
-  
-  // Generate events for next 6 months (approximately 26 weeks)
-  for (let i = 0; i < 26; i++) {
-    const eventDate = new Date(nextWednesday)
-    eventDate.setDate(nextWednesday.getDate() + (i * 7))
-    
-    events.push({
-      id: `weekly-networking-${i}`,
-      title: 'Networking Semanal 323',
-      start: eventDate.toISOString(),
-      end: new Date(eventDate.getTime() + 2 * 60 * 60 * 1000).toISOString(), // +2 horas
-      color: '#f425f4',
-      borderColor: '#00f0ff',
-      textColor: '#ffffff',
-      classNames: ['recurring-event'],
-      extendedProps: {
-        tipo: 'presencial',
-        local: 'Online (Zoom)',
-        isRecurring: true,
-      },
-    })
-  }
-  
-  return events
-}
-
 const calendarOptions = computed(() => {
   const filteredEvents = getFilteredEvents()
   const calendarEvents: EventInput[] = [
@@ -119,8 +134,6 @@ const calendarOptions = computed(() => {
         isRecurring: false,
       },
     })),
-    // Add weekly recurring events (only if filter allows or is 'all')
-    ...(activeFilter.value === 'all' || activeFilter.value === 'networking' ? generateWeeklyEvents() : []),
   ]
 
   return {
@@ -131,7 +144,7 @@ const calendarOptions = computed(() => {
       center: 'title',
       right: 'dayGridMonth,timeGridWeek,timeGridDay',
     },
-    locale: ptBrLocale,
+    locale: locale.value.startsWith('pt') ? ptBrLocale : enUsLocale,
     events: calendarEvents,
     eventClick: handleEventClick,
     eventClassNames: (arg: any) => {
@@ -150,10 +163,10 @@ const calendarOptions = computed(() => {
     weekends: true,
     firstDay: 0, // Sunday
     buttonText: {
-      today: 'Hoje',
-      month: 'Mês',
-      week: 'Semana',
-      day: 'Dia',
+      today: t('calendar.buttons.today'),
+      month: t('calendar.buttons.month'),
+      week: t('calendar.buttons.week'),
+      day: t('calendar.buttons.day'),
     },
   }
 })
@@ -184,13 +197,33 @@ function handleFilterChange(filter: string) {
 }
 
 function handleEventClick(info: any) {
-  const eventId = info.event.id
-  if (eventId && eventId.startsWith('weekly-networking')) {
-    // For recurring events, show a modal or navigate to a special page
-    alert('Este é um evento semanal recorrente que acontece toda quarta-feira às 18:00. Participe do nosso Networking Semanal 323!')
-  } else if (eventId) {
-    router.push(`/eventos/${eventId}`)
+  selectedEvent.value = {
+    id: info.event.id,
+    title: info.event.title,
+    start: info.event.start,
+    local: info.event.extendedProps.local,
+    tipo: info.event.extendedProps.tipo,
+    isRecurring: info.event.extendedProps.isRecurring
   }
+  showDetailsModal.value = true
+}
+
+function goToEvent() {
+  if (selectedEvent.value?.id) {
+    router.push(`/eventos/${selectedEvent.value.id}`)
+  }
+}
+
+function formatDate(date: any) {
+  if (!date) return ''
+  return new Date(date).toLocaleString(locale.value, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 onMounted(async () => {
@@ -258,46 +291,63 @@ onMounted(async () => {
 }
 
 :deep(.fc-col-header-cell) {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: white;
-  font-weight: 600;
-  padding: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-:deep(.fc-daygrid-day-number) {
+:deep(.fc-col-header-cell-cushion) {
+  color: white !important;
+  padding: 0.75rem;
+  display: block;
+  text-decoration: none !important;
+}
+
+:deep(.fc-theme-standard td), :deep(.fc-theme-standard th) {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+:deep(.fc-scrollgrid), :deep(.fc-scrollgrid-section), :deep(.fc-scrollgrid-section td), :deep(.fc-scrollgrid-section th) {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  background: transparent !important;
+}
+
+:deep(.fc-daygrid-day-number), :deep(.fc-daygrid-day-top) {
   color: white;
   padding: 0.5rem;
+  text-decoration: none !important;
 }
 
-:deep(.fc-daygrid-day-top) {
-  flex-direction: row;
-  justify-content: flex-start;
+:deep(.fc-timegrid-slot) {
+  height: 3.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: transparent !important;
+}
+
+:deep(.fc-timegrid-axis-cushion), :deep(.fc-timegrid-slot-label-cushion) {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+:deep(.fc-timegrid-col) {
+  background: transparent !important;
 }
 
 :deep(.fc-event) {
   cursor: pointer;
-  border: 2px solid;
-  padding: 0.25rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.125rem 0.25rem;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   transition: all 0.2s;
+  border-radius: 4px;
 }
 
 :deep(.fc-event:hover) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  filter: brightness(1.1);
-}
-
-:deep(.fc-event.recurring-event) {
-  background: linear-gradient(135deg, #f425f4 0%, #00f0ff 100%);
-  border-color: #00f0ff;
-  box-shadow: 0 0 10px rgba(244, 37, 244, 0.4);
+  transform: translateY(-1px);
+  filter: brightness(1.2);
 }
 
 :deep(.fc-daygrid-event) {
-  margin: 0.125rem 0;
+  margin: 1px 0;
 }
 
 :deep(.fc-toolbar-title) {
@@ -306,8 +356,22 @@ onMounted(async () => {
   font-size: 1.5rem;
 }
 
+/* Fix for white header in week/day view */
+:deep(.fc-col-header), :deep(.fc-timegrid-header) {
+  background-color: transparent !important;
+}
+
+
+
 .bg-neon-gradient {
   background: linear-gradient(135deg, #f425f4 0%, #00f0ff 100%);
+}
+
+.neon-text-gradient {
+  background: linear-gradient(135deg, #f425f4 0%, #00f0ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 </style>
 

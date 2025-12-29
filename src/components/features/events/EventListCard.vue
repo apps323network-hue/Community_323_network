@@ -59,7 +59,7 @@
       
       <!-- Description -->
       <p class="text-white/60 text-xs sm:text-sm line-clamp-2">
-        {{ event.descricao || 'Junte-se a profissionais brasileiros para uma noite de conexões e oportunidades de negócios.' }}
+        {{ event.descricao || t('events.heroPlaceholder') }}
       </p>
       
       <!-- Location -->
@@ -90,7 +90,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Event } from '@/types/events'
+
+const { t } = useI18n()
 
 interface Props {
   event: Event
@@ -106,11 +109,15 @@ const emit = defineEmits<{
 
 // Date formatting
 const eventDate = computed(() => new Date(props.event.data_hora))
+const day = computed(() => eventDate.value.getDate())
 const month = computed(() => {
-  const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
+  const months = [
+    t('months.jan'), t('months.feb'), t('months.mar'), t('months.apr'),
+    t('months.may'), t('months.jun'), t('months.jul'), t('months.aug'),
+    t('months.sep'), t('months.oct'), t('months.nov'), t('months.dec')
+  ]
   return months[eventDate.value.getMonth()]
 })
-const day = computed(() => eventDate.value.getDate())
 
 const formattedTime = computed(() => {
   const hours = eventDate.value.getHours().toString().padStart(2, '0')
@@ -118,95 +125,104 @@ const formattedTime = computed(() => {
   return `${hours}:${minutes}h`
 })
 
-// Determine event type label based on title/content
-const eventTypeLabel = computed(() => {
+// Category logic (untranslated for styling/logic consistency)
+const category = computed(() => {
   const title = props.event.titulo.toLowerCase()
   if (title.includes('workshop') || title.includes('branding') || title.includes('aprenda')) {
-    return 'Workshop'
+    return 'workshop'
   }
   if (title.includes('showcase') || title.includes('exposição') || title.includes('art')) {
-    return 'Showcase'
+    return 'showcase'
   }
   if (title.includes('networking') || title.includes('negócios') || title.includes('pitch')) {
-    return 'Networking'
+    return 'networking'
   }
   if (title.includes('happy hour') || title.includes('social') || title.includes('encontro')) {
-    return 'Social'
+    return 'social'
   }
   // Default based on tipo
-  return props.event.tipo === 'webinar' ? 'Workshop' : 'Networking'
+  return props.event.tipo === 'webinar' ? 'workshop' : 'networking'
+})
+
+const eventTypeLabel = computed(() => {
+  const cat = category.value
+  if (cat === 'workshop') return t('events.filterWorkshop')
+  if (cat === 'showcase') return t('events.filterShowcase')
+  if (cat === 'networking') return t('events.filterNetworking')
+  if (cat === 'social') return t('events.filterSocial')
+  return t('events.filterNetworking')
 })
 
 // Card styling based on type
 const cardHoverClass = computed(() => {
-  const label = eventTypeLabel.value
-  if (label === 'Showcase' || label === 'Networking') {
+  const cat = category.value
+  if (cat === 'showcase' || cat === 'networking') {
     return 'hover:border-primary hover:shadow-neon-pink'
   }
-  if (label === 'Workshop') {
+  if (cat === 'workshop') {
     return 'hover:border-secondary hover:shadow-neon-blue'
   }
   return 'hover:border-white/30 hover:shadow-neon-mixed'
 })
 
 const dateBadgeClass = computed(() => {
-  const label = eventTypeLabel.value
-  if (label === 'Showcase' || label === 'Networking') {
+  const cat = category.value
+  if (cat === 'showcase' || cat === 'networking') {
     return 'border border-primary/30'
   }
-  if (label === 'Workshop') {
+  if (cat === 'workshop') {
     return 'border border-secondary/30'
   }
   return 'border border-white/20'
 })
 
 const dateNumberClass = computed(() => {
-  const label = eventTypeLabel.value
-  if (label === 'Showcase' || label === 'Networking') {
+  const cat = category.value
+  if (cat === 'showcase' || cat === 'networking') {
     return 'text-primary drop-shadow-[0_0_5px_rgba(244,37,244,0.8)]'
   }
-  if (label === 'Workshop') {
+  if (cat === 'workshop') {
     return 'text-secondary drop-shadow-[0_0_5px_rgba(0,240,255,0.8)]'
   }
   return 'bg-clip-text text-transparent bg-neon-gradient'
 })
 
 const accentLineClass = computed(() => {
-  const label = eventTypeLabel.value
-  if (label === 'Showcase' || label === 'Networking') {
+  const cat = category.value
+  if (cat === 'showcase' || cat === 'networking') {
     return 'bg-gradient-to-r from-primary to-transparent'
   }
-  if (label === 'Workshop') {
+  if (cat === 'workshop') {
     return 'bg-gradient-to-r from-secondary to-transparent'
   }
   return 'bg-neon-gradient'
 })
 
 const typeBadgeClass = computed(() => {
-  const label = eventTypeLabel.value
-  if (label === 'Showcase' || label === 'Networking') {
+  const cat = category.value
+  if (cat === 'showcase' || cat === 'networking') {
     return 'bg-primary/20 text-primary border-primary/40 shadow-[0_0_10px_rgba(244,37,244,0.1)]'
   }
-  if (label === 'Workshop') {
+  if (cat === 'workshop') {
     return 'bg-secondary/20 text-secondary border-secondary/40 shadow-[0_0_10px_rgba(0,240,255,0.1)]'
   }
   return 'bg-white/10 text-white border-white/20'
 })
 
 const titleHoverClass = computed(() => {
-  const label = eventTypeLabel.value
-  if (label === 'Showcase' || label === 'Networking') {
+  const cat = category.value
+  if (cat === 'showcase' || cat === 'networking') {
     return 'group-hover:text-primary text-glow-pink-hover'
   }
-  if (label === 'Workshop') {
+  if (cat === 'workshop') {
     return 'group-hover:text-secondary'
   }
   return 'group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-neon-gradient'
 })
 
 const locationIconClass = computed(() => {
-  const label = eventTypeLabel.value
-  if (label === 'Showcase' || label === 'Networking') {
+  const cat = category.value
+  if (cat === 'showcase' || cat === 'networking') {
     return 'text-primary'
   }
   return 'text-secondary'
@@ -216,7 +232,7 @@ const locationText = computed(() => {
   if (props.event.tipo === 'webinar') {
     return 'Online (Zoom)'
   }
-  return props.event.local || 'Local a definir'
+  return props.event.local || t('events.locationToBeDefined')
 })
 
 // Button styling and text
@@ -243,19 +259,16 @@ const buttonClass = computed(() => {
 
 const buttonText = computed(() => {
   if (props.event.is_confirmed) {
-    return 'Confirmado'
+    return t('events.presenceConfirmed')
   }
-  const label = eventTypeLabel.value
-  if (label === 'Showcase') {
-    return 'RSVP'
+  const title = props.event.titulo.toLowerCase()
+  if (title.includes('showcase')) {
+    return t('events.rsvp')
   }
-  if (label === 'Workshop') {
-    return 'Inscrever-se'
+  if (props.event.tipo === 'webinar') {
+    return t('auth.register')
   }
-  if (label === 'Networking') {
-    return 'Aplicar Agora'
-  }
-  return 'Confirmar Presença'
+  return t('events.confirmPresence')
 })
 
 const buttonIcon = computed(() => {
