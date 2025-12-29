@@ -125,6 +125,14 @@
                     <span class="material-symbols-outlined text-base sm:text-lg">cancel</span>
                   </button>
                   <button
+                    v-if="user.status === 'banned'"
+                    class="p-2 text-green-400 hover:bg-green-500/20 rounded-lg transition-all"
+                    title="Desbanir Usuário"
+                    @click="$emit('unban', user.id)"
+                  >
+                    <span class="material-symbols-outlined text-base sm:text-lg">check_circle</span>
+                  </button>
+                  <button
                     v-if="user.status === 'suspended'"
                     class="p-2 text-green-400 hover:bg-green-500/20 rounded-lg transition-all"
                     title="Remover Suspensão"
@@ -165,6 +173,7 @@ const props = defineProps<Props>()
 defineEmits<{
   suspend: [userId: string]
   ban: [userId: string]
+  unban: [userId: string]
   unsuspend: [userId: string]
   'view-history': [userId: string]
 }>()
