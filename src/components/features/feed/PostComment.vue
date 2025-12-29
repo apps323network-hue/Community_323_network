@@ -9,30 +9,48 @@
           </span>
           <span class="text-xs text-gray-400 ml-2">{{ formatTime(comment.created_at) }}</span>
         </div>
-        <div v-if="isOwnComment" class="flex gap-2">
+        <div class="flex gap-2">
           <button
+            v-if="isOwnComment"
             class="text-gray-400 hover:text-secondary text-sm transition-colors"
             @click="emit('edit', comment.id)"
           >
             Editar
           </button>
           <button
+            v-if="isOwnComment"
             class="text-gray-400 hover:text-primary text-sm transition-colors"
             @click="emit('delete', comment.id)"
           >
             Deletar
+          </button>
+          <button
+            v-if="!isOwnComment"
+            class="text-gray-400 hover:text-orange-500 text-sm transition-colors"
+            @click="handleReport"
+          >
+            Reportar
           </button>
         </div>
       </div>
       <p class="text-sm text-gray-900 dark:text-gray-300 mt-1 leading-relaxed">{{ comment.conteudo }}</p>
     </div>
   </div>
+
+  <!-- Report Modal -->
+  <ReportModal
+    v-model="showReportModal"
+    :item-type="'comment'"
+    :item-id="comment.id"
+    @reported="handleReportSubmitted"
+  />
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import Avatar from '@/components/ui/Avatar.vue'
+import ReportModal from './ReportModal.vue'
 import type { Comment } from '@/types/posts'
 
 interface Props {
@@ -47,6 +65,7 @@ const emit = defineEmits<{
 }>()
 
 const authStore = useAuthStore()
+const showReportModal = ref(false)
 
 const isOwnComment = computed(() => {
   return authStore.user?.id === props.comment.user_id
@@ -70,6 +89,14 @@ function formatTime(date: string) {
   if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}min atrás`
   if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h atrás`
   return commentDate.toLocaleDateString('pt-BR')
+}
+
+function handleReport() {
+  showReportModal.value = true
+}
+
+function handleReportSubmitted() {
+  showReportModal.value = false
 }
 </script>
 

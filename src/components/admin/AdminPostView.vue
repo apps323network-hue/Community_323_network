@@ -42,9 +42,30 @@
       <p class="text-white/90 text-base sm:text-lg whitespace-pre-wrap mb-3">
         {{ post.conteudo }}
       </p>
-      <div v-if="post.image_url" class="rounded-lg overflow-hidden mt-3">
-        <img :src="post.image_url" alt="Post image" class="w-full h-auto max-h-96 object-contain" />
+      <div
+        v-if="post.image_url"
+        class="rounded-lg overflow-hidden mt-3 cursor-pointer group relative"
+        @click="showImageLightbox = true"
+      >
+        <img
+          :src="post.image_url"
+          alt="Post image"
+          class="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105"
+        />
+        <!-- Zoom Icon Overlay -->
+        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+          <div class="bg-black/50 backdrop-blur-sm rounded-full p-3">
+            <span class="material-symbols-outlined text-white text-2xl">zoom_in</span>
+          </div>
+        </div>
       </div>
+
+      <!-- Image Lightbox -->
+      <ImageLightbox
+        v-model="showImageLightbox"
+        :image-url="post.image_url"
+        :alt="`Imagem do post de ${post.author?.nome || 'Usuário'}`"
+      />
     </div>
 
     <!-- Post Stats -->
@@ -161,10 +182,12 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import type { AdminPost } from '@/types/admin'
 import Avatar from '@/components/ui/Avatar.vue'
 import PostStatusBadge from '@/components/ui/PostStatusBadge.vue'
+import ImageLightbox from '@/components/ui/ImageLightbox.vue'
 
 interface Props {
   post: AdminPost
@@ -178,6 +201,8 @@ defineEmits<{
   remove: [postId: string]
   spam: [postId: string]
 }>()
+
+const showImageLightbox = ref(false)
 
 function formattedDate(dateString?: string) {
   if (!dateString) return ''

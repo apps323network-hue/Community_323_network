@@ -46,6 +46,7 @@ const adminStore = useAdminStore()
 onMounted(async () => {
   await adminStore.fetchUserStats()
   await adminStore.fetchPostStats()
+  await adminStore.fetchReportStats()
 })
 
 const menuItems = computed(() => [
@@ -76,6 +77,27 @@ const menuItems = computed(() => [
     icon: 'event',
     badge: undefined,
     badgeClass: '',
+  },
+  {
+    path: '/admin/servicos',
+    label: 'Serviços',
+    icon: 'business_center',
+    badge: undefined,
+    badgeClass: '',
+  },
+  {
+    path: '/admin/palavras-proibidas',
+    label: 'Palavras Proibidas',
+    icon: 'block',
+    badge: undefined,
+    badgeClass: '',
+  },
+  {
+    path: '/admin/reports',
+    label: 'Reports',
+    icon: 'report',
+    badge: adminStore.reportStats.pending > 0 ? adminStore.reportStats.pending : undefined,
+    badgeClass: 'bg-yellow-500/20 text-yellow-400',
   },
 ])
 

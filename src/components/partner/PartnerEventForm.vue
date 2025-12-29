@@ -221,16 +221,19 @@ async function uploadImage(): Promise<string | null> {
     const filePath = `events/${fileName}`
 
     const { error: uploadError } = await supabase.storage
-      .from('images')
-      .upload(filePath, imageFile.value)
+      .from('event-images')
+      .upload(filePath, imageFile.value, {
+        cacheControl: '3600',
+        upsert: false
+      })
 
     if (uploadError) throw uploadError
 
-    const { data } = supabase.storage
-      .from('images')
+    const { data: { publicUrl } } = supabase.storage
+      .from('event-images')
       .getPublicUrl(filePath)
 
-    return data.publicUrl
+    return publicUrl
   } catch (err: any) {
     console.error('Error uploading image:', err)
     error.value = 'Erro ao fazer upload da imagem'

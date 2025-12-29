@@ -13,9 +13,30 @@
           </div>
         </div>
         <p class="text-white/80 text-sm line-clamp-3">{{ post?.conteudo || '' }}</p>
-        <div v-if="post?.image_url" class="mt-3 rounded-lg overflow-hidden">
-          <img :src="post.image_url" alt="Post image" class="w-full h-auto max-h-40 object-cover" />
+        <div
+          v-if="post?.image_url"
+          class="mt-3 rounded-lg overflow-hidden cursor-pointer group relative"
+          @click="showImageLightbox = true"
+        >
+          <img
+            :src="post.image_url"
+            alt="Post image"
+            class="w-full h-auto max-h-40 object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+          <!-- Zoom Icon Overlay -->
+          <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+            <div class="bg-black/50 backdrop-blur-sm rounded-full p-2">
+              <span class="material-symbols-outlined text-white text-lg">zoom_in</span>
+            </div>
+          </div>
         </div>
+
+        <!-- Image Lightbox -->
+        <ImageLightbox
+          v-model="showImageLightbox"
+          :image-url="post?.image_url"
+          :alt="`Imagem do post de ${post?.author?.nome || 'Usuário'}`"
+        />
       </div>
 
       <!-- Action Selection -->
@@ -144,6 +165,7 @@ import { ref, computed, watch } from 'vue'
 import type { AdminPost } from '@/types/admin'
 import Modal from '@/components/ui/Modal.vue'
 import Button from '@/components/ui/Button.vue'
+import ImageLightbox from '@/components/ui/ImageLightbox.vue'
 
 interface Props {
   modelValue: boolean
@@ -170,6 +192,7 @@ const reason = ref('')
 const addStrike = ref(false)
 const error = ref<string | null>(null)
 const processing = ref(false)
+const showImageLightbox = ref(false)
 
 const canSubmit = computed(() => {
   if (action.value === 'hide' || action.value === 'remove') {

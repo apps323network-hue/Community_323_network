@@ -273,50 +273,25 @@ function toggleUserMenu() {
 const isLoggingOut = ref(false)
 
 async function handleLogout() {
-  // #region agent log
-  fetch('http://127.0.0.1:7246/ingest/0e16ca07-47b3-4e57-90f8-e4c32947f7f6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppHeader.vue:262',message:'handleLogout called',data:{isLoggingOut:isLoggingOut.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
-
   // Prevenir múltiplos cliques
   if (isLoggingOut.value) {
-    // #region agent log
-    fetch('http://127.0.0.1:7246/ingest/0e16ca07-47b3-4e57-90f8-e4c32947f7f6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppHeader.vue:266',message:'Logout already in progress, returning',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     return
   }
 
   isLoggingOut.value = true
   showUserMenu.value = false
 
-  // #region agent log
-  fetch('http://127.0.0.1:7246/ingest/0e16ca07-47b3-4e57-90f8-e4c32947f7f6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppHeader.vue:272',message:'Clearing auth state',data:{hasUser:!!authStore.user},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-  // #endregion
-
   // Limpar estado local imediatamente para feedback visual rápido
   authStore.user = null
   const userStore = useUserStore()
   userStore.clearProfile()
 
-  // #region agent log
-  fetch('http://127.0.0.1:7246/ingest/0e16ca07-47b3-4e57-90f8-e4c32947f7f6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppHeader.vue:277',message:'Calling signOut',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-  // #endregion
-
   // Fazer signOut primeiro
   try {
     await authStore.signOut()
-    // #region agent log
-    fetch('http://127.0.0.1:7246/ingest/0e16ca07-47b3-4e57-90f8-e4c32947f7f6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppHeader.vue:282',message:'signOut completed, redirecting to login',data:{currentPath:route.path},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-    // #endregion
   } catch (err: any) {
-    // #region agent log
-    fetch('http://127.0.0.1:7246/ingest/0e16ca07-47b3-4e57-90f8-e4c32947f7f6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppHeader.vue:285',message:'signOut error, but redirecting anyway',data:{error:err?.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
     // Ignorar erros - vamos redirecionar mesmo assim
   }
-
-  // #region agent log
-  fetch('http://127.0.0.1:7246/ingest/0e16ca07-47b3-4e57-90f8-e4c32947f7f6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppHeader.vue:290',message:'Redirecting to login page',data:{targetPath:'/login'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
-  // #endregion
 
   // Redirecionar para página de login usando router
   router.push({ name: 'Login' })

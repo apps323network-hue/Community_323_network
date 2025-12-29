@@ -1,0 +1,184 @@
+<template>
+  <Modal v-model="isOpen" title="Reportar Conteúdo" size="md">
+    <div class="space-y-6">
+      <!-- Informação do item reportado -->
+      <div class="bg-surface-card rounded-lg p-4 border border-white/5">
+        <p class="text-white/60 text-sm mb-2">Você está reportando:</p>
+        <p class="text-white font-semibold">
+          {{ itemType === 'post' ? 'Post' : itemType === 'comment' ? 'Comentário' : 'Usuário' }}
+        </p>
+      </div>
+
+      <!-- Motivo do Report -->
+      <div>
+        <label class="block text-white/80 text-sm font-semibold mb-3">Motivo do Report *</label>
+        <div class="space-y-2">
+          <label
+            v-for="reason in reasons"
+            :key="reason.value"
+            :class="[
+              'flex items-center gap-3 px-4 py-3 rounded-lg border cursor-pointer transition-all',
+              formData.reason === reason.value
+                ? 'bg-primary/20 border-primary text-white'
+                : 'bg-surface-card border-white/10 text-white/60 hover:border-primary/30'
+            ]"
+          >
+            <input
+              v-model="formData.reason"
+              type="radio"
+              :value="reason.value"
+              class="w-4 h-4 text-primary focus:ring-primary"
+            />
+            <div class="flex-1">
+              <div class="font-medium">{{ reason.label }}</div>
+              <div class="text-xs text-white/40">{{ reason.description }}</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Descrição Opcional -->
+      <div>
+        <label class="block text-white/80 text-sm font-semibold mb-2">Descrição (opcional)</label>
+        <textarea
+          v-model="formData.description"
+          rows="4"
+          class="w-full rounded-lg border border-white/10 bg-surface-dark p-3 text-white placeholder-white/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-none"
+          placeholder="Adicione mais detalhes sobre o problema..."
+        />
+      </div>
+
+      <!-- Erro -->
+      <div v-if="error" class="text-red-400 text-sm">{{ error }}</div>
+
+      <!-- Botões -->
+      <div class="flex gap-3 pt-4">
+        <button
+          type="button"
+          @click="handleSubmit"
+          :disabled="!formData.reason || submitting"
+          class="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-black font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {{ submitting ? 'Enviando...' : 'Enviar Report' }}
+        </button>
+        <button
+          type="button"
+          @click="isOpen = false"
+          class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white font-medium transition-all"
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </Modal>
+</template>
+
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import { useAdminStore } from '@/stores/admin'
+import Modal from '@/components/ui/Modal.vue'
+import { toast } from 'vue-sonner'
+import type { ReportItemType, ReportReason } from '@/types/admin'
+
+interface Props {
+  modelValue: boolean
+  itemType: ReportItemType
+  itemId: string
+}
+
+const props = defineProps<Props>()
+const emit = defineEmits<{
+  'update:modelValue': [value: boolean]
+  'reported': []
+}>()
+
+const adminStore = useAdminStore()
+
+const isOpen = ref(props.modelValue)
+const submitting = ref(false)
+const error = ref<string | null>(null)
+
+const formData = ref<{
+  reason: ReportReason | ''
+  description: string
+}>({
+  reason: '',
+  description: '',
+})
+
+const reasons: Array<{ value: ReportReason; label: string; description: string }> = [
+  {
+    value: 'spam',
+    label: 'Spam',
+    description: 'Conteúdo promocional ou repetitivo',
+  },
+  {
+    value: 'inappropriate',
+    label: 'Conteúdo Inapropriado',
+    description: 'Conteúdo ofensivo ou inadequado',
+  },
+  {
+    value: 'harassment',
+    label: 'Assédio',
+    description: 'Bullying, assédio ou comportamento abusivo',
+  },
+  {
+    value: 'fake_news',
+    label: 'Informação Falsa',
+    description: 'Notícias falsas ou informações enganosas',
+  },
+  {
+    value: 'other',
+    label: 'Outro',
+    description: 'Outro motivo não listado',
+  },
+]
+
+watch(() => props.modelValue, (newVal) => {
+  isOpen.value = newVal
+  if (!newVal) {
+    // Reset form when modal closes
+    formData.value = {
+      reason: '',
+      description: '',
+    }
+    error.value = null
+  }
+})
+
+watch(isOpen, (newVal) => {
+  emit('update:modelValue', newVal)
+})
+
+async function handleSubmit() {
+  if (!formData.value.reason) {
+    error.value = 'Por favor, selecione um motivo'
+    return
+  }
+
+  submitting.value = true
+  error.value = null
+
+  try {
+    await adminStore.createReport({
+      reported_item_type: props.itemType,
+      reported_item_id: props.itemId,
+      reason: formData.value.reason,
+      description: formData.value.description || undefined,
+    })
+
+    toast.success('Report enviado com sucesso!', {
+      description: 'Nossa equipe irá analisar o conteúdo reportado.',
+    })
+
+    isOpen.value = false
+    emit('reported')
+  } catch (err: any) {
+    error.value = err.message || 'Erro ao enviar report. Tente novamente.'
+    console.error('Error creating report:', err)
+  } finally {
+    submitting.value = false
+  }
+}
+</script>
+

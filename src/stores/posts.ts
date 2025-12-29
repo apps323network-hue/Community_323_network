@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from './auth'
+import { checkBannedWords } from '@/lib/bannedWords'
 import type { Post, Comment, PostCreateInput, CommentCreateInput, PostFilters } from '@/types/posts'
 
 export const usePostStore = defineStore('posts', () => {
@@ -45,6 +46,7 @@ export const usePostStore = defineStore('posts', () => {
     error.value = null
 
     try {
+      console.log('[POSTS] Buscando posts...')
 
       let query = supabase
         .from('posts')
@@ -56,7 +58,7 @@ export const usePostStore = defineStore('posts', () => {
       // Não filtrar por status aqui - deixar a RLS fazer o trabalho
       // A RLS já permite:
       // - Admins veem todos os posts
-      // - Usuários veem apenas posts 'approved'
+      // - Usuários autenticados veem apenas posts 'approved'
       // - Criador pode ver seu próprio post mesmo se 'pending' ou 'hidden'
       // Se filtrarmos aqui, podemos bloquear posts que a RLS permite ver
 
@@ -75,7 +77,15 @@ export const usePostStore = defineStore('posts', () => {
 
       const { data, error: queryError } = await query
 
-      if (queryError) throw queryError
+      if (queryError) {
+        console.error('[POSTS] Erro ao buscar posts:', queryError)
+        throw queryError
+      }
+
+      console.log(`[POSTS] Posts encontrados: ${data?.length || 0}`)
+      if (data && data.length > 0) {
+        console.log('[POSTS] Status dos posts:', data.map((p: any) => ({ id: p.id, status: p.status })))
+      }
 
       if (!data || data.length === 0) {
         hasMore.value = false
@@ -267,6 +277,23 @@ export const usePostStore = defineStore('posts', () => {
     error.value = null
 
     try {
+      // Verificar palavras proibidas
+      const bannedCheck = await checkBannedWords(input.conteudo)
+      
+      if (bannedCheck.found) {
+        // Bloquear qualquer palavra ofensiva encontrada
+        throw new Error('Seu post contém palavras ofensivas. Por favor, revise o conteúdo.')
+      }
+
+      // Determinar status baseado na verificação
+      let postStatus: 'pending' | 'approved' = 'pending'
+      if (bannedCheck.found && bannedCheck.action === 'warn') {
+        postStatus = 'pending'
+      } else if (!bannedCheck.found) {
+        // Se não encontrou palavras proibidas, ainda cria como pending (padrão)
+        postStatus = 'pending'
+      }
+
       const { data, error: insertError } = await supabase
         .from('posts')
         .insert({
@@ -274,7 +301,7 @@ export const usePostStore = defineStore('posts', () => {
           tipo: input.tipo,
           conteudo: input.conteudo,
           image_url: input.image_url || null,
-          status: 'pending', // Sempre criar como pending
+          status: postStatus,
         })
         .select('*')
         .single()
@@ -527,6 +554,14 @@ export const usePostStore = defineStore('posts', () => {
     }
 
     try {
+      // Verificar palavras proibidas
+      const bannedCheck = await checkBannedWords(input.conteudo)
+      
+      if (bannedCheck.found) {
+        // Bloquear qualquer palavra ofensiva encontrada
+        throw new Error('Seu comentário contém palavras ofensivas. Por favor, revise o conteúdo.')
+      }
+
       const { data, error: insertError } = await supabase
         .from('post_comments')
         .insert({

@@ -155,7 +155,9 @@ function handleReject(userId: string) {
 async function handleModalApprove(userId: string) {
   try {
     await adminStore.approveUser(userId)
+    // A função approveUser já recarrega a lista, mas vamos garantir
     await adminStore.fetchPendingUsers()
+    await adminStore.fetchAllUsers()
     await adminStore.fetchUserStats()
     toast.success('Usuário aprovado com sucesso!')
     showApprovalModal.value = false
@@ -163,6 +165,9 @@ async function handleModalApprove(userId: string) {
   } catch (error: any) {
     toast.error(error.message || 'Erro ao aprovar usuário')
     console.error('Error approving user:', error)
+    // Recarregar mesmo em caso de erro para garantir sincronização
+    await adminStore.fetchPendingUsers()
+    await adminStore.fetchUserStats()
   }
 }
 
