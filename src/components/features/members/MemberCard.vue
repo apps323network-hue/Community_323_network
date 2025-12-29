@@ -2,7 +2,7 @@
   <!-- List View -->
   <div
     v-if="variant === 'list'"
-    class="group p-3 sm:p-4 md:p-6 border-b border-white/5 hover:bg-white/5 transition-all duration-300 flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6 cursor-pointer overflow-hidden"
+    class="group p-3 sm:p-4 md:p-6 border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition-all duration-300 flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6 cursor-pointer overflow-hidden"
     @click="$emit('view-profile', member.id)"
   >
     <!-- Avatar -->
@@ -39,10 +39,10 @@
 
     <!-- Member Info -->
     <div class="flex-1 min-w-0 overflow-hidden">
-      <h3 class="text-sm sm:text-base md:text-lg font-bold text-white group-hover:text-secondary transition-colors truncate">
+      <h3 class="text-sm sm:text-base md:text-lg font-bold text-slate-900 dark:text-white group-hover:text-secondary transition-colors truncate">
         {{ member.nome }}
       </h3>
-      <p class="text-xs sm:text-sm text-gray-400 truncate">
+      <p class="text-xs sm:text-sm text-slate-500 dark:text-gray-400 truncate">
         {{ member.area_atuacao || 'Membro' }} • {{ [member.cidade, member.pais].filter(Boolean).join(', ') }}
       </p>
     </div>
@@ -55,17 +55,11 @@
         Conectar
       </button>
       <button
-        class="px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 md:py-2.5 rounded-md sm:rounded-lg border border-gray-800 bg-card-dark text-gray-400 hover:text-secondary hover:border-secondary hover:bg-secondary/10 hover:shadow-neon-pink transition-all duration-300"
-      >
-        <span class="material-icons text-xs sm:text-sm md:text-base">chat</span>
-      </button>
-      <!-- Bookmark Button - sempre visível na lista -->
-      <button
         :class="[
           'px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 md:py-2.5 rounded-md sm:rounded-lg border transition-all duration-300',
           isBookmarkedComputed
-            ? 'border-secondary/40 text-secondary bg-secondary/10 hover:bg-secondary/20 hover:shadow-neon-pink'
-            : 'border-gray-800 bg-card-dark text-gray-400 hover:text-secondary hover:border-secondary hover:bg-secondary/10'
+            ? 'border-secondary-dark/40 dark:border-secondary/40 text-secondary-dark dark:text-secondary bg-secondary-dark/10 dark:bg-secondary/10 hover:bg-secondary-dark/20 dark:hover:bg-secondary/20 hover:shadow-neon-pink'
+            : 'border-slate-200 dark:border-gray-800 bg-white dark:bg-surface-card text-slate-400 dark:text-gray-400 hover:text-secondary hover:border-secondary hover:bg-secondary/10'
         ]"
         @click.stop="handleToggleBookmark"
         :disabled="bookmarkLoading"
@@ -80,24 +74,24 @@
   <!-- Featured/Grid View -->
   <div
     v-else
-    class="relative group rounded-xl sm:rounded-2xl overflow-hidden bg-card-dark border border-white/5 shadow-xl hover:border-secondary/50 hover:shadow-neon-blue transition-all duration-500 hover:-translate-y-2 cursor-pointer"
+    class="relative group rounded-xl sm:rounded-2xl overflow-hidden bg-white dark:bg-surface-card border border-slate-200 dark:border-white/5 shadow-lg dark:shadow-xl hover:border-secondary/50 hover:shadow-neon-blue transition-all duration-500 hover:-translate-y-2 cursor-pointer"
     @click="$emit('view-profile', member.id)"
   >
     <!-- Gradient Cover -->
     <div
-      class="h-24 sm:h-28 bg-gradient-to-r from-blue-700 via-blue-500 to-blue-400 opacity-90 group-hover:opacity-100 transition-opacity"
+      class="h-24 sm:h-28 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-400 dark:from-blue-700 dark:via-blue-500 dark:to-blue-400 opacity-90 group-hover:opacity-100 transition-opacity"
     ></div>
 
     <!-- Card Content -->
     <div class="px-4 sm:px-6 pb-4 sm:pb-6 relative">
       <!-- Avatar -->
-      <div class="absolute -top-12 sm:-top-14 left-4 sm:left-6">
+      <div class="absolute -top-12 sm:-top-14 bg-transparent left-4 sm:left-6">
         <Avatar
           :src="member.avatar_url"
           :name="member.nome"
           size="xl"
           :border="false"
-          class="ring-2 ring-transparent transition-all shadow-2xl"
+          class="transition-all shadow-xl"
         />
       </div>
 
@@ -107,8 +101,8 @@
           :class="[
             'transition-all duration-300',
             isBookmarkedComputed
-              ? 'text-secondary hover:text-secondary/80 hover:scale-110'
-              : 'text-gray-400 hover:text-white hover:scale-110'
+              ? 'text-secondary-dark dark:text-secondary hover:text-secondary-dark/80 dark:hover:text-secondary/80 hover:scale-110'
+              : 'text-slate-400 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:scale-110'
           ]"
           @click.stop="handleToggleBookmark"
           :disabled="bookmarkLoading"
@@ -122,7 +116,7 @@
       <!-- Member Info -->
       <div class="pt-12 sm:pt-16">
         <!-- Name -->
-        <h3 class="text-lg sm:text-xl font-bold text-white group-hover:text-secondary transition-colors mb-2 sm:mb-3">
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white group-hover:text-secondary transition-colors mb-2 sm:mb-3">
           {{ member.nome }}
         </h3>
 
@@ -132,7 +126,7 @@
         </p>
 
         <!-- Description/Bio -->
-        <p v-if="member.objetivo" class="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-5 line-clamp-2 leading-relaxed">
+        <p v-if="member.objetivo" class="text-xs sm:text-sm text-slate-600 dark:text-gray-300 mb-3 sm:mb-5 line-clamp-2 leading-relaxed">
           {{ member.objetivo }}
         </p>
 
@@ -144,7 +138,7 @@
         <!-- Location -->
         <div
           v-if="member.cidade || member.pais"
-          class="flex items-center gap-1 text-xs sm:text-sm text-gray-400 mb-3 sm:mb-5"
+          class="flex items-center gap-1 text-xs sm:text-sm text-slate-500 dark:text-gray-400 mb-3 sm:mb-5"
         >
           <span class="material-icons text-sm sm:text-base">place</span>
           {{ [member.cidade, member.pais].filter(Boolean).join(', ') }}
@@ -153,16 +147,10 @@
         <!-- Action Buttons -->
         <div class="flex gap-2 sm:gap-3">
           <button
-            class="flex-1 bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-300 hover:to-blue-500 text-black font-bold py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm transition-all shadow-glow-secondary hover:shadow-neon-blue hover:scale-[1.02]"
+            class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-bold py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm transition-all shadow-lg hover:shadow-neon-blue hover:scale-[1.02]"
             @click.stop="$emit('view-profile', member.id)"
           >
             Conectar
-          </button>
-          <button
-            class="p-2 sm:p-2.5 rounded-lg sm:rounded-xl border border-gray-700 hover:border-secondary hover:bg-secondary/10 hover:text-secondary hover:shadow-neon-pink text-gray-400 transition-all duration-300"
-            @click.stop
-          >
-            <span class="material-icons text-lg sm:text-xl">chat_bubble_outline</span>
           </button>
         </div>
       </div>

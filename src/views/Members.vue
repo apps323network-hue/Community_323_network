@@ -4,14 +4,14 @@
       <!-- Header -->
       <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 sm:gap-6 lg:gap-8 w-full overflow-hidden">
         <div class="w-full lg:flex-1 lg:max-w-2xl min-w-0">
-          <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-2 sm:mb-3 tracking-tight">
+          <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-extrabold mb-2 sm:mb-3 tracking-tight">
             <span
-              class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-400 to-secondary neon-text-blue"
+              class="bg-clip-text text-transparent bg-gradient-to-r pl-1 from-blue-700 to-indigo-800 dark:from-secondary dark:to-blue-500"
             >
               Comunidade
             </span>
           </h1>
-          <p class="text-gray-500 dark:text-gray-400 max-w-xl text-xs sm:text-sm md:text-base lg:text-lg">
+          <p class="text-slate-600 pl-1 dark:text-gray-400 max-w-xl text-xs sm:text-sm md:text-base lg:text-lg">
             Conecte-se com artistas, empreendedores e visionários brasileiros nos EUA.
           </p>
         </div>
@@ -25,14 +25,14 @@
             </div>
             <input
               v-model="searchQuery"
-              class="block w-full  mt-1.5 pl-10 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 border border-secondary/50 rounded-lg sm:rounded-xl leading-5 bg-[#0a040f] text-white placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] transition-all duration-300"
+              class="block w-full  mt-1.5 pl-10 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 border border-slate-200 dark:border-secondary/50 rounded-lg sm:rounded-xl leading-5 bg-white dark:bg-[#0a040f] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] transition-all duration-300"
               placeholder="Buscar por nome, área ou cidade..."
               type="text"
               @input="handleSearch"
             />
           </div>
           <button
-            class="group flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3.5 border border-secondary/50 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold text-gray-200 bg-[#0a040f] hover:bg-secondary/10 hover:border-secondary hover:shadow-[0_0_15px_rgba(244,37,244,0.3)] transition-all duration-300 whitespace-nowrap shrink-0"
+            class="group flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3.5 border border-slate-200 dark:border-secondary/50 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-gray-200 bg-white dark:bg-[#0a040f] hover:bg-slate-50 dark:hover:bg-secondary/10 hover:border-secondary hover:shadow-[0_0_15px_rgba(244,37,244,0.3)] transition-all duration-300 whitespace-nowrap shrink-0"
             @click="showFilters = !showFilters"
           >
             <span class="material-icons text-base sm:text-lg text-secondary group-hover:animate-pulse"
@@ -46,7 +46,7 @@
       <!-- Filters Panel (collapsible) -->
       <div
         v-if="showFilters"
-        class="bg-card-dark rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/5 shadow-lg animate-fade-in-up"
+        class="bg-white dark:bg-surface-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-white/5 shadow-lg animate-fade-in-up"
       >
         <MemberFilters
           v-model="filters"
@@ -58,12 +58,12 @@
       <!-- Featured Section -->
       <section>
         <div class="flex items-center justify-between mb-4 sm:mb-6 lg:mb-8">
-          <h2 class="text-lg sm:text-xl md:text-2xl font-bold flex items-center gap-2 sm:gap-3 text-white">
+          <h2 class="text-lg sm:text-xl md:text-2xl font-bold flex items-center gap-2 sm:gap-3 text-slate-900 dark:text-white">
             <span class="material-icons text-secondary text-base sm:text-lg md:text-xl">local_fire_department</span>
             <span class="truncate">Em destaque</span>
           </h2>
           <a
-            class="text-primary text-xs sm:text-sm font-semibold hover:text-white hover:shadow-neon-blue transition-all px-2 sm:px-3 py-1 rounded-lg hover:bg-primary/20 cursor-pointer whitespace-nowrap flex-shrink-0"
+            class="text-primary text-xs sm:text-sm font-semibold hover:text-slate-900 dark:hover:text-white hover:shadow-neon-blue transition-all px-2 sm:px-3 py-1 rounded-lg hover:bg-primary/20 cursor-pointer whitespace-nowrap flex-shrink-0"
           >
             Ver todos
           </a>
@@ -98,7 +98,7 @@
       <!-- All Members Section -->
       <section>
         <div class="flex items-center justify-between mb-4 sm:mb-6 gap-2">
-          <h2 class="text-base sm:text-lg md:text-xl font-bold text-white tracking-tight truncate">
+          <h2 class="text-base sm:text-lg md:text-xl font-bold text-slate-900 dark:text-white tracking-tight truncate">
             Todos os membros
           </h2>
           <div class="flex gap-1 sm:gap-2 flex-shrink-0">
@@ -106,8 +106,8 @@
               :class="[
                 'p-2 rounded-lg transition-colors',
                 viewMode === 'grid'
-                  ? 'bg-white/5 text-white'
-                  : 'text-gray-400 hover:bg-primary/20 hover:text-primary',
+                  ? 'bg-primary text-white shadow-md'
+                  : 'text-slate-400 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-primary/20 hover:text-primary',
               ]"
               @click="viewMode = 'grid'"
             >
@@ -117,8 +117,8 @@
               :class="[
                 'p-2 rounded-lg transition-colors',
                 viewMode === 'list'
-                  ? 'bg-white/5 text-white'
-                  : 'text-gray-400 hover:bg-primary/20 hover:text-primary',
+                  ? 'bg-primary text-white shadow-md'
+                  : 'text-slate-400 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-primary/20 hover:text-primary',
               ]"
               @click="viewMode = 'list'"
             >
@@ -130,7 +130,7 @@
         <!-- Members List/Grid -->
         <div
           v-if="viewMode === 'list'"
-          class="bg-card-dark rounded-xl sm:rounded-2xl shadow-sm border border-white/5 overflow-hidden"
+          class="bg-white dark:bg-surface-card rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 dark:border-white/5 overflow-hidden"
         >
           <MemberCard
             v-for="member in allMembers"
@@ -278,12 +278,6 @@ async function handleBookmarkChanged(_memberId: string, _isBookmarked: boolean) 
 </script>
 
 <style scoped>
-.neon-text-blue {
-  text-shadow:
-    0 0 5px rgba(0, 195, 255, 0.7),
-    0 0 15px rgba(0, 195, 255, 0.5);
-}
-
 .animate-fade-in-up {
   animation: fadeInUp 0.3s ease-out;
 }
