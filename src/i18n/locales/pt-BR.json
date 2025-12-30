@@ -545,7 +545,9 @@
         "notifications": "Notificações",
         "markAllAsRead": "Marcar todas como lidas",
         "noNotifications": "Nenhuma notificação",
-        "noNotificationsDesc": "Você está em dia! Sem notificações no momento."
+        "noNotificationsDesc": "Você está em dia! Sem notificações no momento.",
+        "new": "NOVAS",
+        "newNotifications": "novas notificações"
     },
     "sidebar": {
         "yourBusinessHere": "Seu Negócio Aqui",
