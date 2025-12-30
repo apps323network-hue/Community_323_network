@@ -128,10 +128,8 @@
           </div>
         </div>
 
-        <!-- Mobile Menu - Theme, Notifications, User -->
+        <!-- Mobile Menu - Notifications, User -->
         <div class="md:hidden flex items-center gap-3">
-          <AnimatedThemeToggler />
-          
           <!-- Notifications Mobile -->
           <NotificationsDropdown />
           
@@ -194,7 +192,7 @@
                     @click="showUserMenu = false"
                   >
                     <span class="material-symbols-outlined text-[20px]">groups</span>
-                    Minha Rede
+                    {{ t('navigation.myNetwork') }}
                   </RouterLink>
                   <RouterLink
                     to="/meus-servicos"
@@ -202,7 +200,7 @@
                     @click="showUserMenu = false"
                   >
                     <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
-                    Meus Serviços
+                    {{ t('navigation.myServices') }}
                   </RouterLink>
                   <RouterLink
                     to="/perfil"
@@ -210,8 +208,47 @@
                     @click="showUserMenu = false"
                   >
                     <span class="material-symbols-outlined text-[20px]">person</span>
-                    Meu Perfil
+                    {{ t('navigation.myProfile') }}
                   </RouterLink>
+                  
+                  <!-- Dark Mode Toggle -->
+                  <div class="border-t border-slate-200 dark:border-white/10 mt-1 pt-1">
+                    <div class="flex items-center justify-between px-4 py-3">
+                      <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[20px] text-slate-700 dark:text-gray-300">dark_mode</span>
+                        <span class="text-sm font-medium text-slate-700 dark:text-gray-300">{{ t('navigation.theme') }}</span>
+                      </div>
+                      <AnimatedThemeToggler />
+                    </div>
+                  </div>
+                  
+                  <!-- Language Switcher -->
+                  <div class="border-t border-slate-200 dark:border-white/10 mt-1 pt-1">
+                    <div class="px-4 py-2">
+                      <div class="flex items-center gap-3 mb-2">
+                        <span class="material-symbols-outlined text-[20px] text-slate-700 dark:text-gray-300">language</span>
+                        <span class="text-sm font-medium text-slate-700 dark:text-gray-300">{{ t('navigation.language') }}</span>
+                      </div>
+                      <div class="space-y-1">
+                        <button
+                          v-for="locale in availableLocales"
+                          :key="locale.code"
+                          @click="handleLocaleChange(locale.code)"
+                          class="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                          :class="[
+                            currentLocale === locale.code
+                              ? 'bg-primary/10 text-primary dark:bg-secondary/10 dark:text-secondary'
+                              : 'text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-surface-lighter'
+                          ]"
+                        >
+                          <span class="text-base">{{ locale.flag }}</span>
+                          <span>{{ locale.name }}</span>
+                          <span v-if="currentLocale === locale.code" class="material-icons text-sm ml-auto">check</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <!-- Dashboard Admin (apenas para admins) -->
                   <div v-if="isAdmin" class="border-t border-slate-200 dark:border-white/10 mt-1 pt-1">
                     <RouterLink
@@ -220,7 +257,7 @@
                       @click="showUserMenu = false"
                     >
                       <span class="material-symbols-outlined text-[20px]">dashboard</span>
-                      Dashboard Admin
+                      {{ t('navigation.dashboardAdmin') }}
                     </RouterLink>
                   </div>
                   <button
@@ -228,7 +265,7 @@
                     class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left"
                   >
                     <span class="material-symbols-outlined text-[20px]">logout</span>
-                    Sair
+                    {{ t('navigation.logout') }}
                   </button>
                 </div>
               </div>
@@ -331,7 +368,7 @@
                     @click="showUserMenu = false"
                   >
                     <span class="material-symbols-outlined text-[20px]">groups</span>
-                    Minha Rede
+                    {{ t('navigation.myNetwork') }}
                   </RouterLink>
                   <RouterLink
                     to="/meus-servicos"
@@ -339,7 +376,7 @@
                     @click="showUserMenu = false"
                   >
                     <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
-                    Meus Serviços
+                    {{ t('navigation.myServices') }}
                   </RouterLink>
                   <RouterLink
                     to="/perfil"
@@ -347,7 +384,7 @@
                     @click="showUserMenu = false"
                   >
                     <span class="material-symbols-outlined text-[20px]">person</span>
-                    Meu Perfil
+                    {{ t('navigation.myProfile') }}
                   </RouterLink>
                   <!-- Dashboard Admin (apenas para admins) -->
                   <div v-if="isAdmin" class="border-t border-slate-200 dark:border-white/10 mt-1 pt-1">
@@ -357,7 +394,7 @@
                       @click="showUserMenu = false"
                     >
                       <span class="material-symbols-outlined text-[20px]">dashboard</span>
-                      Dashboard Admin
+                      {{ t('navigation.dashboardAdmin') }}
                     </RouterLink>
                   </div>
                   <button
@@ -365,7 +402,7 @@
                     class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left"
                   >
                     <span class="material-symbols-outlined text-[20px]">logout</span>
-                    Sair
+                    {{ t('navigation.logout') }}
                   </button>
                 </div>
               </div>

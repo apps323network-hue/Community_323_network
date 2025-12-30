@@ -50,9 +50,13 @@
         "profile": "Profile",
         "myNetwork": "My Network",
         "myServices": "My Services",
+        "myProfile": "My Profile",
         "myOrders": "My Orders",
         "savedEvents": "Saved Events",
         "settings": "Settings",
+        "theme": "Theme",
+        "language": "Language",
+        "dashboardAdmin": "Admin Dashboard",
         "logout": "Logout"
     },
     "auth": {
