@@ -1,0 +1,449 @@
+<template>
+  <div class="space-y-6">
+    <!-- Header com botão Adicionar -->
+    <div class="flex justify-between items-center">
+      <div>
+        <h2 class="text-white text-2xl font-bold mb-1">Desafios</h2>
+        <p class="text-white/60 text-sm">Gerencie desafios para gamificação e engajamento</p>
+      </div>
+      <button
+        @click="showFormModal = true; editingChallenge = null"
+        class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-black font-bold rounded-lg hover:shadow-lg hover:shadow-primary/30 transition-all"
+      >
+        <span class="material-symbols-outlined">add</span>
+        <span class="hidden sm:inline">Adicionar Desafio</span>
+      </button>
+    </div>
+
+    <!-- Filtros e Busca -->
+    <div class="flex flex-col sm:flex-row gap-4">
+      <div class="flex-1">
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-xl">search</span>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Buscar desafio..."
+            class="w-full pl-10 pr-4 py-2 rounded-lg border border-white/10 bg-surface-dark text-white placeholder-white/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+          />
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <select
+          v-model="filterType"
+          class="px-4 py-2 rounded-lg border border-white/10 bg-surface-dark text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+        >
+          <option value="">Todos os tipos</option>
+          <option value="post">Post</option>
+          <option value="comment">Comentário</option>
+          <option value="event">Evento</option>
+          <option value="connection">Conexão</option>
+          <option value="engagement">Engajamento</option>
+          <option value="other">Outro</option>
+        </select>
+        <select
+          v-model="filterActive"
+          class="px-4 py-2 rounded-lg border border-white/10 bg-surface-dark text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+        >
+          <option value="">Todos</option>
+          <option value="true">Ativos</option>
+          <option value="false">Inativos</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Lista de Desafios -->
+    <div v-if="loading && filteredChallenges.length === 0" class="flex justify-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+
+    <div v-else-if="filteredChallenges.length === 0" class="flex flex-col items-center justify-center py-12 bg-surface-dark/50 rounded-xl border border-white/10">
+      <span class="material-symbols-outlined text-gray-500 text-6xl mb-4">emoji_events</span>
+      <p class="text-gray-400 font-medium">
+        {{ searchQuery || filterType || filterActive ? 'Nenhum desafio encontrado' : 'Nenhum desafio cadastrado' }}
+      </p>
+    </div>
+
+    <div v-else class="grid grid-cols-1 gap-4">
+      <div
+        v-for="challenge in filteredChallenges"
+        :key="challenge.id"
+        class="bg-surface-dark rounded-xl p-6 border border-white/10 hover:border-primary/50 transition-all"
+      >
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3 flex-wrap">
+              <h3 class="text-white font-bold text-lg">{{ challenge.nome }}</h3>
+              <span
+                class="px-2 py-1 rounded-full text-xs font-bold"
+                :class="getTypeClass(challenge.tipo)"
+              >
+                {{ getTypeLabel(challenge.tipo) }}
+              </span>
+              <span
+                class="px-2 py-1 rounded-full text-xs font-bold"
+                :class="challenge.ativo ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'"
+              >
+                {{ challenge.ativo ? 'Ativo' : 'Inativo' }}
+              </span>
+            </div>
+            <p v-if="challenge.descricao" class="text-white/60 text-sm mb-3">{{ challenge.descricao }}</p>
+            <div class="flex items-center gap-4 text-sm text-white/60">
+              <div class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-lg">stars</span>
+                <span class="font-semibold text-primary">{{ challenge.pontos }} pontos</span>
+              </div>
+              <div v-if="challenge.prazo" class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-lg">schedule</span>
+                <span>Prazo: {{ formatDate(challenge.prazo) }}</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-lg">people</span>
+                <span>{{ challenge.total_participants || 0 }} participantes</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-lg">check_circle</span>
+                <span>{{ challenge.total_completed || 0 }} completados</span>
+              </div>
+            </div>
+            <p class="text-white/40 text-xs mt-3">
+              Criado em {{ formatDate(challenge.created_at) }} por {{ challenge.creator_name || 'Admin' }}
+            </p>
+          </div>
+          <div class="flex gap-2">
+            <button
+              @click="editChallenge(challenge)"
+              class="p-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white transition-all"
+              title="Editar"
+            >
+              <span class="material-symbols-outlined text-lg">edit</span>
+            </button>
+            <button
+              @click="confirmDelete(challenge)"
+              class="p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg text-red-400 transition-all"
+              title="Deletar"
+            >
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Formulário -->
+    <Modal
+      v-model="showFormModal"
+      :title="editingChallenge ? 'Editar Desafio' : 'Adicionar Desafio'"
+      size="md"
+    >
+      <form @submit.prevent="handleSubmit" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-white mb-2">Nome do Desafio *</label>
+          <input
+            v-model="formData.nome"
+            type="text"
+            required
+            class="w-full rounded-lg border border-white/10 bg-surface-dark p-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+            placeholder="Ex: Criar 5 posts esta semana"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-white mb-2">Descrição</label>
+          <textarea
+            v-model="formData.descricao"
+            rows="3"
+            class="w-full rounded-lg border border-white/10 bg-surface-dark p-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-none"
+            placeholder="Descreva o desafio em detalhes..."
+          />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-white mb-2">Tipo *</label>
+            <select
+              v-model="formData.tipo"
+              required
+              class="w-full rounded-lg border border-white/10 bg-surface-dark p-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+            >
+              <option value="">Selecione...</option>
+              <option value="post">Post</option>
+              <option value="comment">Comentário</option>
+              <option value="event">Evento</option>
+              <option value="connection">Conexão</option>
+              <option value="engagement">Engajamento</option>
+              <option value="other">Outro</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-white mb-2">Pontos *</label>
+            <input
+              v-model.number="formData.pontos"
+              type="number"
+              min="1"
+              required
+              class="w-full rounded-lg border border-white/10 bg-surface-dark p-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+              placeholder="Ex: 10"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-white mb-2">Prazo (opcional)</label>
+            <input
+              v-model="formData.prazo"
+              type="datetime-local"
+              class="w-full rounded-lg border border-white/10 bg-surface-dark p-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+            />
+            <p class="text-white/40 text-xs mt-1">Deixe em branco para desafio sem prazo</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-white mb-2">Status</label>
+            <div class="flex items-center gap-3 mt-2">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input
+                  v-model="formData.ativo"
+                  type="checkbox"
+                  class="w-5 h-5 text-primary focus:ring-primary rounded"
+                />
+                <span class="text-white text-sm">Ativo</span>
+              </label>
+            </div>
+            <p class="text-white/40 text-xs mt-1">Desafios inativos não aparecem para usuários</p>
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-4">
+          <button
+            type="submit"
+            :disabled="submitting"
+            class="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-black font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50"
+          >
+            {{ submitting ? 'Salvando...' : (editingChallenge ? 'Salvar Alterações' : 'Adicionar Desafio') }}
+          </button>
+          <button
+            type="button"
+            @click="showFormModal = false"
+            class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white font-medium transition-all"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </Modal>
+
+    <!-- Modal de Confirmação de Delete -->
+    <Modal
+      v-model="showDeleteModal"
+      title="Confirmar Exclusão"
+      size="sm"
+    >
+      <div class="space-y-4">
+        <p class="text-white/80">
+          Tem certeza que deseja remover o desafio <strong class="text-white">"{{ challengeToDelete?.nome }}"</strong>?
+        </p>
+        <p class="text-white/60 text-sm">
+          Esta ação não pode ser desfeita. O progresso dos usuários neste desafio será mantido, mas o desafio não estará mais disponível.
+        </p>
+        <div class="flex gap-3 pt-4">
+          <button
+            @click="handleDelete"
+            :disabled="submitting"
+            class="flex-1 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-red-400 font-medium transition-all disabled:opacity-50"
+          >
+            {{ submitting ? 'Deletando...' : 'Deletar' }}
+          </button>
+          <button
+            @click="showDeleteModal = false"
+            class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white font-medium transition-all"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </Modal>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { useAdminStore } from '@/stores/admin'
+import Modal from '@/components/ui/Modal.vue'
+import { toast } from 'vue-sonner'
+import type { Challenge, ChallengeType } from '@/types/admin'
+
+const adminStore = useAdminStore()
+
+const loading = computed(() => adminStore.loading)
+const challenges = computed(() => adminStore.challenges)
+
+const searchQuery = ref('')
+const filterType = ref('')
+const filterActive = ref('')
+const showFormModal = ref(false)
+const showDeleteModal = ref(false)
+const editingChallenge = ref<Challenge | null>(null)
+const challengeToDelete = ref<Challenge | null>(null)
+const submitting = ref(false)
+
+const formData = ref({
+  nome: '',
+  descricao: '',
+  tipo: '' as ChallengeType | '',
+  pontos: 10,
+  prazo: '',
+  ativo: true,
+})
+
+const filteredChallenges = computed(() => {
+  let items = challenges.value
+
+  // Filtrar por busca
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    items = items.filter(c => 
+      c.nome.toLowerCase().includes(query) ||
+      (c.descricao && c.descricao.toLowerCase().includes(query))
+    )
+  }
+
+  // Filtrar por tipo
+  if (filterType.value) {
+    items = items.filter(c => c.tipo === filterType.value)
+  }
+
+  // Filtrar por status ativo
+  if (filterActive.value) {
+    const isActive = filterActive.value === 'true'
+    items = items.filter(c => c.ativo === isActive)
+  }
+
+  return items
+})
+
+function getTypeLabel(tipo: string): string {
+  const labels: Record<string, string> = {
+    post: 'Post',
+    comment: 'Comentário',
+    event: 'Evento',
+    connection: 'Conexão',
+    engagement: 'Engajamento',
+    other: 'Outro',
+  }
+  return labels[tipo] || tipo
+}
+
+function getTypeClass(tipo: string): string {
+  const classes: Record<string, string> = {
+    post: 'bg-blue-500/20 text-blue-400',
+    comment: 'bg-purple-500/20 text-purple-400',
+    event: 'bg-green-500/20 text-green-400',
+    connection: 'bg-yellow-500/20 text-yellow-400',
+    engagement: 'bg-pink-500/20 text-pink-400',
+    other: 'bg-gray-500/20 text-gray-400',
+  }
+  return classes[tipo] || 'bg-gray-500/20 text-gray-400'
+}
+
+function formatDate(dateString: string): string {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+function editChallenge(challenge: Challenge) {
+  editingChallenge.value = challenge
+  formData.value = {
+    nome: challenge.nome,
+    descricao: challenge.descricao || '',
+    tipo: challenge.tipo,
+    pontos: challenge.pontos,
+    prazo: challenge.prazo ? new Date(challenge.prazo).toISOString().slice(0, 16) : '',
+    ativo: challenge.ativo,
+  }
+  showFormModal.value = true
+}
+
+function confirmDelete(challenge: Challenge) {
+  challengeToDelete.value = challenge
+  showDeleteModal.value = true
+}
+
+async function handleSubmit() {
+  if (!formData.value.nome.trim() || !formData.value.tipo || !formData.value.pontos) {
+    toast.error('Por favor, preencha todos os campos obrigatórios')
+    return
+  }
+
+  try {
+    submitting.value = true
+
+    const challengeData = {
+      nome: formData.value.nome.trim(),
+      descricao: formData.value.descricao.trim() || undefined,
+      tipo: formData.value.tipo as ChallengeType,
+      pontos: formData.value.pontos,
+      prazo: formData.value.prazo ? new Date(formData.value.prazo).toISOString() : undefined,
+      ativo: formData.value.ativo,
+    }
+
+    if (editingChallenge.value) {
+      await adminStore.updateChallenge(editingChallenge.value.id, challengeData)
+      toast.success('Desafio atualizado com sucesso!')
+    } else {
+      await adminStore.createChallenge(challengeData)
+      toast.success('Desafio criado com sucesso!')
+    }
+
+    showFormModal.value = false
+    resetForm()
+  } catch (error: any) {
+    toast.error(error.message || 'Erro ao salvar desafio')
+    console.error('Error saving challenge:', error)
+  } finally {
+    submitting.value = false
+  }
+}
+
+async function handleDelete() {
+  if (!challengeToDelete.value) return
+
+  try {
+    submitting.value = true
+    await adminStore.deleteChallenge(challengeToDelete.value.id)
+    toast.success('Desafio removido com sucesso!')
+    showDeleteModal.value = false
+    challengeToDelete.value = null
+  } catch (error: any) {
+    toast.error(error.message || 'Erro ao deletar desafio')
+    console.error('Error deleting challenge:', error)
+  } finally {
+    submitting.value = false
+  }
+}
+
+function resetForm() {
+  formData.value = {
+    nome: '',
+    descricao: '',
+    tipo: '' as ChallengeType | '',
+    pontos: 10,
+    prazo: '',
+    ativo: true,
+  }
+  editingChallenge.value = null
+}
+
+onMounted(async () => {
+  await adminStore.fetchChallenges()
+})
+</script>
+

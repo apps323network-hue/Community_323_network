@@ -50,9 +50,13 @@
         "profile": "Perfil",
         "myNetwork": "Minha Rede",
         "myServices": "Meus Serviços",
+        "myProfile": "Meu Perfil",
         "myOrders": "Meus Pedidos",
         "savedEvents": "Eventos Salvos",
         "settings": "Configurações",
+        "theme": "Tema",
+        "language": "Idioma",
+        "dashboardAdmin": "Dashboard Admin",
         "logout": "Sair"
     },
     "auth": {
@@ -188,6 +192,7 @@
     "events": {
         "title": "Próximos Eventos",
         "description": "Participe de eventos exclusivos da comunidade 323 Network.",
+        "createEvent": "Criar Evento",
         "searchPlaceholder": "Buscar eventos...",
         "filterAll": "Todos",
         "filterNetworking": "Networking",

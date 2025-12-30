@@ -22,17 +22,12 @@
         style="animation-delay: 2.5s"
       ></div>
       <div class="relative z-10 flex flex-col items-center text-center max-w-lg">
-        <div class="mb-10 p-6 rounded-3xl glass shadow-2xl relative group">
-          <div
-            class="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"
-          ></div>
-          <div class="relative bg-black/40 rounded-2xl p-4">
-            <img
-              alt="323 Network Logo"
-              class="w-56 h-auto object-contain drop-shadow-lg"
-              src="/logo.png"
-            />
-          </div>
+        <div class="mb-10">
+          <img
+            alt="323 Network Logo"
+            class="w-56 h-auto object-contain drop-shadow-lg"
+            src="/logo-removebg-preview.png"
+          />
         </div>
         <h1 class="text-5xl font-black text-slate-900 dark:text-white mb-6 leading-tight tracking-tight">
           {{ t('auth.tagline') }} <br />
@@ -41,8 +36,8 @@
             >{{ t('auth.taglineHighlight') }}</span
           >
         </h1>
-        <p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed mb-10 max-w-md">
-          {{ t('auth.description') }}
+        <p class="text-slate-400 text-lg leading-relaxed mb-10 max-w-md">
+          Grupo de Network de brasileiros nos EUA em busca de negócios a fim de obter parcerias com o intuito de alcançar o american dream
         </p>
       </div>
     </div>
@@ -58,6 +53,15 @@
         class="lg:hidden absolute bottom-[-20%] right-[-20%] w-[400px] h-[400px] bg-secondary/20 rounded-full blur-[100px]"
       ></div>
       <div class="w-full max-w-md space-y-8 relative z-10">
+        <!-- Logo Mobile -->
+        <div class="lg:hidden flex justify-center mb-6">
+          <img
+            alt="323 Network Logo"
+            class="w-40 h-auto object-contain drop-shadow-lg"
+            src="/logo-removebg-preview.png"
+          />
+        </div>
+        
         <!-- Tabs -->
         <div class="flex justify-center mb-8 border-b border-slate-200 dark:border-slate-800 pb-1 relative">
           <div class="grid grid-cols-2 w-full">
@@ -244,17 +248,6 @@
                 required
               />
             </div>
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1" for="role"
-                >{{ t('auth.iAm') }}</label
-              >
-              <Select
-                id="role"
-                v-model="registerForm.role"
-                :options="roleOptions"
-                :placeholder="t('auth.selectPlaceholder')"
-              />
-            </div>
           </div>
           <div>
             <Button variant="secondary" size="lg" full-width :loading="loading" type="submit">
@@ -402,7 +395,6 @@ import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { supabase } from '@/lib/supabase'
 import Button from '@/components/ui/Button.vue'
-import Select from '@/components/ui/Select.vue'
 import Modal from '@/components/ui/Modal.vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import { toast } from 'vue-sonner'
@@ -439,15 +431,7 @@ const registerForm = ref({
   lastName: '',
   email: '',
   password: '',
-  role: null as string | null,
 })
-
-const roleOptions = [
-  { value: 'empreendedor', label: t('auth.roleEntrepreneur') },
-  { value: 'artista', label: t('auth.roleArtist') },
-  { value: 'profissional', label: t('auth.roleProfessional') },
-  { value: 'investidor', label: t('auth.roleInvestor') },
-]
 
 async function handleLogin() {
   const startTime = performance.now()
@@ -621,19 +605,17 @@ async function handleRegister() {
       options: {
         data: {
           nome: `${registerForm.value.firstName} ${registerForm.value.lastName}`,
-          role: registerForm.value.role,
         },
       },
     })
     if (error) throw error
 
-    // Atualizar o perfil com a área de atuação após o signUp
+    // Atualizar o perfil após o signUp
     if (data.user) {
       try {
         await supabase
           .from('profiles')
           .update({
-            area_atuacao: registerForm.value.role,
             nome: `${registerForm.value.firstName} ${registerForm.value.lastName}`,
           })
           .eq('id', data.user.id)
@@ -644,7 +626,6 @@ async function handleRegister() {
           await supabase.from('profiles').insert({
             id: data.user.id,
             nome: `${registerForm.value.firstName} ${registerForm.value.lastName}`,
-            area_atuacao: registerForm.value.role,
             plano: 'Free',
             badge: 'Free',
           })
@@ -664,7 +645,6 @@ async function handleRegister() {
       lastName: '',
       email: '',
       password: '',
-      role: 'empreendedor',
     }
   } catch (error: any) {
     console.error('Register error:', error)
