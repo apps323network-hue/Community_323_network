@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from './auth'
 import { checkBannedWords, invalidateBannedWordsCache } from '@/lib/bannedWords'
+import { logAdminAction } from '@/lib/auditLog'
 import type { AdminEvent, EventStats, EventApprovalAction, AdminUser, UserStats, UserStatus, AdminPost, PostStats, AdminService, ServiceStats, BannedWord, BannedWordStats, Report, ReportStats, ReportCreateInput, ReportResolveInput, ReportStatus, ReportItemType, Challenge, ChallengeStats, ChallengeCreateInput, ChallengeUpdateInput } from '@/types/admin'
 import type { EventStatus } from '@/types/events'
 import type { PostStatus } from '@/types/posts'
@@ -236,6 +237,14 @@ export const useAdminStore = defineStore('admin', () => {
       // Atualizar stats
       await fetchEventStats()
 
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'approve_event',
+        targetId: eventId,
+        targetType: 'event',
+        details: { titulo: data.titulo }
+      })
+
       return data
     } catch (err: any) {
       error.value = err.message
@@ -279,6 +288,14 @@ export const useAdminStore = defineStore('admin', () => {
       // Atualizar stats
       await fetchEventStats()
 
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'reject_event',
+        targetId: eventId,
+        targetType: 'event',
+        details: { reason }
+      })
+
       return data
     } catch (err: any) {
       error.value = err.message
@@ -321,6 +338,14 @@ export const useAdminStore = defineStore('admin', () => {
       await fetchPendingEvents()
       await fetchAllEvents()
       await fetchEventStats()
+
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'create_event',
+        targetId: data.id,
+        targetType: 'event',
+        details: { titulo: data.titulo, tipo: data.tipo, status: data.status }
+      })
 
       return data
     } catch (err: any) {
@@ -477,6 +502,13 @@ export const useAdminStore = defineStore('admin', () => {
       // Atualizar stats
       await fetchUserStats()
 
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'approve_user',
+        targetId: userId,
+        targetType: 'user'
+      })
+
       return data
     } catch (err: any) {
       error.value = err.message
@@ -520,6 +552,14 @@ export const useAdminStore = defineStore('admin', () => {
       // Atualizar stats
       await fetchUserStats()
 
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'reject_user',
+        targetId: userId,
+        targetType: 'user',
+        details: { reason }
+      })
+
       return data
     } catch (err: any) {
       error.value = err.message
@@ -558,6 +598,14 @@ export const useAdminStore = defineStore('admin', () => {
       await fetchAllUsers()
       await fetchUserStats()
 
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'ban_user',
+        targetId: userId,
+        targetType: 'user',
+        details: { reason: reason || 'Banido por violação dos termos de uso' }
+      })
+
       return data
     } catch (err: any) {
       error.value = err.message
@@ -592,6 +640,13 @@ export const useAdminStore = defineStore('admin', () => {
 
       await fetchAllUsers()
       await fetchUserStats()
+
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'unban_user',
+        targetId: userId,
+        targetType: 'user'
+      })
 
       return data
     } catch (err: any) {
@@ -796,6 +851,14 @@ export const useAdminStore = defineStore('admin', () => {
       // Atualizar stats
       await fetchPostStats()
 
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'approve_post',
+        targetId: postId,
+        targetType: 'post',
+        details: { conteudo: data?.conteudo }
+      })
+
       return data
     } catch (err: any) {
       error.value = err.message
@@ -838,6 +901,14 @@ export const useAdminStore = defineStore('admin', () => {
 
       // Atualizar stats
       await fetchPostStats()
+
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'hide_post',
+        targetId: postId,
+        targetType: 'post',
+        details: { reason, conteudo: data?.conteudo }
+      })
 
       return data
     } catch (err: any) {
@@ -896,6 +967,14 @@ export const useAdminStore = defineStore('admin', () => {
       // Atualizar stats
       await fetchPostStats()
 
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'remove_post',
+        targetId: postId,
+        targetType: 'post',
+        details: { reason, addStrike, userId: postData?.user_id, conteudo: data?.conteudo }
+      })
+
       return data
     } catch (err: any) {
       error.value = err.message
@@ -952,6 +1031,14 @@ export const useAdminStore = defineStore('admin', () => {
 
       // Atualizar stats
       await fetchPostStats()
+
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'mark_spam',
+        targetId: postId,
+        targetType: 'post',
+        details: { userId: postData?.user_id, conteudo: data?.conteudo }
+      })
 
       return data
     } catch (err: any) {
@@ -1048,6 +1135,14 @@ export const useAdminStore = defineStore('admin', () => {
       ])
 
       console.log('[ADMIN] Listas recarregadas com sucesso')
+
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'create_post',
+        targetId: data.id,
+        targetType: 'post',
+        details: { tipo: data.tipo }
+      })
 
       return data
     } catch (err: any) {
@@ -1189,6 +1284,14 @@ export const useAdminStore = defineStore('admin', () => {
       await fetchAllServices()
       await fetchServiceStats()
 
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'create_service',
+        targetId: data.id,
+        targetType: 'service',
+        details: { nome: data.nome, categoria: data.categoria }
+      })
+
       return data
     } catch (err: any) {
       error.value = err.message
@@ -1252,6 +1355,14 @@ export const useAdminStore = defineStore('admin', () => {
       await fetchAllServices()
       await fetchServiceStats()
 
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'update_service',
+        targetId: serviceId,
+        targetType: 'service',
+        details: { updates: Object.keys(cleanData) }
+      })
+
       return data
     } catch (err: any) {
       error.value = err.message
@@ -1282,6 +1393,13 @@ export const useAdminStore = defineStore('admin', () => {
       // Atualizar lista
       await fetchAllServices()
       await fetchServiceStats()
+
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'delete_service',
+        targetId: serviceId,
+        targetType: 'service'
+      })
     } catch (err: any) {
       error.value = err.message
       console.error('Error deleting service:', err)
@@ -1396,6 +1514,14 @@ export const useAdminStore = defineStore('admin', () => {
       // Recarregar lista
       await fetchBannedWords()
 
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'create_banned_word',
+        targetId: data.id,
+        targetType: 'banned_word',
+        details: { word: data.word, category: data.category, action: data.action }
+      })
+
       return data
     } catch (err: any) {
       error.value = err.message
@@ -1444,6 +1570,14 @@ export const useAdminStore = defineStore('admin', () => {
       // Recarregar lista
       await fetchBannedWords()
 
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'update_banned_word',
+        targetId: id,
+        targetType: 'banned_word',
+        details: { word: data.word, category: data.category, action: data.action }
+      })
+
       return data
     } catch (err: any) {
       error.value = err.message
@@ -1472,6 +1606,15 @@ export const useAdminStore = defineStore('admin', () => {
 
       // Recarregar lista
       await fetchBannedWords()
+
+      // Log da ação
+      if (authStore.user) {
+        logAdminAction(authStore.user.id, {
+          action: 'delete_banned_word',
+          targetId: id,
+          targetType: 'banned_word'
+        })
+      }
     } catch (err: any) {
       error.value = err.message
       console.error('Error deleting banned word:', err)
@@ -1680,6 +1823,14 @@ export const useAdminStore = defineStore('admin', () => {
 
       if (insertError) throw insertError
 
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'create_report',
+        targetId: data.id,
+        targetType: 'report',
+        details: { item_type: input.reported_item_type, reason: input.reason }
+      })
+
       // Recarregar lista se estiver em contexto admin
       if (await checkIsAdmin()) {
         await fetchReports()
@@ -1721,13 +1872,18 @@ export const useAdminStore = defineStore('admin', () => {
         if (report.reported_item_type === 'post') {
           await removePost(report.reported_item_id, input.details || 'Removido por report', input.add_strike || false)
         } else if (report.reported_item_type === 'comment') {
-          // Remover comentário
-          const { error: deleteError } = await supabase
+          // Marcar comentário como removido (soft-delete)
+          const { error: updateError } = await supabase
             .from('post_comments')
-            .delete()
+            .update({
+              status: 'removed',
+              moderated_at: new Date().toISOString(),
+              moderated_by: authStore.user.id,
+              rejection_reason: input.details || 'Removido por report'
+            })
             .eq('id', report.reported_item_id)
 
-          if (deleteError) throw deleteError
+          if (updateError) throw updateError
 
           if (input.add_strike && report.reported_item) {
             const commentUserId = (report.reported_item as any).user_id
@@ -1800,6 +1956,19 @@ export const useAdminStore = defineStore('admin', () => {
           }
         }))
       }
+
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'resolve_report',
+        targetId: id,
+        targetType: 'report',
+        details: {
+          action: input.action,
+          reportedItemType: report.reported_item_type,
+          reportedItemId: report.reported_item_id,
+          conteudo: (report.reported_item as any)?.conteudo || (report.reported_item as any)?.titulo
+        }
+      })
     } catch (err: any) {
       error.value = err.message
       console.error('Error resolving report:', err)
@@ -1837,6 +2006,13 @@ export const useAdminStore = defineStore('admin', () => {
       // Recarregar lista e estatísticas
       await fetchReports()
       await fetchReportStats()
+
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'dismiss_report',
+        targetId: id,
+        targetType: 'report'
+      })
     } catch (err: any) {
       error.value = err.message
       console.error('Error dismissing report:', err)
@@ -2002,6 +2178,14 @@ export const useAdminStore = defineStore('admin', () => {
       await fetchChallenges()
       await fetchChallengeStats()
 
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'create_challenge',
+        targetId: data.id,
+        targetType: 'challenge',
+        details: { nome: data.nome, tipo: data.tipo }
+      })
+
       return data
     } catch (err: any) {
       error.value = err.message
@@ -2047,6 +2231,14 @@ export const useAdminStore = defineStore('admin', () => {
       await fetchChallenges()
       await fetchChallengeStats()
 
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'update_challenge',
+        targetId: id,
+        targetType: 'challenge',
+        details: { updates: Object.keys(updateData) }
+      })
+
       return data
     } catch (err: any) {
       error.value = err.message
@@ -2081,6 +2273,13 @@ export const useAdminStore = defineStore('admin', () => {
       // Recarregar lista e estatísticas
       await fetchChallenges()
       await fetchChallengeStats()
+
+      // Log da ação
+      logAdminAction(authStore.user.id, {
+        action: 'delete_challenge',
+        targetId: id,
+        targetType: 'challenge'
+      })
     } catch (err: any) {
       error.value = err.message
       console.error('Error deleting challenge:', err)
