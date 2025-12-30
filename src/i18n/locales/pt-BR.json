@@ -50,9 +50,13 @@
         "profile": "Perfil",
         "myNetwork": "Minha Rede",
         "myServices": "Meus Serviços",
+        "myProfile": "Meu Perfil",
         "myOrders": "Meus Pedidos",
         "savedEvents": "Eventos Salvos",
         "settings": "Configurações",
+        "theme": "Tema",
+        "language": "Idioma",
+        "dashboardAdmin": "Dashboard Admin",
         "logout": "Sair"
     },
     "auth": {
