@@ -107,7 +107,7 @@ export const useAdminStore = defineStore('admin', () => {
       // Buscar profiles dos criadores
       const creatorIds = [...new Set(eventsData.map((e: any) => e.created_by).filter(Boolean))]
       let creatorsMap = new Map<string, any>()
-      
+
       if (creatorIds.length > 0) {
         const { data: profilesData } = await supabase
           .from('profiles')
@@ -164,7 +164,7 @@ export const useAdminStore = defineStore('admin', () => {
       // Buscar profiles dos criadores
       const creatorIds = [...new Set(eventsData.map((e: any) => e.created_by).filter(Boolean))]
       let creatorsMap = new Map<string, any>()
-      
+
       if (creatorIds.length > 0) {
         const { data: profilesData } = await supabase
           .from('profiles')
@@ -441,7 +441,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     try {
       console.log('[ADMIN] Aprovando usuário:', userId)
-      
+
       const { data, error: updateError } = await supabase
         .from('profiles')
         .update({
@@ -514,6 +514,79 @@ export const useAdminStore = defineStore('admin', () => {
     } catch (err: any) {
       error.value = err.message
       console.error('Error rejecting user:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Banir usuário
+  async function banUser(userId: string, reason?: string) {
+    if (!authStore.user) {
+      throw new Error('Usuário não autenticado')
+    }
+
+    loading.value = true
+    error.value = null
+
+    try {
+      const { data, error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          status: 'banned',
+          approved_by: authStore.user.id,
+          approved_at: new Date().toISOString(),
+          rejection_reason: reason || 'Banido por violação dos termos de uso',
+        })
+        .eq('id', userId)
+        .select()
+        .single()
+
+      if (updateError) throw updateError
+
+      // Recarregar listas
+      await fetchAllUsers()
+      await fetchUserStats()
+
+      return data
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error banning user:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Desbanir usuário (restaurar para ativo)
+  async function unbanUser(userId: string) {
+    if (!authStore.user) {
+      throw new Error('Usuário não autenticado')
+    }
+
+    loading.value = true
+    error.value = null
+
+    try {
+      const { data, error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          status: 'active',
+          rejection_reason: null,
+        })
+        .eq('id', userId)
+        .select()
+        .single()
+
+      if (updateError) throw updateError
+
+      await fetchAllUsers()
+      await fetchUserStats()
+
+      return data
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Error unbanning user:', err)
       throw err
     } finally {
       loading.value = false
@@ -929,7 +1002,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     try {
       console.log('[ADMIN] Criando post:', { tipo: postData.tipo, status: postData.status, hasImage: !!postData.image_url })
-      
+
       // Verificar palavras proibidas (admins podem criar mesmo assim, mas vamos avisar)
       const bannedCheck = await checkBannedWords(postData.conteudo)
       if (bannedCheck.found && bannedCheck.action === 'replace' && bannedCheck.sanitizedContent) {
@@ -937,7 +1010,7 @@ export const useAdminStore = defineStore('admin', () => {
         postData.conteudo = bannedCheck.sanitizedContent
       }
       // Admins podem criar posts mesmo com palavras proibidas (não bloqueamos)
-      
+
       const { data, error: insertError } = await supabase
         .from('posts')
         .insert({
@@ -1040,7 +1113,7 @@ export const useAdminStore = defineStore('admin', () => {
       // Buscar nomes dos parceiros se houver
       const partnerIds = [...new Set(servicesData.map((s: any) => s.parceiro_id).filter(Boolean))]
       let partnersMap = new Map<string, any>()
-      
+
       if (partnerIds.length > 0) {
         const { data: partnersData } = await supabase
           .from('partners')
@@ -1130,7 +1203,7 @@ export const useAdminStore = defineStore('admin', () => {
       const cleanData: any = {
         updated_at: new Date().toISOString(),
       }
-      
+
       if (updates.nome !== undefined) cleanData.nome = updates.nome
       if (updates.descricao !== undefined) {
         cleanData.descricao = updates.descricao && updates.descricao.trim() ? updates.descricao : null
@@ -1251,7 +1324,7 @@ export const useAdminStore = defineStore('admin', () => {
       if (queryError) throw queryError
 
       bannedWords.value = data || []
-      
+
       // Calcular estatísticas
       const stats: BannedWordStats = {
         total: data?.length || 0,
@@ -1654,15 +1727,15 @@ export const useAdminStore = defineStore('admin', () => {
           }
         }
       } else if (input.action === 'suspend_user') {
-        const userId = report.reported_item_type === 'user' 
-          ? report.reported_item_id 
+        const userId = report.reported_item_type === 'user'
+          ? report.reported_item_id
           : (report.reported_item as any)?.user_id
 
         if (userId) {
           // Suspender por 7 dias por padrão
           const suspendUntil = new Date()
           suspendUntil.setDate(suspendUntil.getDate() + 7)
-          
+
           await supabase
             .from('profiles')
             .update({
@@ -1672,21 +1745,18 @@ export const useAdminStore = defineStore('admin', () => {
             .eq('id', userId)
         }
       } else if (input.action === 'ban_user') {
-        const userId = report.reported_item_type === 'user' 
-          ? report.reported_item_id 
+        const userId = report.reported_item_type === 'user'
+          ? report.reported_item_id
           : (report.reported_item as any)?.user_id
 
         if (userId) {
-          await supabase
-            .from('profiles')
-            .update({
-              status: 'banned',
-            })
-            .eq('id', userId)
+          // Usar a função banUser para garantir rastreamento completo
+          const reason = input.details || `Banido por violação reportada (Report #${id})`
+          await banUser(userId, reason)
         }
       } else if (input.action === 'add_strike') {
-        const userId = report.reported_item_type === 'user' 
-          ? report.reported_item_id 
+        const userId = report.reported_item_type === 'user'
+          ? report.reported_item_id
           : (report.reported_item as any)?.user_id
 
         if (userId) {
@@ -1713,11 +1783,11 @@ export const useAdminStore = defineStore('admin', () => {
       // Se foi removido conteúdo, emitir evento para atualizar feed
       if (input.action === 'remove_content') {
         // Disparar evento customizado para atualizar o feed
-        window.dispatchEvent(new CustomEvent('post-removed', { 
-          detail: { 
+        window.dispatchEvent(new CustomEvent('post-removed', {
+          detail: {
             itemId: report.reported_item_id,
             itemType: report.reported_item_type
-          } 
+          }
         }))
       }
     } catch (err: any) {
@@ -1861,6 +1931,8 @@ export const useAdminStore = defineStore('admin', () => {
     fetchAllUsers,
     approveUser,
     rejectUser,
+    banUser,
+    unbanUser,
     fetchUserStats,
     fetchPendingPosts,
     fetchAllPosts,
