@@ -204,6 +204,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/partner/PartnerEvents.vue'),
     meta: { requiresAuth: true, requiresRole: 'partner' },
   },
+  // Catch-all 404 route - must be last
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/NotFound.vue'),
+  },
 ]
 
 const router = createRouter({
