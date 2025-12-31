@@ -92,7 +92,7 @@
         "copyright": "© 2025 (323) Network. Todos os direitos reservados.",
         "tagline": "Conectando o Brasil",
         "taglineHighlight": "nos EUA",
-        "description": "Grupo de Network de brasileiros nos EUA em busca de negócios a fim de obter parcerias com o intuito de alcançar o american dream.",
+        "description": "A 323 Network conecta brasileiros nos Estados Unidos que buscam oportunidades de negócios, parcerias estratégicas e crescimento profissional. Atuamos como um hub de relacionamento e negócios, criando um ambiente onde conexões qualificadas impulsionam projetos, empresas e a construção do American Dream.",
         "emailNotConfirmedTitle": "Email não confirmado",
         "emailNotConfirmedMessage": "O email {email} ainda não foi confirmado. Por favor, verifique sua caixa de entrada e clique no link de confirmação que enviamos.",
         "loginErrorTitle": "Erro ao fazer login",
@@ -743,6 +743,172 @@
             "copyright": "© 2025 (323) Network. Todos os direitos reservados.",
             "terms": "Termos de Uso",
             "privacy": "Privacidade"
+        }
+    },
+    "partners": {
+        "enterCommunity": "Entrar na Comunidade",
+        "hero": {
+            "title": "Seja Parceiro da",
+            "subtitle": "323 Network",
+            "description": "Conectando marcas à comunidade brasileira nos Estados Unidos",
+            "becomeSponsor": "Tornar-se Patrocinador",
+            "downloadMediaKit": "Baixar Media Kit"
+        },
+        "about": {
+            "title": "Quem é a 323 Network",
+            "description1": "323 Network é uma rede de conexão entre artistas, empreendedores e profissionais brasileiros nos Estados Unidos, focada na construção de comunidade, oportunidades de negócios e visibilidade de marca.",
+            "description2": "Organizamos eventos presenciais e experiências exclusivas em várias cidades dos EUA, conectando brasileiros com alto poder de compra, formação universitária e interesse em crescimento profissional e financeiro no país.",
+            "whatWeDo": "O Que Fazemos",
+            "items": {
+                "artists": {
+                    "title": "Artistas e Palestrantes Curados",
+                    "description": "Artistas e palestrantes curados conectados à comunidade brasileira."
+                },
+                "events": {
+                    "title": "Eventos Recorrentes",
+                    "description": "Eventos recorrentes para grupos de 50 a 200 pessoas em locais selecionados."
+                },
+                "projects": {
+                    "title": "Projetos Exclusivos",
+                    "description": "Projetos como American Dream, projetados para brasileiros com formação universitária que vivem ou querem viver nos EUA."
+                },
+                "content": {
+                    "title": "Conteúdo Contínuo",
+                    "description": "Conteúdo contínuo nas redes sociais, focando em histórias reais, educação, arte e oportunidades."
+                }
+            },
+            "stats": {
+                "members": "Membros Ativos",
+                "events": "Eventos Realizados",
+                "cities": "Cidades nos EUA",
+                "years": "Anos de Experiência"
+            }
+        },
+        "events": {
+            "title": "Eventos da 323 Network",
+            "description": "Veja como conectamos a comunidade brasileira através de experiências únicas",
+            "attendees": "participantes",
+            "noEvents": "Nenhum evento disponível no momento"
+        },
+        "gallery": {
+            "title": "Nossos Eventos em Ação",
+            "description": "Veja como conectamos a comunidade brasileira em Los Angeles através de experiências únicas",
+            "noImages": "Nenhuma imagem disponível no momento"
+        },
+        "videos": {
+            "title": "Portfólio de Vídeos",
+            "description": "Assista aos melhores momentos dos nossos eventos e palestras",
+            "noVideos": "Nenhum vídeo disponível no momento"
+        },
+        "benefits": {
+            "title": "Por Que Patrocinar a 323 Network?",
+            "description": "Alcance um público qualificado e engajado com alto potencial de conversão",
+            "items": {
+                "niche": {
+                    "title": "100% Público Nicho",
+                    "description": "Brasileiros nos EUA ou com forte intenção de vir."
+                },
+                "purchasing": {
+                    "title": "Alto Poder de Compra",
+                    "description": "Audiência com poder de compra acima da média, muitos já empreendedores ou em transição de carreira."
+                },
+                "regular": {
+                    "title": "Eventos Regulares",
+                    "description": "Eventos regulares ao longo do ano, gerando exposição consistente da marca."
+                },
+                "activation": {
+                    "title": "Possibilidades de Ativação",
+                    "description": "Registros, cupons, QR codes, links e ofertas exclusivas."
+                }
+            }
+        },
+        "testimonials": {
+            "title": "O Que Dizem Sobre Nós"
+        },
+        "plans": {
+            "title": "Planos de Patrocínio",
+            "description": "Escolha o plano ideal para sua marca se conectar com a comunidade brasileira nos EUA",
+            "mostPopular": "MAIS POPULAR",
+            "price": "Sob consulta",
+            "cta": "Quero este plano",
+            "start": {
+                "title": "START",
+                "goal": "Objetivo: estar presente e ser visto consistentemente.",
+                "features": {
+                    "logo": "Logo em todas as artes dos eventos 323 como Parceiro Oficial",
+                    "post": "1 post no feed por mês mencionando a marca",
+                    "stories": "2 sequências de stories por mês com tagging e link",
+                    "presentation": "Logo nas apresentações de abertura dos eventos",
+                    "website": "Inclusão na lista de parceiros no site"
+                }
+            },
+            "grow": {
+                "title": "GROW",
+                "goal": "Objetivo: reconhecimento de marca e geração de leads.",
+                "features": {
+                    "everything": "Tudo do plano START",
+                    "dedicated": "1 post dedicado por mês apresentando a marca e oferta",
+                    "mention": "Menção verbal em todos os eventos presenciais durante o período",
+                    "qr": "QR code / link do patrocinador nos slides e materiais do evento",
+                    "offer": "1 oferta exclusiva enviada aos participantes do evento"
+                }
+            },
+            "impact": {
+                "title": "IMPACT",
+                "goal": "Objetivo: relacionamento profundo, leads e resultados mensuráveis.",
+                "features": {
+                    "everything": "Tudo do plano GROW",
+                    "video": "Co-criação de 1 conteúdo em vídeo por mês com artista/mentor 323",
+                    "space": "Espaço físico em eventos selecionados (mesa/stand)",
+                    "speaking": "3-5 minutos de fala em pelo menos 1 evento-chave",
+                    "cta": "Inserção direta de call-to-action nos eventos",
+                    "report": "Relatório simples de performance: alcance, engajamento e cliques"
+                }
+            }
+        },
+        "namingRights": {
+            "title": "Quer Ser a Marca Principal?",
+            "description": "Para marcas que querem uma presença ainda mais forte, oferecemos a possibilidade de Naming Rights:",
+            "benefit1": "Associe o nome da sua marca a um projeto, ciclo de eventos ou programa 323",
+            "benefit2": "Máxima visibilidade em todas as comunicações",
+            "benefit3": "Ações exclusivas projetadas com sua equipe de marketing",
+            "cta": "Quero discutir Naming Rights"
+        },
+        "cta": {
+            "title": "Pronto para construir algo significativo juntos?",
+            "description": "Se sua marca quer se conectar com brasileiros nos Estados Unidos de forma estratégica, autêntica e consistente, a 323 Network é o parceiro certo.",
+            "button": "Quero falar com a 323"
+        },
+        "contact": {
+            "title": "Entre em Contato com a 323 Network",
+            "description": "Responderemos sua consulta o mais rápido possível para entender as necessidades da sua marca e apresentar possibilidades de parceria.",
+            "name": "Nome",
+            "namePlaceholder": "Seu nome completo",
+            "company": "Empresa",
+            "companyPlaceholder": "Nome da empresa",
+            "email": "Email",
+            "emailPlaceholder": "seu@email.com",
+            "phone": "Telefone",
+            "phonePlaceholder": "(opcional)",
+            "subject": "Assunto",
+            "subjectPlaceholder": "Selecione um assunto",
+            "subjects": {
+                "sponsorship": "Patrocínio",
+                "partnership": "Parceria",
+                "naming": "Naming Rights",
+                "other": "Outro"
+            },
+            "message": "Mensagem",
+            "messagePlaceholder": "Conte-nos sobre sua marca e como podemos trabalhar juntos...",
+            "submit": "Enviar Mensagem",
+            "alternative": "Se preferir, entre em contato diretamente via",
+            "whatsapp": "Chat no WhatsApp"
+        },
+        "footer": {
+            "description": "Conectando marcas à comunidade brasileira nos Estados Unidos",
+            "contact": "Contato",
+            "social": "Redes Sociais",
+            "rights": "Todos os direitos reservados."
         }
     }
 }
