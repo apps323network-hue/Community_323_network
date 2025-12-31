@@ -37,6 +37,12 @@ const routes: RouteRecordRaw[] = [
     // Não usar requiresGuest pois o Supabase cria uma sessão temporária durante recovery
   },
   {
+    path: '/parceiros',
+    name: 'PartnersLanding',
+    component: () => import('@/views/public/PartnersLanding.vue'),
+    // Rota pública - não requer autenticação
+  },
+  {
     path: '/banned',
     name: 'Banned',
     component: () => import('@/views/Banned.vue'),

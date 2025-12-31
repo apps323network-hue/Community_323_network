@@ -621,5 +621,171 @@
             "viewEvent": "View Full Event",
             "close": "Close"
         }
+    },
+    "partners": {
+        "enterCommunity": "Enter Community",
+        "hero": {
+            "title": "Become a Partner of",
+            "subtitle": "323 Network",
+            "description": "Connecting brands to the Brazilian community in the United States",
+            "becomeSponsor": "Become a Sponsor",
+            "downloadMediaKit": "Download Media Kit"
+        },
+        "about": {
+            "title": "Who is 323 Network",
+            "description1": "323 Network is a connection network between Brazilian artists, entrepreneurs, and professionals in the United States, focused on community building, business opportunities, and brand visibility.",
+            "description2": "We organize in-person events and exclusive experiences in various US cities, connecting Brazilians with high purchasing power, university education, and interest in professional and financial growth in the country.",
+            "whatWeDo": "What We Do",
+            "items": {
+                "artists": {
+                    "title": "Curated Artists and Speakers",
+                    "description": "Curated artists and speakers connected to the Brazilian community."
+                },
+                "events": {
+                    "title": "Recurring Events",
+                    "description": "Recurring events for groups of 50 to 200 people in selected venues."
+                },
+                "projects": {
+                    "title": "Exclusive Projects",
+                    "description": "Projects like American Dream, designed for Brazilians with university degrees who live or want to live in the USA."
+                },
+                "content": {
+                    "title": "Continuous Content",
+                    "description": "Continuous content on social media, focusing on real stories, education, art, and opportunities."
+                }
+            },
+            "stats": {
+                "members": "Active Members",
+                "events": "Events Held",
+                "cities": "US Cities",
+                "years": "Years of Experience"
+            }
+        },
+        "events": {
+            "title": "323 Network Events",
+            "description": "See how we connect the Brazilian community through unique experiences",
+            "attendees": "attendees",
+            "noEvents": "No events available at the moment"
+        },
+        "gallery": {
+            "title": "Our Events in Action",
+            "description": "See how we connect the Brazilian community in Los Angeles through unique experiences",
+            "noImages": "No images available at the moment"
+        },
+        "videos": {
+            "title": "Video Portfolio",
+            "description": "Watch the best moments from our events and talks",
+            "noVideos": "No videos available at the moment"
+        },
+        "benefits": {
+            "title": "Why Sponsor 323 Network?",
+            "description": "Reach a qualified, engaged audience with high conversion potential",
+            "items": {
+                "niche": {
+                    "title": "100% Niche Audience",
+                    "description": "Brazilians in the USA or with strong intention to come."
+                },
+                "purchasing": {
+                    "title": "High Purchasing Power",
+                    "description": "Audience with above-average purchasing power, many already entrepreneurs or in career transition."
+                },
+                "regular": {
+                    "title": "Regular Events",
+                    "description": "Regular events throughout the year, generating consistent brand exposure."
+                },
+                "activation": {
+                    "title": "Activation Possibilities",
+                    "description": "Registrations, coupons, QR codes, links, and exclusive offers."
+                }
+            }
+        },
+        "testimonials": {
+            "title": "What They Say About Us"
+        },
+        "plans": {
+            "title": "Sponsorship Plans",
+            "description": "Choose the ideal plan for your brand to connect with the Brazilian community in the USA",
+            "mostPopular": "MOST POPULAR",
+            "price": "Upon request",
+            "cta": "I want this plan",
+            "start": {
+                "title": "START",
+                "goal": "Goal: be present and seen consistently.",
+                "features": {
+                    "logo": "Logo on all 323 event artwork as an Official Partner",
+                    "post": "1 feed post per month mentioning the brand",
+                    "stories": "2 story sequences per month with tagging and link",
+                    "presentation": "Logo on event opening presentations",
+                    "website": "Inclusion in the partners list on the website"
+                }
+            },
+            "grow": {
+                "title": "GROW",
+                "goal": "Goal: brand recognition and lead generation.",
+                "features": {
+                    "everything": "Everything from the START plan",
+                    "dedicated": "1 dedicated post per month presenting the brand and offer",
+                    "mention": "Verbal mention at all in-person events during the period",
+                    "qr": "Sponsor QR code / link on slides and event materials",
+                    "offer": "1 exclusive offer sent to event participants"
+                }
+            },
+            "impact": {
+                "title": "IMPACT",
+                "goal": "Goal: deep relationship, leads, and measurable results.",
+                "features": {
+                    "everything": "Everything from the GROW plan",
+                    "video": "Co-creation of 1 video content per month with 323 artist/mentor",
+                    "space": "Physical space at selected events (table/stand)",
+                    "speaking": "3-5 minutes speaking time at least 1 key event",
+                    "cta": "Direct call-to-action insertion at events",
+                    "report": "Simple performance report: reach, engagement, and clicks"
+                }
+            }
+        },
+        "namingRights": {
+            "title": "Want to Be the Main Brand?",
+            "description": "For brands that want an even stronger presence, we offer the possibility of Naming Rights:",
+            "benefit1": "Associate your brand name with a project, event cycle, or 323 program",
+            "benefit2": "Maximum visibility in all communications",
+            "benefit3": "Exclusive actions designed with your marketing team",
+            "cta": "I want to discuss Naming Rights"
+        },
+        "cta": {
+            "title": "Ready to build something meaningful together?",
+            "description": "If your brand wants to connect with Brazilians in the United States strategically, authentically, and consistently, 323 Network is the right partner.",
+            "button": "I want to talk to 323"
+        },
+        "contact": {
+            "title": "Contact 323 Network",
+            "description": "We will respond to your inquiry as soon as possible to understand your brand's needs and present partnership possibilities.",
+            "name": "Name",
+            "namePlaceholder": "Your full name",
+            "company": "Company",
+            "companyPlaceholder": "Company name",
+            "email": "Email",
+            "emailPlaceholder": "your@email.com",
+            "phone": "Phone",
+            "phonePlaceholder": "(optional)",
+            "subject": "Subject",
+            "subjectPlaceholder": "Select a subject",
+            "subjects": {
+                "sponsorship": "Sponsorship",
+                "partnership": "Partnership",
+                "naming": "Naming Rights",
+                "other": "Other"
+            },
+            "message": "Message",
+            "messagePlaceholder": "Tell us about your brand and how we can work together...",
+            "submit": "Send Message",
+            "alternative": "If you prefer, contact us directly via",
+            "whatsapp": "Chat on WhatsApp"
+        },
+        "footer": {
+            "description": "Connecting brands to the Brazilian community in the United States",
+            "contact": "Contact",
+            "social": "Social Media",
+            "rights": "All rights reserved."
+        }
     }
 }
