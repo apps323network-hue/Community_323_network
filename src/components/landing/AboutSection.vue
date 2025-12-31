@@ -46,14 +46,19 @@
         class="text-center section-reveal"
         :class="{ 'revealed': partnersVisible }"
       >
-        <p class="text-sm text-slate-500 dark:text-gray-500 uppercase tracking-wider mb-6 font-medium">
+        <p class="text-sm text-slate-500 dark:text-gray-400 uppercase tracking-widest mb-10 font-bold">
           {{ t('landing.about.partnersTitle') }}
         </p>
-        <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
-          <div class="w-24 h-12 bg-slate-300 dark:bg-slate-700 rounded flex items-center justify-center text-xs text-slate-500 dark:text-slate-400">BR News</div>
-          <div class="w-24 h-12 bg-slate-300 dark:bg-slate-700 rounded flex items-center justify-center text-xs text-slate-500 dark:text-slate-400">Brazilian Times</div>
-          <div class="w-24 h-12 bg-slate-300 dark:bg-slate-700 rounded flex items-center justify-center text-xs text-slate-500 dark:text-slate-400">Media 3</div>
-          <div class="w-24 h-12 bg-slate-300 dark:bg-slate-700 rounded flex items-center justify-center text-xs text-slate-500 dark:text-slate-400">Media 4</div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-4xl mx-auto">
+          <div v-for="partner in ['BR News', 'Brazilian Times', 'Media 3', 'Media 4']" :key="partner"
+            class="partner-item group"
+          >
+            <div class="h-16 md:h-20 bg-slate-100 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700/50 flex items-center justify-center p-4 transition-all duration-500 hover:scale-105 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5">
+              <span class="text-sm md:text-base font-bold text-slate-400 dark:text-slate-500 group-hover:text-primary dark:group-hover:text-primary transition-colors duration-500 tracking-tight">
+                {{ partner }}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
