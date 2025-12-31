@@ -875,9 +875,14 @@
             "cta": "Quero discutir Naming Rights"
         },
         "cta": {
+            "badge": "Oportunidade Exclusiva",
             "title": "Pronto para construir algo significativo juntos?",
+            "subtitle": "Vamos criar algo incrível",
             "description": "Se sua marca quer se conectar com brasileiros nos Estados Unidos de forma estratégica, autêntica e consistente, a 323 Network é o parceiro certo.",
-            "button": "Quero falar com a 323"
+            "button": "Quero falar com a 323",
+            "trust1": "Parcerias Comprovadas",
+            "trust2": "Dados Seguros",
+            "trust3": "Resposta Rápida"
         },
         "contact": {
             "title": "Entre em Contato com a 323 Network",
@@ -887,7 +892,7 @@
             "company": "Empresa",
             "companyPlaceholder": "Nome da empresa",
             "email": "Email",
-            "emailPlaceholder": "seu@email.com",
+            "emailPlaceholder": "seu email",
             "phone": "Telefone",
             "phonePlaceholder": "(opcional)",
             "subject": "Assunto",

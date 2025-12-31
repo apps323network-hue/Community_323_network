@@ -36,14 +36,8 @@ export const useUserStore = defineStore('user', () => {
   const loading = ref(false)
 
   async function fetchProfile(userId: string) {
-    const fetchStartTime = performance.now()
-    console.log(`[USER] fetchProfile iniciado para userId: ${userId}`)
-
     loading.value = true
     try {
-      const queryStartTime = performance.now()
-      console.log('[USER] Executando query no Supabase...')
-
       // Verificar se o Supabase está configurado
       if (!supabase) {
         throw new Error('Cliente Supabase não está inicializado. Verifique as variáveis de ambiente.')
@@ -54,9 +48,6 @@ export const useUserStore = defineStore('user', () => {
         .select('*')
         .eq('id', userId)
         .single()
-
-      const queryEndTime = performance.now()
-      console.log(`[USER] Query completou em ${(queryEndTime - queryStartTime).toFixed(2)}ms`)
 
       if (error) {
         // Melhorar mensagem de erro
@@ -72,17 +63,14 @@ export const useUserStore = defineStore('user', () => {
       }
 
       profile.value = data
-      const fetchEndTime = performance.now()
-      console.log(`[USER] fetchProfile completou em ${(fetchEndTime - fetchStartTime).toFixed(2)}ms`)
     } catch (error: any) {
-      const fetchErrorTime = performance.now()
       const errorDetails = {
         message: error?.message || 'Erro desconhecido',
         details: error?.stack || error?.toString(),
         hint: error?.hint || '',
         code: error?.code || '',
       }
-      console.error(`[USER] fetchProfile erro após ${(fetchErrorTime - fetchStartTime).toFixed(2)}ms:`, errorDetails)
+      console.error('[USER] fetchProfile erro:', errorDetails)
 
       // Não bloquear se houver erro - apenas logar
       // Mas definir profile como null para evitar estados inconsistentes
