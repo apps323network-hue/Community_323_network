@@ -874,9 +874,14 @@
             "cta": "I want to discuss Naming Rights"
         },
         "cta": {
+            "badge": "Exclusive Opportunity",
             "title": "Ready to build something meaningful together?",
+            "subtitle": "Let's create something amazing",
             "description": "If your brand wants to connect with Brazilians in the United States strategically, authentically, and consistently, 323 Network is the right partner.",
-            "button": "I want to talk to 323"
+            "button": "I want to talk to 323",
+            "trust1": "Proven Partnerships",
+            "trust2": "Secure Data",
+            "trust3": "Quick Response"
         },
         "contact": {
             "title": "Contact 323 Network",
@@ -886,7 +891,7 @@
             "company": "Company",
             "companyPlaceholder": "Company name",
             "email": "Email",
-            "emailPlaceholder": "your@email.com",
+            "emailPlaceholder": "your email",
             "phone": "Phone",
             "phonePlaceholder": "(optional)",
             "subject": "Subject",

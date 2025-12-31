@@ -121,7 +121,7 @@ const whatWeDoItems = [
 ]
 
 const statistics = [
-  { key: 'members', value: '500+' },
+  { key: 'members', value: '5000+' },
   { key: 'events', value: '50+' },
   { key: 'cities', value: '10+' },
   { key: 'years', value: '3+' },

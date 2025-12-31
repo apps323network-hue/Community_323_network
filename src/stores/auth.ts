@@ -216,10 +216,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // Escutar mudanças de autenticação ANTES de checkSession para evitar race conditions
-  supabase.auth.onAuthStateChange(async (event, session) => {
-    const onAuthStartTime = performance.now()
-    console.log(`[AUTH] onAuthStateChange: ${event}`)
-    
+  supabase.auth.onAuthStateChange(async (_event, session) => {
     user.value = session?.user ?? null
     
     // Buscar ou limpar profile quando estado de auth mudar (em background, não bloquear)
@@ -235,9 +232,6 @@ export const useAuthStore = defineStore('auth', () => {
     } else {
       userStore.clearProfile()
     }
-    
-    const onAuthEndTime = performance.now()
-    console.log(`[AUTH] onAuthStateChange completou em ${(onAuthEndTime - onAuthStartTime).toFixed(2)}ms`)
   })
 
   // Inicializar verificando sessão APÓS configurar o listener
