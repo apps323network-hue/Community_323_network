@@ -1,8 +1,16 @@
 <template>
-  <section class="py-16 sm:py-20 md:py-24 bg-slate-900">
+  <section 
+    id="videos"
+    ref="sectionRef"
+    class="py-16 sm:py-20 md:py-24 bg-slate-900 dark:bg-background-dark overflow-hidden"
+  >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Title -->
-      <div class="text-center mb-12 md:mb-16">
+      <div 
+        ref="headerRef"
+        class="text-center mb-12 md:mb-16 section-header"
+        :class="{ 'revealed': headerVisible }"
+      >
         <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">
           {{ t('partners.videos.title') }}
         </h2>
@@ -13,11 +21,16 @@
       </div>
 
       <!-- Videos Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+      <div 
+        ref="gridRef"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+      >
         <div
           v-for="(video, index) in placeholderVideos"
           :key="index"
-          class="bg-slate-800 rounded-xl overflow-hidden border border-slate-700 hover:border-primary/50 transition-all duration-300 hover:shadow-xl group cursor-pointer"
+          class="video-card bg-slate-800 dark:bg-surface-lighter rounded-xl overflow-hidden border border-slate-700 dark:border-slate-800 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 group cursor-pointer"
+          :class="{ 'revealed': cardsVisible }"
+          :style="{ transitionDelay: `${index * 120}ms` }"
           @click="openVideo(video.url)"
         >
           <!-- Video Thumbnail -->
@@ -86,11 +99,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/ui/Modal.vue'
 
 const { t } = useI18n()
+
+const sectionRef = ref<HTMLElement | null>(null)
+const headerRef = ref<HTMLElement | null>(null)
+const gridRef = ref<HTMLElement | null>(null)
+
+const headerVisible = ref(false)
+const cardsVisible = ref(false)
+
+let observer: IntersectionObserver | null = null
 
 const videoModalOpen = ref(false)
 const selectedVideoUrl = ref<string | null>(null)
@@ -127,5 +149,89 @@ function openVideo(url: string | null) {
   selectedVideoTitle.value = placeholderVideos.find(v => v.url === url)?.title || ''
   videoModalOpen.value = true
 }
+
+onMounted(() => {
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          if (entry.target === headerRef.value) {
+            headerVisible.value = true
+          }
+          if (entry.target === gridRef.value) {
+            cardsVisible.value = true
+          }
+          observer?.unobserve(entry.target)
+        }
+      })
+    },
+    { threshold: 0.15 }
+  )
+
+  if (headerRef.value) observer.observe(headerRef.value)
+  if (gridRef.value) observer.observe(gridRef.value)
+})
+
+onUnmounted(() => {
+  observer?.disconnect()
+})
 </script>
+
+<style scoped>
+/* Section header reveal - horizontal slide with blur */
+.section-header {
+  opacity: 0;
+  transform: translateX(60px);
+  filter: blur(12px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.section-header.revealed {
+  opacity: 1;
+  transform: translateX(0);
+  filter: blur(0);
+}
+
+/* Video card - 3D rotate entrance with blur */
+.video-card {
+  opacity: 0;
+  transform: perspective(1000px) rotateY(15deg) translateZ(-50px);
+  filter: blur(8px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.video-card.revealed {
+  opacity: 1;
+  transform: perspective(1000px) rotateY(0) translateZ(0);
+  filter: blur(0);
+}
+
+/* Card hover effects */
+.video-card:hover {
+  transform: translateY(-10px) scale(1.02);
+}
+
+/* Glow effect on hover */
+.video-card:hover {
+  box-shadow: 0 20px 40px -10px rgba(var(--color-primary-rgb, 234, 98, 29), 0.3);
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .section-header,
+  .video-card {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+}
+</style>
 
