@@ -435,7 +435,15 @@ const loginErrorModal = ref({
 
 // Ler query parameters para integração com American Dream
 const source = route.query.source as string
-const returnTo = route.query.returnTo as string
+// Decodificar returnTo se estiver URL-encoded (Vue Router pode já decodificar, mas garantir)
+let returnTo = route.query.returnTo as string
+if (returnTo) {
+  try {
+    returnTo = decodeURIComponent(returnTo)
+  } catch {
+    // Se falhar, usar o valor original
+  }
+}
 const prefillEmail = route.query.email as string
 const prefillName = route.query.name as string
 const prefillPhone = route.query.phone as string
