@@ -119,19 +119,32 @@ export const useAuthStore = defineStore('auth', () => {
         // Se tiver returnTo, redirecionar com token
         if (userData?.returnTo && accessToken) {
           try {
+            // Decodificar returnTo se estiver URL-encoded
+            let decodedReturnTo = userData.returnTo
+            try {
+              // Tentar decodificar (pode estar URL-encoded)
+              decodedReturnTo = decodeURIComponent(userData.returnTo)
+            } catch {
+              // Se falhar ao decodificar, usar o valor original
+              decodedReturnTo = userData.returnTo
+            }
+            
+            console.log('[SSO] returnTo original:', userData.returnTo)
+            console.log('[SSO] returnTo decodificado:', decodedReturnTo)
+            
             // Verificar se returnTo é uma URL válida
             let returnUrl: URL
             
             // Se já é uma URL absoluta, usar diretamente
-            if (userData.returnTo.startsWith('http://') || userData.returnTo.startsWith('https://')) {
-              returnUrl = new URL(userData.returnTo)
+            if (decodedReturnTo.startsWith('http://') || decodedReturnTo.startsWith('https://')) {
+              returnUrl = new URL(decodedReturnTo)
             } else {
               // Se for uma URL relativa, construir URL absoluta
               // Assumir que é do American Dream (produção)
-              const baseUrl = userData.returnTo.startsWith('/') 
+              const baseUrl = decodedReturnTo.startsWith('/') 
                 ? 'https://americandream.323network.com' 
                 : 'https://americandream.323network.com/'
-              returnUrl = new URL(userData.returnTo, baseUrl)
+              returnUrl = new URL(decodedReturnTo, baseUrl)
             }
             
             returnUrl.searchParams.set('token', accessToken)
