@@ -242,8 +242,8 @@ function formatFileSize(bytes: number | null) {
 
 function goToLesson(lesson: ProgramLesson) {
   currentLessonId.value = lesson.id
-  // Update URL without reload
-  router.replace({ query: { aula: lesson.id } })
+  // Update URL and allow browser back button
+  router.push({ query: { ...route.query, aula: lesson.id } })
   // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
@@ -335,6 +335,9 @@ onMounted(() => {
 watch(() => route.query.aula, (newLessonId) => {
   if (newLessonId && typeof newLessonId === 'string') {
     currentLessonId.value = newLessonId
+  } else if (allLessons.value.length > 0) {
+    // Fallback to first lesson if query is cleared
+    currentLessonId.value = allLessons.value[0].id
   }
 })
 </script>

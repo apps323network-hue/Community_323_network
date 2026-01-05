@@ -121,7 +121,11 @@ function onPlayerReady() {
 function onPlayerStateChange(event: any) {
   const state = event.data
   
-  // YT.PlayerState.PLAYING = 1
+  // YT.PlayerState.PLAYING = 1, BUFFERING = 3, CUED = 5
+  if (state === 1 || state === 3 || state === 5) {
+    loading.value = false
+  }
+
   if (state === 1) {
     emit('playing')
   }
