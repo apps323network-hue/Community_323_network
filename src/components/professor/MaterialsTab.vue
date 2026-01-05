@@ -1,92 +1,93 @@
 <template>
-  <div>
+  <div class="space-y-8">
     <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
       <div>
-        <h2 class="text-2xl font-black text-slate-900 dark:text-white">Materiais do Programa</h2>
-        <p class="text-sm text-slate-600 dark:text-gray-400 mt-1">Upload de PDFs para os alunos</p>
+        <h2 class="text-3xl font-black text-slate-900 dark:text-white flex items-center gap-3">
+          <span class="w-1.5 h-8 bg-red-500 rounded-full"></span>
+          Materiais de Apoio
+        </h2>
+        <p class="text-slate-500 dark:text-gray-400 font-medium mt-1">Gerencie arquivos PDF e documentos complementares</p>
       </div>
       <button
         @click="openUploadModal"
         :disabled="modules.length === 0"
-        class="flex items-center gap-2 px-6 py-3 bg-secondary text-black font-bold rounded-xl hover:bg-secondary/90 transition-all shadow-lg hover:shadow-secondary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="flex items-center justify-center gap-2 px-8 py-4 bg-slate-900 text-white dark:bg-white dark:text-black font-black rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span class="material-symbols-outlined">upload_file</span>
-        Upload Material
+        Novo Material
       </button>
     </div>
 
     <!-- No modules state -->
-    <div v-if="modules.length === 0" class="text-center py-20 bg-white dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-white/5">
-      <div class="bg-secondary/10 p-8 rounded-full w-fit mx-auto mb-6">
-        <span class="material-symbols-outlined text-6xl text-secondary">folder_open</span>
+    <div v-if="modules.length === 0" class="text-center py-24 bg-white dark:bg-surface-dark rounded-[40px] border border-slate-200 dark:border-white/5 shadow-xl">
+      <div class="bg-secondary/10 p-10 rounded-full w-fit mx-auto mb-8">
+        <span class="material-symbols-outlined text-7xl text-secondary">folder_open</span>
       </div>
-      <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Crie módulos primeiro</h3>
-      <p class="text-slate-600 dark:text-gray-400">
-        Você precisa criar pelo menos um módulo antes de adicionar materiais.
+      <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-3">Crie módulos primeiro</h3>
+      <p class="text-slate-600 dark:text-gray-400 text-lg max-w-sm mx-auto">
+        Você precisa organizar sua grade curricular antes de fazer o upload de materiais.
       </p>
     </div>
 
     <!-- Materials List -->
-    <div v-else-if="materials.length === 0" class="text-center py-20 bg-white dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-white/5">
-      <div class="bg-secondary/10 p-8 rounded-full w-fit mx-auto mb-6">
-        <span class="material-symbols-outlined text-6xl text-secondary">description</span>
+    <div v-else-if="materials.length === 0" class="text-center py-24 bg-white dark:bg-surface-dark rounded-[40px] border border-slate-200 dark:border-white/5 shadow-xl">
+      <div class="bg-slate-100 dark:bg-white/5 p-10 rounded-full w-fit mx-auto mb-8">
+        <span class="material-symbols-outlined text-7xl text-slate-400">description</span>
       </div>
-      <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Nenhum material enviado</h3>
-      <p class="text-slate-600 dark:text-gray-400 mb-6">
-        Faça upload de PDFs para que seus alunos possam baixar.
+      <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-3">Nenhum material ainda</h3>
+      <p class="text-slate-600 dark:text-gray-400 text-lg mb-8 max-w-sm mx-auto">
+        Comece enviando PDFs, slides ou apostilas para enriquecer suas aulas.
       </p>
       <button
         @click="openUploadModal"
-        class="px-8 py-3 bg-secondary text-black font-bold rounded-xl hover:bg-secondary/90 transition-all inline-flex items-center gap-2"
+        class="px-10 py-4 bg-secondary text-black font-black rounded-2xl hover:bg-secondary/90 transition-all shadow-lg shadow-secondary/20 inline-flex items-center gap-3"
       >
-        <span class="material-symbols-outlined">upload_file</span>
-        Upload Primeiro Material
+        <span class="material-symbols-outlined">add_circle</span>
+        Upload do Primeiro Material
       </button>
     </div>
 
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       <div
         v-for="material in materials"
         :key="material.id"
-        class="bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/5 p-4 hover:shadow-lg transition-shadow"
+        class="group bg-white dark:bg-surface-dark rounded-[32px] border border-slate-200 dark:border-white/5 p-6 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 hover:-translate-y-1 relative"
       >
-        <div class="flex items-start justify-between gap-3 mb-3">
-          <div class="bg-red-500/10 p-3 rounded-lg flex-shrink-0">
-            <span class="material-symbols-outlined text-2xl text-red-500">picture_as_pdf</span>
+        <div class="flex items-start justify-between mb-6">
+          <div class="bg-red-500/10 p-4 rounded-2xl group-hover:scale-110 transition-transform duration-500">
+            <span class="material-symbols-outlined text-3xl text-red-500">picture_as_pdf</span>
           </div>
           <button
             @click="confirmDelete(material)"
-            class="p-2 text-slate-600 dark:text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+            class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+            title="Excluir Material"
           >
-            <span class="material-symbols-outlined">delete</span>
+            <span class="material-symbols-outlined text-xl">delete</span>
           </button>
         </div>
 
-        <h4 class="text-base font-black text-slate-900 dark:text-white mb-2 line-clamp-2">
+        <h4 class="text-lg font-black text-slate-900 dark:text-white mb-4 line-clamp-2 leading-tight">
           {{ getMaterialTitle(material) }}
         </h4>
 
-        <div class="text-xs font-bold text-slate-500 dark:text-gray-400 space-y-1">
-          <div v-if="material.lesson_id" class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm">play_circle</span>
-            Vinculado a uma aula
+        <div class="space-y-3 mb-8">
+          <div class="flex items-center gap-3 text-xs font-bold text-slate-500 dark:text-gray-400 bg-slate-50 dark:bg-black/20 p-2.5 rounded-xl">
+             <span class="material-symbols-outlined text-sm text-secondary">folder_open</span>
+             <span class="truncate">{{ getModuleName(material.module_id) }}</span>
           </div>
-          <div v-else-if="material.module_id" class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm">folder</span>
-            {{ getModuleName(material.module_id) }}
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm">insert_drive_file</span>
-            {{ formatFileSize(material.file_size_bytes) }}
+          <div class="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">
+             <span class="material-symbols-outlined text-sm">attachment</span>
+             {{ formatFileSize(material.file_size_bytes) }}
           </div>
         </div>
 
         <button
           @click="downloadMaterial(material)"
-          class="w-full mt-4 px-4 py-2 bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white font-bold rounded-lg hover:bg-secondary hover:text-black transition-all text-sm"
+          class="w-full py-3.5 bg-slate-900 text-white dark:bg-white dark:text-black font-black rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg"
         >
-          Baixar
+          <span class="material-symbols-outlined text-xl">download</span>
+          Baixar Arquivo
         </button>
       </div>
     </div>
@@ -226,7 +227,8 @@ const getMaterialTitle = (material: ProgramMaterial) => {
   return currentLocale.value === 'pt-BR' ? material.title_pt : material.title_en
 }
 
-const getModuleName = (moduleId: string) => {
+const getModuleName = (moduleId: string | null) => {
+  if (!moduleId) return 'Geral'
   const module = modules.value.find(m => m.id === moduleId)
   return module ? getModuleTitle(module) : 'N/A'
 }

@@ -403,17 +403,10 @@ router.beforeEach(async (to, _from, next) => {  // Detectar se é uma URL de rec
 
     const userRole: string = userStore.profile?.role || 'user'
 
-    // Admin pode acessar tudo
-    if (userRole !== 'admin') {
-      // Verificar se tem a role necessária
-      if (requiresRole === 'admin') {
-        next({ name: 'Home' })
-        return
-      }
-      if (requiresRole === 'partner' && userRole !== 'partner') {
-        next({ name: 'Home' })
-        return
-      }
+    // Admin pode acessar tudo, caso contrário verifica a role específica
+    if (userRole !== 'admin' && userRole !== requiresRole) {
+      next({ name: 'Home' })
+      return
     }
   }
 

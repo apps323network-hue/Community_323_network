@@ -8,7 +8,10 @@
       
       <div class="relative z-10">
         <h2 class="text-xl font-bold mb-1 text-slate-900 dark:text-white">{{ t('common.hello') }}, {{ userName }}!</h2>
-        <p class="text-sm text-slate-500 dark:text-gray-400 mb-6">{{ t('profile.memberSince') }} {{ memberSinceYear }}</p>
+        <div class="flex flex-col mb-6">
+          <p class="text-sm font-semibold text-primary dark:text-secondary">{{ userTitle }}</p>
+          <p class="text-xs text-slate-500 dark:text-gray-400">{{ t('profile.memberSince') }} {{ memberSinceYear }}</p>
+        </div>
         
         <button
           class="w-full bg-transparent border border-secondary text-secondary hover:bg-secondary hover:text-black font-bold py-2.5 px-4 rounded-lg transition-all shadow-lg shadow-secondary/10 hover:shadow-secondary/40"
@@ -122,6 +125,17 @@
           </span>
           {{ t('navigation.benefits') }}
         </RouterLink>
+
+        <!-- Professor Area -->
+        <div v-if="isProfessor" class="pt-2 mt-2 border-t border-slate-100 dark:border-white/5">
+          <RouterLink
+            to="/professor"
+            class="flex items-center px-4 py-3 text-sm font-semibold rounded-lg bg-primary/10 dark:bg-secondary/10 text-primary dark:text-secondary hover:bg-primary/20 dark:hover:bg-secondary/20 transition-all"
+          >
+            <span class="material-icons-outlined mr-3">school</span>
+            {{ t('navigation.dashboardProfessor') }}
+          </RouterLink>
+        </div>
       </nav>
     </div>
   </aside>
@@ -161,6 +175,14 @@ const memberSinceYear = computed(() => {
   }
   // Fallback para ano atual se não tiver created_at
   return new Date().getFullYear()
+})
+
+const isProfessor = computed(() => ['admin', 'professor'].includes(userStore.profile?.role || ''))
+
+const userTitle = computed(() => {
+  if (userStore.profile?.role === 'professor') return 'Professor'
+  if (userStore.profile?.role === 'admin') return 'Administrador'
+  return userStore.profile?.area_atuacao || 'Membro'
 })
 
 // Carregar perfil quando componente for montado

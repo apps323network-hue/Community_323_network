@@ -65,6 +65,7 @@
         "theme": "Tema",
         "language": "Idioma",
         "dashboardAdmin": "Dashboard Admin",
+        "dashboardProfessor": "Área do Professor",
         "challenges": "Desafios",
         "ranking": "Ranking",
         "logout": "Sair"

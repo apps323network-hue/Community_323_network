@@ -139,18 +139,50 @@
           <!-- YouTube Video ID -->
           <div>
             <label class="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2">
-              YouTube Video ID *
-              <span class="text-xs font-normal text-slate-500">(Ex: dQw4w9WgXcQ)</span>
+              Vídeo do YouTube *
+              <span class="text-xs font-normal text-slate-500">(Cole o ID ou URL completa)</span>
             </label>
-            <input
-              v-model="formData.youtube_video_id"
-              type="text"
-              required
-              class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-slate-900 dark:text-white focus:ring-2 focus:ring-secondary outline-none transition-all"
-              placeholder="dQw4w9WgXcQ"
-            />
+            <div class="flex gap-3">
+              <div class="flex-1 relative">
+                <input
+                  v-model="formData.youtube_video_id"
+                  type="text"
+                  required
+                  @input="handleVideoIdInput"
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-slate-900 dark:text-white focus:ring-2 focus:ring-secondary outline-none transition-all pl-10"
+                  placeholder="Ex: dQw4w9WgXcQ ou link do vídeo"
+                />
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">smart_display</span>
+              </div>
+              <button
+                v-if="formData.youtube_video_id && formData.youtube_video_id.length === 11"
+                type="button"
+                @click="fetchVideoMetadata"
+                :disabled="modulesStore.loading"
+                class="px-4 py-2 bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white font-bold rounded-xl hover:bg-secondary hover:text-black transition-all text-sm flex items-center gap-2 whitespace-nowrap"
+              >
+                <span class="material-symbols-outlined text-sm">download</span>
+                Auto-completar
+              </button>
+            </div>
+            
+            <!-- Thumbnail Preview in Modal -->
+            <div v-if="formData.youtube_video_id && formData.youtube_video_id.length === 11" class="mt-4 flex gap-4 p-4 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-200 dark:border-white/5">
+              <img
+                :src="getYouTubeThumbnail(formData.youtube_video_id)"
+                class="w-32 h-20 object-cover rounded-lg shadow-sm"
+              />
+              <div class="flex-1">
+                <p class="text-xs font-bold text-slate-500 uppercase">Preview do Vídeo</p>
+                <p class="text-sm font-black text-slate-900 dark:text-white mt-1">ID: {{ formData.youtube_video_id }}</p>
+                <a :href="`https://youtube.com/watch?v=${formData.youtube_video_id}`" target="_blank" class="text-xs text-secondary hover:underline flex items-center gap-1 mt-1">
+                  Ver no YouTube <span class="material-symbols-outlined text-xs">open_in_new</span>
+                </a>
+              </div>
+            </div>
+
             <p class="text-xs text-slate-500 dark:text-gray-400 mt-2">
-              Cole apenas o ID do vídeo, não a URL completa. Ex: youtube.com/watch?v=<strong>dQw4w9WgXcQ</strong>
+              Suporta links curtos (youtu.be), URLs completas ou apenas o ID de 11 caracteres.
             </p>
           </div>
 
@@ -222,6 +254,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useLocale } from '@/composables/useLocale'
 import { useModulesStore } from '@/stores/modules'
+import { extractYouTubeVideoId, getYouTubeThumbnail } from '@/lib/youtube'
 import type { ProgramModule, ProgramLesson } from '@/types/modules'
 
 const props = defineProps<{
@@ -254,9 +287,38 @@ const getLessonTitle = (lesson: ProgramLesson) => {
 
 function formatDuration(seconds: number | null) {
   if (!seconds) return 'N/A'
-  const mins = Math.floor(seconds / 60)
+  const hours = Math.floor(seconds / 3600)
+  const mins = Math.floor((seconds % 3600) / 60)
   const secs = seconds % 60
+  
+  if (hours > 0) {
+    return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+  }
   return `${mins}:${secs.toString().padStart(2, '0')}`
+}
+
+function handleVideoIdInput() {
+  const extractedId = extractYouTubeVideoId(formData.value.youtube_video_id)
+  if (extractedId) {
+    formData.value.youtube_video_id = extractedId
+  }
+}
+
+async function fetchVideoMetadata() {
+  if (!formData.value.youtube_video_id || formData.value.youtube_video_id.length !== 11) return
+  
+  try {
+    const details = await modulesStore.getYouTubeVideoDetails(formData.value.youtube_video_id)
+    if (details) {
+      if (!formData.value.title_pt) formData.value.title_pt = details.title
+      if (!formData.value.title_en) formData.value.title_en = details.title
+      // You can also add description if needed
+    } else {
+      alert('Não foi possível encontrar este vídeo ou a API key não está configurada.')
+    }
+  } catch (error) {
+    console.error('Error fetching metadata:', error)
+  }
 }
 
 function openCreateModal(module?: ProgramModule) {

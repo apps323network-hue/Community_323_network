@@ -98,6 +98,7 @@ const hideSidebars = computed(() => {
     route.path.startsWith('/eventos/') ||
     route.path === '/programas' ||
     route.path.startsWith('/programas/') ||
+    route.path.startsWith('/professor') ||
     route.path === '/perfil'
 })
 

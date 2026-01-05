@@ -1,6 +1,6 @@
 // Pinia store for managing program modules and lessons
 import { defineStore } from 'pinia'
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '@/lib/supabase'
 import type { ProgramModule, ProgramLesson, ProgramMaterial, YouTubeVideoDetails } from '@/types/modules'
 
 interface ModulesState {
@@ -14,7 +14,7 @@ interface ModulesState {
 }
 
 export const useModulesStore = defineStore('modules', {
-    state: (): ModulesState =& gt; ({
+    state: (): ModulesState => ({
         modules: [],
         currentModule: null,
         lessons: [],
@@ -24,12 +24,12 @@ export const useModulesStore = defineStore('modules', {
         error: null
     }),
 
-        getters: {
-    getModulesByProgram: (state) => (programId: string) => {
-        return state.modules
-            .filter(m => m.program_id === programId)
-            .sort((a, b) => a.order_index - b.order_index)
-    },
+    getters: {
+        getModulesByProgram: (state) => (programId: string) => {
+            return state.modules
+                .filter(m => m.program_id === programId)
+                .sort((a, b) => a.order_index - b.order_index)
+        },
 
         getLessonsByModule: (state) => (moduleId: string) => {
             return state.lessons
@@ -37,409 +37,412 @@ export const useModulesStore = defineStore('modules', {
                 .sort((a, b) => a.order_index - b.order_index)
         },
 
-            getMaterialsByLesson: (state) => (lessonId: string) => {
-                return state.materials
-                    .filter(m => m.lesson_id === lessonId)
-                    .sort((a, b) => a.order_index - b.order_index)
-            },
+        getMaterialsByLesson: (state) => (lessonId: string) => {
+            return state.materials
+                .filter(m => m.lesson_id === lessonId)
+                .sort((a, b) => a.order_index - b.order_index)
+        },
 
-                getMaterialsByModule: (state) => (moduleId: string) => {
-                    return state.materials
-                        .filter(m => m.module_id === moduleId && !m.lesson_id)
-                        .sort((a, b) => a.order_index - b.order_index)
-                }
-},
+        getMaterialsByModule: (state) => (moduleId: string) => {
+            return state.materials
+                .filter(m => m.module_id === moduleId && !m.lesson_id)
+                .sort((a, b) => a.order_index - b.order_index)
+        }
+    },
 
-actions: {
-    // ============================================
-    // MODULES ACTIONS
-    // ============================================
-    
-    async fetchModulesWithLessons(programId: string) {
-        this.loading = true
-        this.error = null
+    actions: {
+        // ============================================
+        // MODULES ACTIONS
+        // ============================================
 
-        try {
-            const { data: modules, error } = await supabase
-                .from('program_modules')
-                .select(`
+        async fetchModulesWithLessons(programId: string) {
+            this.loading = true
+            this.error = null
+
+            try {
+                const { data: modules, error } = await supabase
+                    .from('program_modules')
+                    .select(`
             *,
             lessons:program_lessons(*)
           `)
-                .eq('program_id', programId)
-                .order('order_index', { ascending: true })
+                    .eq('program_id', programId)
+                    .order('order_index', { ascending: true })
 
-            if (error) throw error
+                if (error) throw error
 
-            this.modules = modules || []
+                this.modules = modules || []
 
-            // Flatten lessons for easy access
-            this.lessons = modules?.flatMap(m => m.lessons || []) || []
+                // Flatten lessons for easy access
+                // Note: Supabase returns lessons nested in modules, we flatten them to store in state.lessons
+                // We need to cast 'any' here because the type definition expects flat structure but query returns nested
+                const modulesWithLessons = modules as any[]
+                this.lessons = modulesWithLessons?.flatMap(m => m.lessons || []) || []
 
-            return modules
-        } catch (err: any) {
-            this.error = err.message
-            console.error('Error fetching modules:', err)
-            return []
-        } finally {
-            this.loading = false
-        }
-    },
-
-    async createModule(moduleData: Partial<ProgramModule>) {
-        this.loading = true
-        this.error = null
-
-        try {
-            const { data, error } = await supabase
-                .from('program_modules')
-                .insert([moduleData])
-                .select()
-                .single()
-
-            if (error) throw error
-
-            this.modules.push(data)
-            return data
-        } catch (err: any) {
-            this.error = err.message
-            console.error('Error creating module:', err)
-            throw err
-        } finally {
-            this.loading = false
-        }
-    },
-
-    async updateModule(moduleId: string, updates: Partial<ProgramModule>) {
-        this.loading = true
-        this.error = null
-
-        try {
-            const { data, error } = await supabase
-                .from('program_modules')
-                .update(updates)
-                .eq('id', moduleId)
-                .select()
-                .single()
-
-            if (error) throw error
-
-            const index = this.modules.findIndex(m => m.id === moduleId)
-            if (index !== -1) {
-                this.modules[index] = data
+                return modules
+            } catch (err: any) {
+                this.error = err.message
+                console.error('Error fetching modules:', err)
+                return []
+            } finally {
+                this.loading = false
             }
+        },
 
-            return data
-        } catch (err: any) {
-            this.error = err.message
-            console.error('Error updating module:', err)
-            throw err
-        } finally {
-            this.loading = false
-        }
-    },
+        async createModule(moduleData: Partial<ProgramModule>) {
+            this.loading = true
+            this.error = null
 
-    async deleteModule(moduleId: string) {
-        this.loading = true
-        this.error = null
+            try {
+                const { data, error } = await supabase
+                    .from('program_modules')
+                    .insert([moduleData])
+                    .select()
+                    .single()
 
-        try {
-            const { error } = await supabase
-                .from('program_modules')
-                .delete()
-                .eq('id', moduleId)
+                if (error) throw error
 
-            if (error) throw error
+                this.modules.push(data)
+                return data
+            } catch (err: any) {
+                this.error = err.message
+                console.error('Error creating module:', err)
+                throw err
+            } finally {
+                this.loading = false
+            }
+        },
 
-            this.modules = this.modules.filter(m => m.id !== moduleId)
-            this.lessons = this.lessons.filter(l => l.module_id !== moduleId)
-        } catch (err: any) {
-            this.error = err.message
-            console.error('Error deleting module:', err)
-            throw err
-        } finally {
-            this.loading = false
-        }
-    },
+        async updateModule(moduleId: string, updates: Partial<ProgramModule>) {
+            this.loading = true
+            this.error = null
 
-    // ============================================
-    // LESSONS ACTIONS
-    // ============================================
+            try {
+                const { data, error } = await supabase
+                    .from('program_modules')
+                    .update(updates)
+                    .eq('id', moduleId)
+                    .select()
+                    .single()
 
-    async fetchLesson(lessonId: string) {
-        this.loading = true
-        this.error = null
+                if (error) throw error
 
-        try {
-            const { data, error } = await supabase
-                .from('program_lessons')
-                .select('*')
-                .eq('id', lessonId)
-                .single()
+                const index = this.modules.findIndex(m => m.id === moduleId)
+                if (index !== -1) {
+                    this.modules[index] = data
+                }
 
-            if (error) throw error
+                return data
+            } catch (err: any) {
+                this.error = err.message
+                console.error('Error updating module:', err)
+                throw err
+            } finally {
+                this.loading = false
+            }
+        },
 
-            this.currentLesson = data
-            return data
-        } catch (err: any) {
-            this.error = err.message
-            console.error('Error fetching lesson:', err)
-            return null
-        } finally {
-            this.loading = false
-        }
-    },
+        async deleteModule(moduleId: string) {
+            this.loading = true
+            this.error = null
 
-    async createLesson(lessonData: Partial<ProgramLesson>, fetchYouTubeData = true) {
-        this.loading = true
-        this.error = null
+            try {
+                const { error } = await supabase
+                    .from('program_modules')
+                    .delete()
+                    .eq('id', moduleId)
 
-        try {
-            let finalLessonData = { ...lessonData }
+                if (error) throw error
 
-            // Fetch YouTube video details if enabled
-            if (fetchYouTubeData && lessonData.youtube_video_id) {
-                const youtubeDetails = await this.getYouTubeVideoDetails(lessonData.youtube_video_id)
+                this.modules = this.modules.filter(m => m.id !== moduleId)
+                this.lessons = this.lessons.filter(l => l.module_id !== moduleId)
+            } catch (err: any) {
+                this.error = err.message
+                console.error('Error deleting module:', err)
+                throw err
+            } finally {
+                this.loading = false
+            }
+        },
 
-                if (youtubeDetails) {
-                    finalLessonData = {
-                        ...finalLessonData,
-                        youtube_thumbnail_url: youtubeDetails.thumbnail_url,
-                        duration_seconds: youtubeDetails.duration_seconds
+        // ============================================
+        // LESSONS ACTIONS
+        // ============================================
+
+        async fetchLesson(lessonId: string) {
+            this.loading = true
+            this.error = null
+
+            try {
+                const { data, error } = await supabase
+                    .from('program_lessons')
+                    .select('*')
+                    .eq('id', lessonId)
+                    .single()
+
+                if (error) throw error
+
+                this.currentLesson = data
+                return data
+            } catch (err: any) {
+                this.error = err.message
+                console.error('Error fetching lesson:', err)
+                return null
+            } finally {
+                this.loading = false
+            }
+        },
+
+        async createLesson(lessonData: Partial<ProgramLesson>, fetchYouTubeData = true) {
+            this.loading = true
+            this.error = null
+
+            try {
+                let finalLessonData = { ...lessonData }
+
+                // Fetch YouTube video details if enabled
+                if (fetchYouTubeData && lessonData.youtube_video_id) {
+                    const youtubeDetails = await this.getYouTubeVideoDetails(lessonData.youtube_video_id)
+
+                    if (youtubeDetails) {
+                        finalLessonData = {
+                            ...finalLessonData,
+                            youtube_thumbnail_url: youtubeDetails.thumbnail_url,
+                            duration_seconds: youtubeDetails.duration_seconds
+                        }
                     }
                 }
+
+                const { data, error } = await supabase
+                    .from('program_lessons')
+                    .insert([finalLessonData])
+                    .select()
+                    .single()
+
+                if (error) throw error
+
+                this.lessons.push(data)
+                return data
+            } catch (err: any) {
+                this.error = err.message
+                console.error('Error creating lesson:', err)
+                throw err
+            } finally {
+                this.loading = false
             }
+        },
 
-            const { data, error } = await supabase
-                .from('program_lessons')
-                .insert([finalLessonData])
-                .select()
-                .single()
+        async updateLesson(lessonId: string, updates: Partial<ProgramLesson>, fetchYouTubeData = false) {
+            this.loading = true
+            this.error = null
 
-            if (error) throw error
+            try {
+                let finalUpdates = { ...updates }
 
-            this.lessons.push(data)
-            return data
-        } catch (err: any) {
-            this.error = err.message
-            console.error('Error creating lesson:', err)
-            throw err
-        } finally {
-            this.loading = false
-        }
-    },
+                // Fetch YouTube details if video ID changed
+                if (fetchYouTubeData && updates.youtube_video_id) {
+                    const youtubeDetails = await this.getYouTubeVideoDetails(updates.youtube_video_id)
 
-    async updateLesson(lessonId: string, updates: Partial<ProgramLesson>, fetchYouTubeData = false) {
-        this.loading = true
-        this.error = null
-
-        try {
-            let finalUpdates = { ...updates }
-
-            // Fetch YouTube details if video ID changed
-            if (fetchYouTubeData && updates.youtube_video_id) {
-                const youtubeDetails = await this.getYouTubeVideoDetails(updates.youtube_video_id)
-
-                if (youtubeDetails) {
-                    finalUpdates = {
-                        ...finalUpdates,
-                        youtube_thumbnail_url: youtubeDetails.thumbnail_url,
-                        duration_seconds: youtubeDetails.duration_seconds
+                    if (youtubeDetails) {
+                        finalUpdates = {
+                            ...finalUpdates,
+                            youtube_thumbnail_url: youtubeDetails.thumbnail_url,
+                            duration_seconds: youtubeDetails.duration_seconds
+                        }
                     }
                 }
+
+                const { data, error } = await supabase
+                    .from('program_lessons')
+                    .update(finalUpdates)
+                    .eq('id', lessonId)
+                    .select()
+                    .single()
+
+                if (error) throw error
+
+                const index = this.lessons.findIndex(l => l.id === lessonId)
+                if (index !== -1) {
+                    this.lessons[index] = data
+                }
+
+                return data
+            } catch (err: any) {
+                this.error = err.message
+                console.error('Error updating lesson:', err)
+                throw err
+            } finally {
+                this.loading = false
             }
+        },
 
-            const { data, error } = await supabase
-                .from('program_lessons')
-                .update(finalUpdates)
-                .eq('id', lessonId)
-                .select()
-                .single()
+        async deleteLesson(lessonId: string) {
+            this.loading = true
+            this.error = null
 
-            if (error) throw error
+            try {
+                const { error } = await supabase
+                    .from('program_lessons')
+                    .delete()
+                    .eq('id', lessonId)
 
-            const index = this.lessons.findIndex(l => l.id === lessonId)
-            if (index !== -1) {
-                this.lessons[index] = data
+                if (error) throw error
+
+                this.lessons = this.lessons.filter(l => l.id !== lessonId)
+                this.materials = this.materials.filter(m => m.lesson_id !== lessonId)
+            } catch (err: any) {
+                this.error = err.message
+                console.error('Error deleting lesson:', err)
+                throw err
+            } finally {
+                this.loading = false
             }
+        },
 
-            return data
-        } catch (err: any) {
-            this.error = err.message
-            console.error('Error updating lesson:', err)
-            throw err
-        } finally {
-            this.loading = false
-        }
-    },
+        // ============================================
+        // MATERIALS ACTIONS
+        // ============================================
 
-    async deleteLesson(lessonId: string) {
-        this.loading = true
-        this.error = null
+        async fetchMaterials(programId: string) {
+            this.loading = true
+            this.error = null
 
-        try {
-            const { error } = await supabase
-                .from('program_lessons')
-                .delete()
-                .eq('id', lessonId)
+            try {
+                const { data, error } = await supabase
+                    .from('program_materials')
+                    .select('*')
+                    .eq('program_id', programId)
+                    .order('order_index', { ascending: true })
 
-            if (error) throw error
+                if (error) throw error
 
-            this.lessons = this.lessons.filter(l => l.id !== lessonId)
-            this.materials = this.materials.filter(m => m.lesson_id !== lessonId)
-        } catch (err: any) {
-            this.error = err.message
-            console.error('Error deleting lesson:', err)
-            throw err
-        } finally {
-            this.loading = false
-        }
-    },
+                this.materials = data || []
+                return data
+            } catch (err: any) {
+                this.error = err.message
+                console.error('Error fetching materials:', err)
+                return []
+            } finally {
+                this.loading = false
+            }
+        },
 
-    // ============================================
-    // MATERIALS ACTIONS
-    // ============================================
+        async uploadMaterial(file: File, programId: string, lessonId: string | null, moduleId: string | null, materialData: Partial<ProgramMaterial>) {
+            this.loading = true
+            this.error = null
 
-    async fetchMaterials(programId: string) {
-        this.loading = true
-        this.error = null
+            try {
+                // Upload file to Supabase Storage
+                const fileExt = file.name.split('.').pop()
+                const fileName = `${crypto.randomUUID()}.${fileExt}`
+                const filePath = `${programId}/${fileName}`
 
-        try {
-            const { data, error } = await supabase
-                .from('program_materials')
-                .select('*')
-                .eq('program_id', programId)
-                .order('order_index', { ascending: true })
+                const { error: uploadError } = await supabase.storage
+                    .from('program-materials') // Use the bucket name you created
+                    .upload(filePath, file)
 
-            if (error) throw error
+                if (uploadError) throw uploadError
 
-            this.materials = data || []
-            return data
-        } catch (err: any) {
-            this.error = err.message
-            console.error('Error fetching materials:', err)
-            return []
-        } finally {
-            this.loading = false
-        }
-    },
+                // Create material record in database
+                const { data, error: dbError } = await supabase
+                    .from('program_materials')
+                    .insert([{
+                        ...materialData,
+                        program_id: programId,
+                        lesson_id: lessonId,
+                        module_id: moduleId,
+                        file_path: filePath,
+                        file_size_bytes: file.size,
+                        file_type: file.type
+                    }])
+                    .select()
+                    .single()
 
-    async uploadMaterial(file: File, programId: string, lessonId: string | null, moduleId: string | null, materialData: Partial<ProgramMaterial>) {
-        this.loading = true
-        this.error = null
+                if (dbError) throw dbError
 
-        try {
-            // Upload file to Supabase Storage
-            const fileExt = file.name.split('.').pop()
-            const fileName = `${crypto.randomUUID()}.${fileExt}`
-            const filePath = `${programId}/${fileName}`
+                this.materials.push(data)
+                return data
+            } catch (err: any) {
+                this.error = err.message
+                console.error('Error uploading material:', err)
+                throw err
+            } finally {
+                this.loading = false
+            }
+        },
 
-            const { error: uploadError } = await supabase.storage
+        async deleteMaterial(materialId: string, filePath: string) {
+            this.loading = true
+            this.error = null
+
+            try {
+                // Delete from storage
+                const { error: storageError } = await supabase.storage
+                    .from('program-materials')
+                    .remove([filePath])
+
+                if (storageError) console.warn('Error deleting file from storage:', storageError)
+
+                // Delete from database
+                const { error: dbError } = await supabase
+                    .from('program_materials')
+                    .delete()
+                    .eq('id', materialId)
+
+                if (dbError) throw dbError
+
+                this.materials = this.materials.filter(m => m.id !== materialId)
+            } catch (err: any) {
+                this.error = err.message
+                console.error('Error deleting material:', err)
+                throw err
+            } finally {
+                this.loading = false
+            }
+        },
+
+        async getMaterialDownloadUrl(filePath: string) {
+            const { data } = await supabase.storage
                 .from('program-materials')
-                .upload(filePath, file)
+                .createSignedUrl(filePath, 3600) // 1 hour expiry
 
-            if (uploadError) throw uploadError
+            return data?.signedUrl || null
+        },
 
-            // Create material record in database
-            const { data, error: dbError } = await supabase
-                .from('program_materials')
-                .insert([{
-                    ...materialData,
-                    program_id: programId,
-                    lesson_id: lessonId,
-                    module_id: moduleId,
-                    file_path: filePath,
-                    file_size_bytes: file.size,
-                    file_type: file.type
-                }])
-                .select()
-                .single()
+        // ============================================
+        // YOUTUBE API HELPER
+        // ============================================
 
-            if (dbError) throw dbError
+        async getYouTubeVideoDetails(videoId: string): Promise<YouTubeVideoDetails | null> {
+            try {
+                const { data, error } = await supabase.functions.invoke('get-youtube-video-details', {
+                    body: { videoId }
+                })
 
-            this.materials.push(data)
-            return data
-        } catch (err: any) {
-            this.error = err.message
-            console.error('Error uploading material:', err)
-            throw err
-        } finally {
-            this.loading = false
-        }
-    },
-
-    async deleteMaterial(materialId: string, filePath: string) {
-        this.loading = true
-        this.error = null
-
-        try {
-            // Delete from storage
-            const { error: storageError } = await supabase.storage
-                .from('program-materials')
-                .remove([filePath])
-
-            if (storageError) console.warn('Error deleting file from storage:', storageError)
-
-            // Delete from database
-            const { error: dbError } = await supabase
-                .from('program_materials')
-                .delete()
-                .eq('id', materialId)
-
-            if (dbError) throw dbError
-
-            this.materials = this.materials.filter(m => m.id !== materialId)
-        } catch (err: any) {
-            this.error = err.message
-            console.error('Error deleting material:', err)
-            throw err
-        } finally {
-            this.loading = false
-        }
-    },
-
-    async getMaterialDownloadUrl(filePath: string) {
-        const { data } = await supabase.storage
-            .from('program-materials')
-            .createSignedUrl(filePath, 3600) // 1 hour expiry
-
-        return data?.signedUrl || null
-    },
-
-    // ============================================
-    // YOUTUBE API HELPER
-    // ============================================
-
-    async getYouTubeVideoDetails(videoId: string): Promise < YouTubeVideoDetails | null > {
-        try {
-            const { data, error } = await supabase.functions.invoke('get-youtube-video-details', {
-                body: { videoId }
-            })
-
-        if(error) throw error
-        return data
-        } catch(err: any) {
-            console.error('Error fetching YouTube details:', err)
-            return null
-        }
-    },
+                if (error) throw error
+                return data
+            } catch (err: any) {
+                console.error('Error fetching YouTube details:', err)
+                return null
+            }
+        },
 
         // ============================================
         // UTILITY
         // ============================================
 
         clearError() {
-        this.error = null
-    },
+            this.error = null
+        },
 
-    resetState() {
-        this.modules = []
-        this.currentModule = null
-        this.lessons = []
-        this.currentLesson = null
-        this.materials = []
-        this.loading = false
-        this.error = null
+        resetState() {
+            this.modules = []
+            this.currentModule = null
+            this.lessons = []
+            this.currentLesson = null
+            this.materials = []
+            this.loading = false
+            this.error = null
+        }
     }
-}
 })

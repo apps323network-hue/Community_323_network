@@ -309,6 +309,18 @@
                   <!-- Divider -->
                   <div class="border-t border-slate-200 dark:border-white/10 mt-2"></div>
                   
+                  <!-- Dashboard Professor (para profs e admins) -->
+                  <div v-if="isProfessor" class="border-t border-slate-200 dark:border-white/10 mt-1 pt-1">
+                    <RouterLink
+                      to="/professor"
+                      class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-primary dark:text-secondary hover:bg-primary/10 dark:hover:bg-secondary/10 transition-colors"
+                      @click="showUserMenu = false"
+                    >
+                      <span class="material-symbols-outlined text-[20px]">school</span>
+                      {{ t('navigation.dashboardProfessor') }}
+                    </RouterLink>
+                  </div>
+
                   <!-- Dashboard Admin (apenas para admins) -->
                   <div v-if="isAdmin" class="border-t border-slate-200 dark:border-white/10 mt-1 pt-1">
                     <RouterLink
@@ -514,6 +526,18 @@
                     <span class="material-symbols-outlined text-[20px]">bookmark</span>
                     {{ t('navigation.savedPosts') }}
                   </RouterLink>
+                  <!-- Dashboard Professor (para profs e admins) -->
+                  <div v-if="isProfessor" class="border-t border-slate-200 dark:border-white/10 mt-1 pt-1">
+                    <RouterLink
+                      to="/professor"
+                      class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-primary dark:text-secondary hover:bg-primary/10 dark:hover:bg-secondary/10 transition-colors"
+                      @click="showUserMenu = false"
+                    >
+                      <span class="material-symbols-outlined text-[20px]">school</span>
+                      {{ t('navigation.dashboardProfessor') }}
+                    </RouterLink>
+                  </div>
+
                   <!-- Dashboard Admin (apenas para admins) -->
                   <div v-if="isAdmin" class="border-t border-slate-200 dark:border-white/10 mt-1 pt-1">
                     <RouterLink
@@ -585,8 +609,13 @@ const userAvatar = computed(
   () => userStore.profile?.avatar_url || authStore.user?.user_metadata?.avatar_url || ''
 )
 const userDisplayName = computed(() => userStore.profile?.nome || userName.value)
-const userTitle = computed(() => userStore.profile?.area_atuacao || 'Membro')
+const userTitle = computed(() => {
+  if (userStore.profile?.role === 'professor') return 'Professor'
+  if (userStore.profile?.role === 'admin') return 'Administrador'
+  return userStore.profile?.area_atuacao || 'Membro'
+})
 const isAdmin = computed(() => userStore.profile?.role === 'admin')
+const isProfessor = computed(() => ['admin', 'professor'].includes(userStore.profile?.role || ''))
 
 function toggleUserMenu() {
   showUserMenu.value = !showUserMenu.value

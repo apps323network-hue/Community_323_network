@@ -65,6 +65,7 @@
         "theme": "Theme",
         "language": "Language",
         "dashboardAdmin": "Admin Dashboard",
+        "dashboardProfessor": "Professor Area",
         "challenges": "Challenges",
         "ranking": "Ranking",
         "logout": "Logout"
