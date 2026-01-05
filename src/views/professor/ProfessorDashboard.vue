@@ -90,15 +90,19 @@
               />
               <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
               <div class="absolute top-4 left-4">
-                <span class="px-3 py-1 bg-secondary text-black text-[10px] font-black rounded-full uppercase tracking-tighter">
-                  Ativo
+                <span 
+                  class="px-3 py-1 text-[10px] font-black rounded-full uppercase tracking-tighter"
+                  :class="program.status === 'published' ? 'bg-secondary text-black' : 'bg-slate-500 text-white'"
+                >
+                  {{ program.status === 'published' ? 'Publicado' : 'Rascunho' }}
                 </span>
               </div>
+              
             </div>
 
             <!-- Card Content -->
             <div class="p-6 flex-1 flex flex-col">
-              <h3 class="text-xl font-black text-slate-900 dark:text-white mb-3 line-clamp-1 group-hover:text-secondary transition-colors">
+              <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2 line-clamp-1 group-hover:text-secondary transition-colors">
                 {{ getProgramTitle(program) }}
               </h3>
               <p class="text-sm text-slate-600 dark:text-gray-400 line-clamp-2 mb-6 font-medium leading-relaxed">
@@ -131,8 +135,23 @@
                   Gerenciar Conteúdo
                 </button>
                 <button
+                  @click.stop="openStatusModal(program)"
+                  :class="[
+                    'w-full py-4 font-black rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg',
+                    program.status === 'published' 
+                      ? 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-gray-400 hover:bg-slate-200 dark:hover:bg-white/10' 
+                      : 'bg-primary text-white hover:opacity-90 shadow-primary/20'
+                  ]"
+                >
+                  <span class="material-symbols-outlined text-xl">
+                    {{ program.status === 'published' ? 'visibility_off' : 'rocket_launch' }}
+                  </span>
+                  {{ program.status === 'published' ? 'Remover Publicação' : 'Publicar Treinamento' }}
+                </button>
+
+                <button
                   @click.stop="$router.push(`/programas/${program.id}`)"
-                  class="w-full py-3 bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white font-bold rounded-2xl hover:bg-slate-200 dark:hover:bg-white/10 transition-all text-sm"
+                  class="w-full py-3 text-slate-400 dark:text-gray-500 font-bold rounded-2xl hover:text-slate-600 dark:hover:text-white transition-all text-[10px] uppercase tracking-widest"
                 >
                   Visualizar como Aluno
                 </button>
@@ -288,6 +307,63 @@
         </div>
       </div>
     </div>
+
+    <!-- Status Change Confirmation Modal -->
+    <div
+      v-if="statusModal.show"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4"
+      @click.self="statusModal.show = false"
+    >
+      <div class="bg-white dark:bg-surface-dark w-full max-w-md rounded-[32px] shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden animate-fade-in">
+        <div class="p-8 text-center space-y-6">
+          <div 
+            :class="[
+              'w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-2',
+              statusModal.program?.status === 'published' ? 'bg-amber-500/10 text-amber-500' : 'bg-primary/10 text-primary'
+            ]"
+          >
+            <span class="material-symbols-outlined text-4xl">
+              {{ statusModal.program?.status === 'published' ? 'visibility_off' : 'rocket_launch' }}
+            </span>
+          </div>
+          
+          <div class="space-y-2">
+            <h3 class="text-2xl font-black text-slate-900 dark:text-white">
+              {{ statusModal.program?.status === 'published' ? 'Remover Publicação?' : 'Publicar Treinamento?' }}
+            </h3>
+            <p class="text-slate-600 dark:text-gray-400 font-medium">
+              {{ 
+                statusModal.program?.status === 'published' 
+                  ? 'O conteúdo deixará de ser visível para novos alunos na plataforma.' 
+                  : 'O treinamento ficará visível e disponível para todos os alunos da comunidade.' 
+              }}
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-3 pt-2">
+            <button
+              @click="confirmStatusChange"
+              :disabled="statusModal.loading"
+              :class="[
+                'w-full py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2',
+                statusModal.program?.status === 'published' 
+                  ? 'bg-slate-900 text-white dark:bg-white dark:text-black' 
+                  : 'bg-primary text-white shadow-xl shadow-primary/20'
+              ]"
+            >
+              <span v-if="statusModal.loading" class="animate-spin material-symbols-outlined text-sm">sync</span>
+              {{ statusModal.loading ? 'Processando...' : (statusModal.program?.status === 'published' ? 'Confirmar Retirada' : 'Sim, Publicar Agora') }}
+            </button>
+            <button
+              @click="statusModal.show = false"
+              class="w-full py-4 text-slate-500 font-bold hover:bg-slate-100 dark:hover:bg-white/5 rounded-2xl transition-all text-xs uppercase tracking-widest"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </AppLayout>
 </template>
 
@@ -307,6 +383,14 @@ const showCreateModal = ref(false)
 const creatingProgram = ref(false)
 const thumbnailFile = ref<File | null>(null)
 const thumbnailPreview = ref<string | null>(null)
+
+// Status modal state
+const statusModal = ref({
+  show: false,
+  loading: false,
+  program: null as any
+})
+
 const newProgram = ref({
   title_pt: '',
   title_en: '',
@@ -485,6 +569,38 @@ async function fetchProfessorPrograms() {
     console.error('Error fetching professor programs:', error)
   } finally {
     loading.value = false
+  }
+}
+
+function openStatusModal(program: any) {
+  statusModal.value.program = program
+  statusModal.value.show = true
+}
+
+async function confirmStatusChange() {
+  if (!statusModal.value.program) return
+  
+  const program = statusModal.value.program
+  const newStatus = program.status === 'published' ? 'draft' : 'published'
+  
+  statusModal.value.loading = true
+
+  try {
+    const { error } = await supabase
+      .from('programs')
+      .update({ status: newStatus, updated_at: new Date().toISOString() })
+      .eq('id', program.id)
+
+    if (error) throw error
+    
+    // Update local state
+    program.status = newStatus
+    statusModal.value.show = false
+  } catch (error) {
+    console.error('Error toggling program status:', error)
+    alert('Erro ao alterar status do programa.')
+  } finally {
+    statusModal.value.loading = false
   }
 }
 
