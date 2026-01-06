@@ -70,14 +70,22 @@ export const useProgramsStore = defineStore('programs', {
             this.error = null
 
             try {
-                // Fetch program data
+                // Fetch program data with professors
                 const { data: program, error: programError } = await supabase
                     .from('programs')
-                    .select('*')
+                    .select(`
+                        *,
+                        professors:program_professors(
+                            professor:profiles(id, nome, avatar_url)
+                        )
+                    `)
                     .eq('id', id)
                     .single()
 
                 if (programError) throw programError
+
+                // Flatten professors structure
+                const flattenedProfessors = (program.professors || []).map((p: any) => p.professor)
 
                 // Fetch reviews for this program
                 const { data: reviews, error: reviewsError } = await supabase
@@ -100,6 +108,7 @@ export const useProgramsStore = defineStore('programs', {
 
                 this.currentProgram = {
                     ...program,
+                    professors: flattenedProfessors,
                     average_rating: averageRating,
                     total_reviews: totalReviews,
                 }
@@ -332,12 +341,14 @@ export const useProgramsStore = defineStore('programs', {
                 if (!user) throw new Error('User not authenticated')
 
                 // Sanitize data - remove computed fields and non-db columns
-                const {
-                    average_rating,
-                    total_reviews,
-                    user_enrollment,
-                    ...insertData
-                } = data as any
+                const insertData = { ...(data as any) }
+                const professor_ids = insertData.professor_ids
+
+                delete insertData.professor_ids
+                delete insertData.professors
+                delete insertData.average_rating
+                delete insertData.total_reviews
+                delete insertData.user_enrollment
 
                 const { data: program, error } = await supabase
                     .from('programs')
@@ -350,6 +361,18 @@ export const useProgramsStore = defineStore('programs', {
                     .single()
 
                 if (error) throw error
+
+                // Assign professors
+                if (professor_ids && professor_ids.length > 0) {
+                    const assignments = professor_ids.map((profId: string) => ({
+                        program_id: program.id,
+                        professor_id: profId
+                    }))
+                    const { error: profError } = await supabase
+                        .from('program_professors')
+                        .insert(assignments)
+                    if (profError) throw profError
+                }
 
                 await this.fetchPrograms(true)
 
@@ -370,15 +393,18 @@ export const useProgramsStore = defineStore('programs', {
 
             try {
                 // Sanitize data - remove computed fields and non-db columns
-                const {
-                    id,
-                    created_at,
-                    updated_at,
-                    average_rating,
-                    total_reviews,
-                    user_enrollment,
-                    ...updateData
-                } = data as any
+                const updateData = { ...(data as any) }
+                const id = updateData.id
+                const professor_ids = updateData.professor_ids
+
+                delete updateData.id
+                delete updateData.created_at
+                delete updateData.updated_at
+                delete updateData.average_rating
+                delete updateData.total_reviews
+                delete updateData.user_enrollment
+                delete updateData.professors
+                delete updateData.professor_ids
 
                 const { data: program, error } = await supabase
                     .from('programs')
@@ -391,6 +417,29 @@ export const useProgramsStore = defineStore('programs', {
                     .single()
 
                 if (error) throw error
+
+                // Sync professors
+                if (professor_ids) {
+                    // Delete old assignments
+                    const { error: delError } = await supabase
+                        .from('program_professors')
+                        .delete()
+                        .eq('program_id', id)
+
+                    if (delError) throw delError
+
+                    // Add new assignments
+                    if (professor_ids.length > 0) {
+                        const assignments = professor_ids.map((profId: string) => ({
+                            program_id: id,
+                            professor_id: profId
+                        }))
+                        const { error: insError } = await supabase
+                            .from('program_professors')
+                            .insert(assignments)
+                        if (insError) throw insError
+                    }
+                }
 
                 await this.fetchPrograms(true)
 

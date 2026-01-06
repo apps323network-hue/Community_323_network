@@ -111,6 +111,26 @@
               ></span>
             </RouterLink>
             <RouterLink
+              v-if="authStore.user"
+              to="/meus-programas"
+              class="relative px-3 py-2 text-sm font-medium transition-colors group"
+              :class="
+                route.path === '/meus-programas'
+                  ? 'text-slate-900 dark:text-white'
+                  : 'text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary'
+              "
+            >
+              {{ t('programs.myPrograms') }}
+              <span
+                v-if="route.path === '/meus-programas'"
+                class="absolute bottom-0 left-0 w-full h-0.5 bg-primary dark:bg-secondary transform scale-x-100 transition-transform"
+              ></span>
+              <span
+                v-else
+                class="absolute bottom-0 left-0 w-full h-0.5 bg-primary dark:bg-secondary transform scale-x-0 group-hover:scale-x-100 transition-transform"
+              ></span>
+            </RouterLink>
+            <RouterLink
               to="/servicos"
               class="relative px-3 py-2 text-sm font-medium transition-colors group"
               :class="
@@ -151,10 +171,8 @@
           </div>
         </div>
 
-        <!-- Mobile Menu - Notifications, User -->
+        <!-- Mobile Menu - User -->
         <div v-if="props.showNavigation" class="md:hidden flex items-center gap-3">
-          <!-- Notifications Mobile -->
-          <NotificationsDropdown />
           
           <!-- User Menu Mobile -->
           <div class="relative" ref="userMenuContainerMobile">
@@ -453,9 +471,8 @@
             </Transition>
           </div>
           
-          <!-- Notifications and User Menu (only when logged in) -->
+          <!-- User Menu (only when logged in) -->
           <template v-if="props.showNavigation">
-            <NotificationsDropdown />
             <div class="relative group cursor-pointer" ref="userMenuContainer">
             <div class="flex items-center gap-2 lg:gap-3" @click.stop="toggleUserMenu">
               <div class="relative">
@@ -592,7 +609,6 @@ import { useUserStore } from '@/stores/user'
 import { useLocale } from '@/composables/useLocale'
 import Avatar from '@/components/ui/Avatar.vue'
 import AnimatedThemeToggler from '@/components/ui/AnimatedThemeToggler.vue'
-import NotificationsDropdown from '@/components/layout/NotificationsDropdown.vue'
 
 interface Props {
   showNavigation?: boolean

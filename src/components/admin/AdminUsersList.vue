@@ -57,7 +57,7 @@
             <tr>
               <th class="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-white/80">Usuário</th>
               <th class="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-white/80 hidden sm:table-cell">Área</th>
-              <th class="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-white/80">Cargo</th>
+              <th class="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-white/80">Perfil</th>
               <th class="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-white/80">Status</th>
               <th class="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-slate-700 dark:text-white/80">Ações</th>
             </tr>

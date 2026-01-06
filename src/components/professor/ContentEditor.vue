@@ -193,9 +193,9 @@
                     <p class="text-[10px] text-slate-500 font-bold uppercase">{{ uploadState.fileName }}</p>
                   </div>
                 </div>
-              </div>
+            </div>
 
-              <!-- Video Preview Card (Simplified for Link/Complete Upload) -->
+            <!-- Video Preview Card (Simplified for Link/Complete Upload) -->
               <div v-if="formData.youtube_video_id && formData.youtube_video_id.length === 11" class="flex flex-col sm:flex-row gap-6 p-6 bg-slate-900 rounded-3xl text-white">
                 <div class="relative w-full sm:w-64 h-36 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0">
                   <img :src="getYouTubeThumbnail(formData.youtube_video_id, 'hq')" class="w-full h-full object-cover" />
@@ -236,6 +236,68 @@
                 class="w-6 h-6 rounded-lg text-secondary focus:ring-secondary bg-white dark:bg-black/40 border-slate-300 dark:border-white/10"
               />
             </div>
+
+            <!-- Lesson Materials Section -->
+            <div class="pt-8 border-t border-slate-100 dark:border-white/5 space-y-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">description</span>
+                    Materiais de Apoio
+                  </h3>
+                  <p class="text-xs text-slate-500 mt-1">Arquivos complementares para esta aula</p>
+                </div>
+                <button
+                  @click="showMaterialUpload = true"
+                  type="button"
+                  class="px-4 py-2 bg-primary text-white dark:bg-secondary dark:text-black font-bold rounded-xl hover:opacity-90 transition-all text-sm flex items-center gap-2"
+                >
+                  <span class="material-symbols-outlined text-sm">add</span>
+                  Adicionar Material
+                </button>
+              </div>
+
+              <!-- Materials List -->
+              <div v-if="lessonMaterials.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div
+                  v-for="material in lessonMaterials"
+                  :key="material.id"
+                  class="bg-slate-50 dark:bg-black/20 p-4 rounded-xl border border-slate-200 dark:border-white/10 flex items-center justify-between group hover:border-primary/30 transition-all"
+                >
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="bg-red-500/10 p-2 rounded-lg shrink-0">
+                      <span class="material-symbols-outlined text-red-500 text-xl">picture_as_pdf</span>
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-sm font-bold text-slate-900 dark:text-white truncate">{{ getMaterialTitle(material) }}</p>
+                      <p class="text-[10px] text-slate-500 font-medium">{{ formatFileSize(material.file_size_bytes) }}</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button
+                      @click="downloadMaterial(material)"
+                      type="button"
+                      class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
+                      title="Baixar"
+                    >
+                      <span class="material-symbols-outlined text-sm">download</span>
+                    </button>
+                    <button
+                      @click="deleteMaterial(material)"
+                      type="button"
+                      class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                      title="Excluir"
+                    >
+                      <span class="material-symbols-outlined text-sm">delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="text-center py-8 bg-slate-50 dark:bg-black/20 rounded-xl border border-dashed border-slate-200 dark:border-white/10">
+                <span class="material-symbols-outlined text-slate-300 dark:text-gray-700 text-4xl mb-2">folder_open</span>
+                <p class="text-sm text-slate-500 font-medium">Nenhum material adicionado ainda</p>
+              </div>
+            </div>
           </div>
 
           <!-- Danger Zone (Delete) -->
@@ -259,13 +321,131 @@
       </div>
     </div>
   </div>
+
+  <!-- Material Upload Modal -->
+  <div
+    v-if="showMaterialUpload"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    @click.self="showMaterialUpload = false"
+  >
+    <div class="bg-white dark:bg-surface-dark rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-white/10">
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
+        <h3 class="text-xl font-black text-slate-900 dark:text-white">Adicionar Material</h3>
+        <button
+          @click="showMaterialUpload = false"
+          class="text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form @submit.prevent="handleMaterialUpload" class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2">Arquivo PDF *</label>
+          <input
+            type="file"
+            accept=".pdf"
+            @change="handleMaterialFileSelect"
+            required
+            class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+          />
+          <p class="text-xs text-slate-500 dark:text-gray-400 mt-2">Máximo 10MB por arquivo</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2">Título (Português) *</label>
+          <input
+            v-model="materialFormData.title_pt"
+            type="text"
+            required
+            class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all"
+            placeholder="Ex: Slides da Aula 1"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2">Título (Inglês) *</label>
+          <input
+            v-model="materialFormData.title_en"
+            type="text"
+            required
+            class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all"
+            placeholder="Ex: Lesson 1 Slides"
+          />
+        </div>
+
+        <div class="flex items-center justify-end gap-4 pt-4 border-t border-slate-200 dark:border-white/10">
+          <button
+            type="button"
+            @click="showMaterialUpload = false"
+            class="px-6 py-3 bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-white/10 transition-all"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            :disabled="uploadingMaterial || !materialFile"
+            class="px-6 py-3 bg-primary text-white dark:bg-secondary dark:text-black font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ uploadingMaterial ? 'Enviando...' : 'Upload Material' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Material Confirmation Modal -->
+  <div
+    v-if="showDeleteMaterialModal"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    @click.self="showDeleteMaterialModal = false; materialToDelete = null"
+  >
+    <div class="bg-white dark:bg-surface-dark rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 dark:border-white/10">
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-white/10">
+        <h3 class="text-xl font-black text-slate-900 dark:text-white">Confirmar Exclusão</h3>
+      </div>
+
+      <div class="p-6">
+        <div class="bg-red-500/10 p-4 rounded-xl mb-4 flex items-start gap-3">
+          <span class="material-symbols-outlined text-red-500 text-2xl">warning</span>
+          <div>
+            <p class="text-sm font-bold text-slate-900 dark:text-white mb-1">Esta ação não pode ser desfeita</p>
+            <p class="text-xs text-slate-600 dark:text-gray-400">
+              O material será permanentemente removido.
+            </p>
+          </div>
+        </div>
+        
+        <p class="text-sm text-slate-700 dark:text-gray-300">
+          Deseja realmente excluir <span class="font-bold">"{{ materialToDelete ? getMaterialTitle(materialToDelete) : '' }}"</span>?
+        </p>
+      </div>
+
+      <div class="px-6 py-4 border-t border-slate-200 dark:border-white/10 flex items-center justify-end gap-3">
+        <button
+          @click="showDeleteMaterialModal = false; materialToDelete = null"
+          class="px-6 py-2.5 bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-white/10 transition-all"
+        >
+          Cancelar
+        </button>
+        <button
+          @click="handleDeleteMaterialConfirm"
+          class="px-6 py-2.5 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-all flex items-center gap-2"
+        >
+          <span class="material-symbols-outlined text-sm">delete</span>
+          Excluir Material
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { extractYouTubeVideoId, getYouTubeThumbnail } from '@/lib/youtube'
 import { useModulesStore } from '@/stores/modules'
 import { supabase } from '@/lib/supabase'
+import { useLocale } from '@/composables/useLocale'
 
 const props = defineProps<{
   selectedItem: any | null
@@ -278,6 +458,7 @@ const props = defineProps<{
 const emit = defineEmits(['save', 'cancel', 'delete'])
 
 const modulesStore = useModulesStore()
+const { locale: currentLocale } = useLocale()
 const fetchingMetadata = ref(false)
 const videoSource = ref<'link' | 'upload'>('link')
 const isDragging = ref(false)
@@ -285,6 +466,24 @@ const uploadState = ref({
   isUploading: false,
   progress: 0,
   fileName: ''
+})
+
+// Material management
+const showMaterialUpload = ref(false)
+const uploadingMaterial = ref(false)
+const materialFile = ref<File | null>(null)
+const showDeleteMaterialModal = ref(false)
+const materialToDelete = ref<any>(null)
+const materialFormData = ref({
+  title_pt: '',
+  title_en: ''
+})
+
+const lessonMaterials = computed(() => {
+  if (props.mode === 'lesson' && props.selectedItem?.id) {
+    return modulesStore.getMaterialsByLesson(props.selectedItem.id)
+  }
+  return []
 })
 
 const formData = ref<any>({
@@ -431,6 +630,83 @@ function formatDuration(seconds: number | null) {
 
 function handleSubmit() {
   emit('save', { ...formData.value })
+}
+
+// Material management functions
+const getMaterialTitle = (material: any) => {
+  return currentLocale.value === 'pt-BR' ? material.title_pt : material.title_en
+}
+
+function formatFileSize(bytes: number | null) {
+  if (!bytes) return 'N/A'
+  const mb = bytes / (1024 * 1024)
+  return `${mb.toFixed(2)} MB`
+}
+
+async function downloadMaterial(material: any) {
+  try {
+    const url = await modulesStore.getMaterialDownloadUrl(material.file_path)
+    if (url) {
+      window.open(url, '_blank')
+    }
+  } catch (error) {
+    console.error('Error downloading material:', error)
+  }
+}
+
+function deleteMaterial(material: any) {
+  materialToDelete.value = material
+  showDeleteMaterialModal.value = true
+}
+
+async function handleDeleteMaterialConfirm() {
+  if (!materialToDelete.value) return
+  
+  try {
+    await modulesStore.deleteMaterial(materialToDelete.value.id, materialToDelete.value.file_path)
+    showDeleteMaterialModal.value = false
+    materialToDelete.value = null
+  } catch (error) {
+    console.error('Error deleting material:', error)
+  }
+}
+
+function handleMaterialFileSelect(event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files.length > 0) {
+    materialFile.value = target.files[0]
+  }
+}
+
+async function handleMaterialUpload() {
+  if (!materialFile.value || !props.selectedItem?.id) return
+
+  uploadingMaterial.value = true
+  try {
+    const programId = props.selectedItem.program_id
+    const lessonId = props.selectedItem.id
+    const moduleId = props.selectedItem.module_id
+
+    await modulesStore.uploadMaterial(
+      materialFile.value,
+      programId,
+      lessonId,
+      moduleId,
+      {
+        ...materialFormData.value,
+        order_index: lessonMaterials.value.length
+      }
+    )
+
+    // Reset form
+    showMaterialUpload.value = false
+    materialFile.value = null
+    materialFormData.value = { title_pt: '', title_en: '' }
+  } catch (error: any) {
+    console.error('Error uploading material:', error)
+  } finally {
+    uploadingMaterial.value = false
+  }
 }
 </script>
 

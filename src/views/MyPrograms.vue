@@ -94,22 +94,32 @@
             </div>
 
             <!-- Actions -->
-            <div class="flex gap-2">
+            <div class="flex flex-col sm:flex-row gap-3">
               <RouterLink
-                :to="`/programas/${enrollment.program_id}`"
-                class="flex-1 py-2 px-4 bg-slate-100 dark:bg-surface-lighter text-slate-700 dark:text-gray-300 rounded-lg text-center font-medium hover:bg-slate-200 dark:hover:bg-surface-lighter/80 transition"
+                :to="`/programas/${enrollment.program_id}/assistir`"
+                class="flex-1 py-3 px-4 bg-secondary text-black rounded-xl text-center font-black hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg shadow-secondary/20"
               >
-                {{ t('programs.viewDetails') }}
+                <span class="material-icons text-lg">play_circle</span>
+                {{ t('programs.watchNow') }}
               </RouterLink>
+              
               <a
                 v-if="enrollment.program?.classroom_enabled && enrollment.program?.classroom_invite_link"
                 :href="enrollment.program.classroom_invite_link"
                 target="_blank"
-                class="py-2 px-4 bg-primary dark:bg-secondary text-white rounded-lg font-medium hover:opacity-90 transition flex items-center gap-1"
+                class="py-3 px-4 bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-gray-300 rounded-xl font-bold hover:bg-slate-200 dark:hover:bg-white/10 transition flex items-center justify-center gap-2"
               >
-                <span class="material-icons text-sm">school</span>
+                <span class="material-icons text-lg text-[#1e8e3e]">school</span>
                 Classroom
               </a>
+              
+              <RouterLink
+                :to="`/programas/${enrollment.program_id}`"
+                class="py-3 px-4 bg-slate-100 dark:bg-white/5 text-slate-500 rounded-xl hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center"
+                title="Detalhes"
+              >
+                <span class="material-icons text-lg">info</span>
+              </RouterLink>
             </div>
 
             <!-- Certificate -->

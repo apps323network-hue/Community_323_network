@@ -130,11 +130,11 @@
                           MATRICULADO
                         </div>
                         <RouterLink
-                          to="/meus-programas"
-                          class="flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-black font-black uppercase tracking-widest text-[10px] hover:opacity-90 transition-all shadow-xl"
+                          :to="`/programas/${program.id}/assistir`"
+                          class="flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-secondary text-black font-black uppercase tracking-widest text-xs hover:scale-[1.02] transition-all shadow-xl shadow-secondary/20"
                         >
-                          Acessar Meu Painel
-                          <span class="material-icons text-sm">arrow_forward</span>
+                          <span class="material-icons">play_circle</span>
+                          {{ t('programs.watchNow') }}
                         </RouterLink>
                       </div>
                     </div>
@@ -338,11 +338,11 @@
                       </div>
                       
                       <RouterLink
-                        to="/meus-programas"
-                        class="flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-black font-black uppercase tracking-widest text-xs hover:opacity-90 transition-all shadow-xl"
+                        :to="`/programas/${program.id}/assistir`"
+                        class="flex items-center justify-center gap-3 w-full py-5 rounded-2xl bg-secondary text-black font-black uppercase tracking-widest text-xs hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-secondary/20"
                       >
-                        Acessar Meu Painel
-                        <span class="material-icons text-sm">arrow_forward</span>
+                        <span class="material-icons text-xl">play_circle</span>
+                        {{ t('programs.watchNow') }}
                       </RouterLink>
                     </div>
                   </div>

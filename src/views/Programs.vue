@@ -18,9 +18,19 @@
               <span class="material-symbols-outlined text-secondary drop-shadow-[0_0_8px_rgba(0,240,255,0.6)]">layers</span>
               {{ t('programs.title') }}
             </h2>
-            <p class="text-sm text-slate-500 dark:text-gray-400 font-medium">
-              {{ t('programs.description') }}
-            </p>
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <p class="text-sm text-slate-500 dark:text-gray-400 font-medium">
+                {{ t('programs.description') }}
+              </p>
+              <RouterLink 
+                to="/meus-programas"
+                class="flex items-center gap-2 px-4 py-2 bg-secondary/10 hover:bg-secondary/20 text-secondary border border-secondary/20 rounded-lg text-[10px] font-black transition-all group whitespace-nowrap"
+              >
+                <span class="material-symbols-outlined text-sm">school</span>
+                MEUS PROGRAMAS
+                <span class="material-symbols-outlined text-xs group-hover:translate-x-1 transition-transform">arrow_forward</span>
+              </RouterLink>
+            </div>
           </div>
 
           <div class="flex flex-col md:flex-row gap-4 w-full xl:w-auto items-center">
@@ -158,10 +168,12 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocale } from '@/composables/useLocale'
 import { useProgramsStore } from '@/stores/programs'
+import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import ProgramHero from '@/components/features/programs/ProgramHero.vue'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const { t, locale: currentLocale } = useLocale()
 const programsStore = useProgramsStore()
@@ -217,7 +229,13 @@ const getCategoryLabel = (catValue: string) => {
 }
 
 const navigateToProgram = (programId: string) => {
-  router.push(`/programas/${programId}`)
+  const isEnrolled = programsStore.myEnrollments.some(e => e.program_id === programId && (e.status === 'active' || e.status === 'completed'))
+  
+  if (isEnrolled) {
+    router.push(`/programas/${programId}/assistir`)
+  } else {
+    router.push(`/programas/${programId}`)
+  }
 }
 
 const clearFilters = () => {
@@ -227,6 +245,9 @@ const clearFilters = () => {
 
 onMounted(() => {
   programsStore.fetchPrograms()
+  if (authStore.user) {
+    programsStore.fetchMyEnrollments()
+  }
 })
 </script>
 

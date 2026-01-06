@@ -73,6 +73,11 @@ export interface Program {
     average_rating?: number
     total_reviews?: number
     user_enrollment?: ProgramEnrollment
+    professors?: Array<{
+        id: string
+        nome: string
+        avatar_url?: string
+    }>
 }
 
 export interface ProgramEnrollment {
@@ -170,6 +175,7 @@ export interface CreateProgramData {
     status?: ProgramStatus
     featured?: boolean
     created_by?: string
+    professor_ids?: string[]
 }
 
 export interface UpdateProgramData extends Partial<CreateProgramData> {

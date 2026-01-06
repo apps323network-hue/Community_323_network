@@ -49,13 +49,6 @@
             <span class="w-2 h-8 bg-secondary rounded-full"></span>
             Meus Programas
           </h2>
-          <button
-            @click="showCreateModal = true"
-            class="w-full sm:w-auto px-8 py-4 bg-secondary text-black font-black rounded-2xl hover:bg-secondary/90 transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-2"
-          >
-            <span class="material-symbols-outlined">add_circle</span>
-            Criar Novo Programa
-          </button>
         </div>
 
         <!-- Loading State -->
@@ -162,151 +155,6 @@
       </div>
     </div>
 
-    <!-- Create Program Modal -->
-    <div
-      v-if="showCreateModal"
-      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4"
-      @click.self="closeCreateModal"
-    >
-      <div 
-        class="bg-white dark:bg-surface-dark w-full sm:max-w-3xl sm:rounded-3xl shadow-2xl border-t sm:border border-slate-200 dark:border-white/10 h-[92vh] sm:h-auto sm:max-h-[90vh] flex flex-col overflow-hidden animate-slide-up sm:animate-fade-in"
-      >
-        <!-- Modal Header -->
-        <div class="px-6 py-4 sm:px-8 sm:py-6 border-b border-slate-200 dark:border-white/10 flex items-center justify-between shrink-0">
-          <div>
-            <h3 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">Criar Novo Programa</h3>
-            <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mt-0.5">Preencha os dados do treinamento</p>
-          </div>
-          <button
-            @click="closeCreateModal"
-            class="w-10 h-10 flex items-center justify-center text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors bg-slate-100 dark:bg-white/5 rounded-xl"
-          >
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </div>
-
-        <form @submit.prevent="createProgram" class="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8 custom-scrollbar">
-          <!-- Thumbnail Upload -->
-          <div class="space-y-3">
-            <label class="block text-[10px] sm:text-xs font-black text-slate-500 dark:text-gray-400 uppercase tracking-[0.2em]">
-              Imagem de Capa (Recomendado 1280x720)
-            </label>
-            <div class="relative group border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl p-6 sm:p-10 text-center hover:border-secondary transition-all bg-slate-50 dark:bg-black/20">
-              <input
-                type="file"
-                accept="image/*"
-                @change="handleThumbnailSelect"
-                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-              />
-              <div v-if="!thumbnailPreview" class="space-y-3">
-                <div class="bg-white dark:bg-surface-dark w-12 h-12 rounded-xl shadow-md flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                  <span class="material-symbols-outlined text-2xl text-secondary">add_photo_alternate</span>
-                </div>
-                <p class="text-xs font-bold text-slate-600 dark:text-gray-400">Clique para selecionar imagem</p>
-              </div>
-              <div v-else class="relative inline-block">
-                <img :src="thumbnailPreview" class="max-h-40 sm:max-h-48 rounded-xl shadow-2xl mx-auto" />
-                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl">
-                  <span class="text-white text-xs font-black uppercase">Trocar Imagem</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Basic Info -->
-          <div class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="space-y-2">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Título (Português) *</label>
-                <input
-                  v-model="newProgram.title_pt"
-                  type="text"
-                  required
-                  class="w-full px-4 py-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 text-slate-900 dark:text-white focus:ring-2 focus:ring-secondary outline-none transition-all font-bold text-sm"
-                  placeholder="Ex: Formação em Gestão"
-                />
-              </div>
-
-              <div class="space-y-2">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Título (Inglês) *</label>
-                <input
-                  v-model="newProgram.title_en"
-                  type="text"
-                  required
-                  class="w-full px-4 py-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 text-slate-900 dark:text-white focus:ring-2 focus:ring-secondary outline-none transition-all font-bold text-sm"
-                  placeholder="Ex: Management Training"
-                />
-              </div>
-            </div>
-
-            <!-- Short Descriptions -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="space-y-2">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Resumo (PT) *</label>
-                <textarea
-                  v-model="newProgram.short_description_pt"
-                  rows="3"
-                  required
-                  class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 text-slate-900 dark:text-white focus:ring-2 focus:ring-secondary outline-none transition-all font-medium text-sm resize-none"
-                  placeholder="Uma frase rápida sobre o curso..."
-                ></textarea>
-              </div>
-
-              <div class="space-y-2">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Resumo (EN) *</label>
-                <textarea
-                  v-model="newProgram.short_description_en"
-                  rows="3"
-                  required
-                  class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 text-slate-900 dark:text-white focus:ring-2 focus:ring-secondary outline-none transition-all font-medium text-sm resize-none"
-                  placeholder="A quick summary of the course..."
-                ></textarea>
-              </div>
-            </div>
-
-            <!-- Full Descriptions -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="space-y-2">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Descrição Completa (PT)</label>
-                <textarea
-                  v-model="newProgram.full_description_pt"
-                  rows="4"
-                  class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 text-slate-900 dark:text-white focus:ring-2 focus:ring-secondary outline-none transition-all font-medium text-sm resize-none"
-                ></textarea>
-              </div>
-
-              <div class="space-y-2">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Descrição Completa (EN)</label>
-                <textarea
-                  v-model="newProgram.full_description_en"
-                  rows="4"
-                  class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 text-slate-900 dark:text-white focus:ring-2 focus:ring-secondary outline-none transition-all font-medium text-sm resize-none"
-                ></textarea>
-              </div>
-            </div>
-          </div>
-        </form>
-
-        <!-- Fixed Footer Actions -->
-        <div class="p-4 pb-8 sm:p-6 bg-slate-50 dark:bg-black/20 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-center justify-end gap-3 shrink-0">
-          <button
-            type="button"
-            @click="closeCreateModal"
-            class="w-full sm:w-auto px-8 py-4 text-slate-600 dark:text-gray-400 font-bold hover:bg-slate-200 dark:hover:bg-white/5 rounded-2xl transition-all"
-          >
-            Cancelar
-          </button>
-          <button
-            @click="createProgram"
-            :disabled="creatingProgram || !newProgram.title_pt"
-            class="w-full sm:w-auto px-12 py-4 bg-secondary text-black font-black rounded-2xl hover:bg-secondary/90 transition-all shadow-xl shadow-secondary/20 disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            <span v-if="creatingProgram" class="animate-spin material-symbols-outlined text-lg">sync</span>
-            {{ creatingProgram ? 'Criando...' : 'Criar Programa' }}
-          </button>
-        </div>
-      </div>
-    </div>
 
     <!-- Status Change Confirmation Modal -->
     <div
@@ -378,12 +226,6 @@ const { locale: currentLocale } = useLocale()
 const myPrograms = ref<any[]>([])
 const loading = ref(true)
 
-// Create program modal state
-const showCreateModal = ref(false)
-const creatingProgram = ref(false)
-const thumbnailFile = ref<File | null>(null)
-const thumbnailPreview = ref<string | null>(null)
-
 // Status modal state
 const statusModal = ref({
   show: false,
@@ -391,14 +233,6 @@ const statusModal = ref({
   program: null as any
 })
 
-const newProgram = ref({
-  title_pt: '',
-  title_en: '',
-  short_description_pt: '',
-  short_description_en: '',
-  full_description_pt: '',
-  full_description_en: ''
-})
 
 const totalStudents = computed(() => {
   return myPrograms.value.reduce((sum, p) => sum + (p.studentsCount || 0), 0)
@@ -416,97 +250,6 @@ const getProgramDescription = (program: any) => {
   return currentLocale.value === 'pt-BR' ? program.short_description_pt : program.short_description_en
 }
 
-function handleThumbnailSelect(event: Event) {
-  const target = event.target as HTMLInputElement
-  if (target.files && target.files.length > 0) {
-    thumbnailFile.value = target.files[0]
-    
-    // Create preview
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      thumbnailPreview.value = e.target?.result as string
-    }
-    reader.readAsDataURL(thumbnailFile.value)
-  }
-}
-
-function closeCreateModal() {
-  showCreateModal.value = false
-  newProgram.value = {
-    title_pt: '',
-    title_en: '',
-    short_description_pt: '',
-    short_description_en: '',
-    full_description_pt: '',
-    full_description_en: ''
-  }
-  thumbnailFile.value = null
-  thumbnailPreview.value = null
-}
-
-async function createProgram() {
-  creatingProgram.value = true
-  
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    let thumbnailUrl = null
-
-    // Upload thumbnail if provided
-    if (thumbnailFile.value) {
-      const fileExt = thumbnailFile.value.name.split('.').pop()
-      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`
-      const filePath = `program-thumbnails/${fileName}`
-
-      const { error: uploadError } = await supabase.storage
-        .from('program-materials')
-        .upload(filePath, thumbnailFile.value)
-
-      if (uploadError) throw uploadError
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('program-materials')
-        .getPublicUrl(filePath)
-
-      thumbnailUrl = publicUrl
-    }
-
-    // Create program
-    const { data: program, error: programError } = await supabase
-      .from('programs')
-      .insert({
-        ...newProgram.value,
-        thumbnail_url: thumbnailUrl,
-        status: 'draft',
-        created_by: user.id
-      })
-      .select()
-      .single()
-
-    if (programError) throw programError
-
-    // Assign professor to program
-    const { error: assignError } = await supabase
-      .from('program_professors')
-      .insert({
-        program_id: program.id,
-        professor_id: user.id
-      })
-
-    if (assignError) throw assignError
-
-    // Refresh programs list
-    await fetchProfessorPrograms()
-    
-    closeCreateModal()
-  } catch (error) {
-    console.error('Error creating program:', error)
-    alert('Erro ao criar programa. Tente novamente.')
-  } finally {
-    creatingProgram.value = false
-  }
-}
 
 async function fetchProfessorPrograms() {
   loading.value = true

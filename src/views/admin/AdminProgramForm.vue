@@ -78,8 +78,9 @@
               </div>
 
               <!-- Quick Meta (8/12) -->
-              <div class="lg:col-span-7 xl:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="lg:col-span-7 xl:col-span-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Left Side: Category and Titles -->
+                <div class="space-y-6">
                   <div>
                     <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Categoria *</label>
                     <select v-model="form.category" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 outline-none transition-all">
@@ -90,31 +91,44 @@
                       <option value="servico_especializado">Serviço Especializado</option>
                     </select>
                   </div>
-                  <div>
-                    <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Professor (Instrutor) *</label>
-                    <select 
-                      v-model="form.created_by" 
-                      @change="handleProfessorChange"
-                      required
-                      class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                    >
-                      <option value="">Selecione um professor</option>
-                      <option v-for="prof in professors" :key="prof.id" :value="prof.id">
-                        {{ prof.nome }} ({{ prof.email }})
-                      </option>
-                    </select>
+                  
+                  <div class="grid grid-cols-1 gap-6">
+                    <div>
+                      <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Título (PT) *</label>
+                      <input v-model="form.title_pt" required type="text" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white font-bold" placeholder="Nome do programa em Português" />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Title (EN) *</label>
+                      <input v-model="form.title_en" required type="text" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white font-bold" placeholder="Program name in English" />
+                    </div>
                   </div>
                 </div>
 
-                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                   <div>
-                    <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Título (PT) *</label>
-                    <input v-model="form.title_pt" required type="text" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white font-bold" placeholder="Nome do programa em Português" />
+                <!-- Right Side: Professors -->
+                <div class="flex flex-col h-full">
+                  <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-3">Professores (Instrutores) *</label>
+                  <div class="flex-1 bg-slate-50 dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/10 overflow-y-auto custom-scrollbar min-h-[220px]">
+                    <div class="grid grid-cols-1 gap-2">
+                      <div v-for="prof in professors" :key="prof.id" class="flex items-center gap-4 p-3 rounded-xl hover:bg-white dark:hover:bg-white/5 transition-all group">
+                        <div class="relative flex items-center justify-center">
+                          <input 
+                            type="checkbox" 
+                            :id="`prof-${prof.id}`"
+                            v-model="form.professor_ids"
+                            :value="prof.id"
+                            class="w-6 h-6 rounded-lg border-slate-300 text-primary focus:ring-primary cursor-pointer transition-all"
+                          />
+                        </div>
+                        <label :for="`prof-${prof.id}`" class="flex items-center gap-3 cursor-pointer flex-1 min-w-0">
+                        <div class="min-w-0">
+                            <span class="block text-sm font-bold text-slate-700 dark:text-white truncate">{{ prof.nome }}</span>
+                            <span class="block text-[10px] text-slate-500 font-medium truncate">{{ prof.email }}</span>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Title (EN) *</label>
-                    <input v-model="form.title_en" required type="text" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white font-bold" placeholder="Program name in English" />
-                  </div>
+                  <p class="text-[10px] text-slate-500 mt-2 italic px-2">Selecione um ou mais professores para este programa.</p>
                 </div>
               </div>
             </div>
@@ -202,40 +216,93 @@
                     <label for="featured" class="text-slate-700 dark:text-gray-300 font-medium">Programa em Destaque (⭐)</label>
                   </div>
                    
-                   <div class="border-t border-slate-200 dark:border-white/10 my-4 pt-4">
-                     <p class="text-sm font-bold text-slate-900 dark:text-white mb-2">Período de Inscrição</p>
-                     <div class="grid grid-cols-2 gap-2">
+                  <div class="border-t border-slate-200 dark:border-white/10 my-4 pt-6">
+                    <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-4 uppercase tracking-wider">Metas e Pré-requisitos</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Início das Inscrições</label>
+                        <input v-model="form.enrollment_start_date" type="datetime-local" class="w-full text-sm px-4 py-2 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark" />
+                      </div>
+                      <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Fim das Inscrições</label>
+                        <input v-model="form.enrollment_end_date" type="datetime-local" class="w-full text-sm px-4 py-2 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark" />
+                      </div>
+                      <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                         <div>
-                          <label class="text-xs text-slate-500">Início</label>
-                          <input v-model="form.enrollment_start_date" type="datetime-local" class="w-full text-sm px-2 py-1.5 rounded border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark" />
+                          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Pré-requisitos (PT)</label>
+                          <textarea v-model="form.prerequisites_pt" rows="3" class="w-full text-sm px-4 py-3 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark" placeholder="O que o aluno precisa saber?"></textarea>
                         </div>
-                         <div>
-                          <label class="text-xs text-slate-500">Fim</label>
-                          <input v-model="form.enrollment_end_date" type="datetime-local" class="w-full text-sm px-2 py-1.5 rounded border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark" />
+                        <div>
+                          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Prerequisites (EN)</label>
+                          <textarea v-model="form.prerequisites_en" rows="3" class="w-full text-sm px-4 py-3 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark" placeholder="What should the student know?"></textarea>
                         </div>
-                     </div>
-                   </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- TAB 3: Content (Curriculum) -->
-          <div v-show="currentTab === 'content'" class="space-y-6">
-            <div class="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800 p-4 rounded-lg flex items-center gap-3">
-              <span class="material-icons text-yellow-600 dark:text-yellow-500">info</span>
-              <span class="text-sm text-yellow-800 dark:text-yellow-200">A edição avançada de módulos e aulas estará disponível em breve. Por enquanto, a estrutura de currículo é gerenciada via JSON ou edição simplificada.</span>
+          <!-- TAB 3: Content (Curriculum & Materials) -->
+          <div v-show="currentTab === 'content'" class="space-y-6 -mx-6 sm:-mx-8">
+            <div v-if="!isEditMode" class="p-12 text-center">
+              <div class="bg-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span class="material-icons text-4xl text-primary">add_link</span>
+              </div>
+              <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2">Crie o programa primeiro</h3>
+              <p class="text-slate-500 max-w-sm mx-auto">
+                Para gerenciar módulos, aulas e materiais, você precisa primeiro salvar as informações básicas do programa.
+              </p>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <div>
-                 <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Pré-requisitos (PT)</label>
-                 <textarea v-model="form.prerequisites_pt" rows="4" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white" placeholder="- Item 1&#10;- Item 2"></textarea>
-               </div>
-               <div>
-                 <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Prerequisites (EN)</label>
-                 <textarea v-model="form.prerequisites_en" rows="4" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white" placeholder="- Item 1&#10;- Item 2"></textarea>
-               </div>
+            <div v-else class="flex flex-col h-[700px]">
+              <!-- Content Sub-tabs -->
+              <div class="px-8 border-b border-slate-200 dark:border-white/10 flex items-center bg-slate-50/50 dark:bg-black/20">
+                <button 
+                  v-for="subTab in contentSubTabs" 
+                  :key="subTab.id"
+                  @click="activeContentSubTab = subTab.id"
+                  class="px-6 py-4 text-xs font-black uppercase tracking-widest transition-all relative"
+                  :class="activeContentSubTab === subTab.id ? 'text-primary' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'"
+                >
+                  {{ subTab.label }}
+                  <div v-if="activeContentSubTab === subTab.id" class="absolute bottom-0 left-0 w-full h-1 bg-primary rounded-t-full"></div>
+                </button>
+              </div>
+
+              <!-- Content Views -->
+              <div class="flex-1 overflow-hidden">
+                <!-- Grade Curricular View -->
+                <div v-if="activeContentSubTab === 'grade'" class="flex h-full">
+                  <aside class="w-80 h-full border-r border-slate-200 dark:border-white/10 shrink-0">
+                    <CurriculumSidebar 
+                      :modules="modules" 
+                      :selected-id="selectedContentItem?.id"
+                      @select-module="handleSelectModule"
+                      @select-lesson="handleSelectLesson"
+                      @add-module="handleStartCreateModule"
+                      @add-lesson="handleStartCreateLesson"
+                    />
+                  </aside>
+                  <main class="flex-1 h-full bg-slate-50/30 dark:bg-black/10">
+                    <ContentEditor 
+                      :selected-item="selectedContentItem"
+                      :mode="contentEditorMode"
+                      :is-creating="isCreatingContent"
+                      :program-name="form.title_pt"
+                      :loading="modulesStore.loading"
+                      @save="handleSaveContent"
+                      @cancel="handleCancelContent"
+                      @delete="handleDeleteContent"
+                    />
+                  </main>
+                </div>
+
+                <!-- Materiais View -->
+                <div v-else-if="activeContentSubTab === 'materials'" class="h-full overflow-y-auto p-8 bg-slate-50/30 dark:bg-black/10">
+                  <MaterialsTab :program-id="route.params.id as string" />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -333,8 +400,14 @@ import AdminLayout from '@/components/layout/admin/AdminLayout.vue'
 import { useProgramsStore } from '@/stores/programs'
 import { useAuthStore } from '@/stores/auth'
 import { useSupabase } from '@/composables/useSupabase'
+import { useModulesStore } from '@/stores/modules'
 import type { CreateProgramData } from '@/types/programs'
 import { toast } from 'vue-sonner'
+
+// Content Management Components
+import CurriculumSidebar from '@/components/professor/CurriculumSidebar.vue'
+import ContentEditor from '@/components/professor/ContentEditor.vue'
+import MaterialsTab from '@/components/professor/MaterialsTab.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -342,6 +415,21 @@ const { t } = useLocale()
 const { supabase } = useSupabase()
 const programsStore = useProgramsStore()
 const authStore = useAuthStore()
+
+// Content Management State
+const modulesStore = useModulesStore()
+const activeContentSubTab = ref('grade')
+const selectedContentItem = ref<any>(null)
+const contentEditorMode = ref<'module' | 'lesson'>('module')
+const isCreatingContent = ref(false)
+const targetModuleForLesson = ref<any>(null)
+
+const contentSubTabs = [
+  { id: 'grade', label: 'Grade Curricular' },
+  { id: 'materials', label: 'Materiais de Apoio' },
+]
+
+const modules = computed(() => modulesStore.getModulesByProgram(route.params.id as string || ''))
 
 const isEditMode = computed(() => !!route.params.id)
 const saving = ref(false)
@@ -358,8 +446,8 @@ const professors = ref<any[]>([])
 
 const tabs = [
   { id: 'basic', label: 'Informações Básicas' },
-  { id: 'settings', label: 'Configurações e Preço' },
-  { id: 'content', label: 'Currículo e Conteúdo' },
+  { id: 'settings', label: 'Inscrição e Detalhes' },
+  { id: 'content', label: 'Conteúdo & Grade' },
   { id: 'integrations', label: 'Integrações' },
 ]
 
@@ -385,6 +473,7 @@ const form = ref<CreateProgramData>({
   banner_url: '',
   instructor_name: '',
   created_by: '',
+  professor_ids: [],
   prerequisites_pt: '',
   prerequisites_en: '',
   enrollment_start_date: '',
@@ -412,7 +501,14 @@ onMounted(async () => {
     const program = await programsStore.fetchProgramById(programId)
     if (program) {
       // Map program data to form
-      form.value = { ...program }
+      form.value = { 
+        ...program,
+        professor_ids: program.professors?.map((p: any) => p.id) || []
+      }
+      
+      // Load content
+      await modulesStore.fetchModulesWithLessons(programId)
+      await modulesStore.fetchMaterials(programId)
     } else {
       // Handle not found
       router.push('/admin/programas')
@@ -420,13 +516,93 @@ onMounted(async () => {
   }
 })
 
-const handleProfessorChange = () => {
-  const selectedProf = professors.value.find(p => p.id === form.value.created_by)
-  if (selectedProf) {
-    form.value.instructor_name = selectedProf.nome
-    form.value.instructor_bio = selectedProf.bio
+// Content Management Handlers
+function handleSelectModule(module: any) {
+  selectedContentItem.value = module
+  contentEditorMode.value = 'module'
+  isCreatingContent.value = false
+}
+
+function handleSelectLesson(lesson: any) {
+  selectedContentItem.value = lesson
+  contentEditorMode.value = 'lesson'
+  isCreatingContent.value = false
+}
+
+function handleStartCreateModule() {
+  selectedContentItem.value = null
+  contentEditorMode.value = 'module'
+  isCreatingContent.value = true
+}
+
+function handleStartCreateLesson(module: any) {
+  selectedContentItem.value = null
+  contentEditorMode.value = 'lesson'
+  isCreatingContent.value = true
+  targetModuleForLesson.value = module
+}
+
+function handleCancelContent() {
+  selectedContentItem.value = null
+  isCreatingContent.value = false
+}
+
+async function handleSaveContent(formData: any) {
+  try {
+    const programId = route.params.id as string
+    if (contentEditorMode.value === 'module') {
+      if (isCreatingContent.value) {
+        await modulesStore.createModule({
+          ...formData,
+          program_id: programId,
+          order_index: modules.value.length
+        })
+      } else {
+        await modulesStore.updateModule(selectedContentItem.value.id, formData)
+      }
+    } else {
+      if (isCreatingContent.value) {
+        await modulesStore.createLesson({
+          ...formData,
+          program_id: programId,
+          module_id: targetModuleForLesson.value.id,
+          order_index: targetModuleForLesson.value.lessons?.length || 0
+        }, true)
+      } else {
+        await modulesStore.updateLesson(selectedContentItem.value.id, formData, true)
+      }
+    }
+    
+    await modulesStore.fetchModulesWithLessons(programId)
+    selectedContentItem.value = null
+    isCreatingContent.value = false
+    toast.success('Salvo com sucesso!')
+  } catch (error: any) {
+    console.error('Error saving content:', error)
+    toast.error('Erro ao salvar: ' + (error.message || 'Erro desconhecido'))
   }
 }
+
+async function handleDeleteContent(item: any) {
+  const label = contentEditorMode.value === 'module' ? 'módulo' : 'aula'
+  if (!confirm(`Deseja realmente excluir este ${label}? Esta ação não pode ser desfeita.`)) return
+
+  try {
+    if (contentEditorMode.value === 'module') {
+      await modulesStore.deleteModule(item.id)
+    } else {
+      await modulesStore.deleteLesson(item.id)
+    }
+    
+    await modulesStore.fetchModulesWithLessons(route.params.id as string)
+    selectedContentItem.value = null
+    toast.success('Excluído com sucesso!')
+  } catch (error: any) {
+    console.error('Error deleting content:', error)
+    toast.error('Erro ao excluir: ' + (error.message || 'Erro desconhecido'))
+  }
+}
+
 
 const handleFileSelect = (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -481,6 +657,16 @@ const uploadImage = async (file: File, path: string) => {
 const handleSubmit = async () => {
   try {
     saving.value = true
+
+    // Update instructor_name based on selected professors
+    const selectedProfs = professors.value.filter(p => form.value.professor_ids?.includes(p.id))
+    if (selectedProfs.length > 0) {
+      form.value.instructor_name = selectedProfs.map(p => p.nome).join(', ')
+      // Use the first professor's bio if multiple (best effort)
+      if (!form.value.instructor_bio) {
+        form.value.instructor_bio = selectedProfs[0].bio
+      }
+    }
 
     // 1. Upload image if selected
     if (imageFile.value) {
