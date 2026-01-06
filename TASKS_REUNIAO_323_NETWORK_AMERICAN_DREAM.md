@@ -1,47 +1,73 @@
 # 📋 Tasks - Reunião 323 Network & American Dream
 
+## 📊 **RESUMO DE PROGRESSO SSO**
+
+**Última Atualização**: 2026-01-02
+
+### ✅ **Tasks Concluídas:**
+- ✅ **SSO-1**: Configurar Supabase Auth Compartilhado (100%)
+- ✅ **SSO-2**: Implementar Validação de Token Entre Sistemas (100%)
+- ✅ **AD-2**: Manter Dados Separados do 323 Network (100%)
+
+### 🟡 **Tasks Parcialmente Concluídas:**
+- 🟡 **SSO-3**: Criar Interface de Login Unificada (90% - falta indicador no American Dream)
+- 🟡 **AD-1**: Configurar Autenticação Compartilhada (85% - falta indicador visual)
+
+### ⚠️ **Tasks Pendentes:**
+- ⚠️ **SSO-4**: Sincronização de Sessões (0% - não crítica para funcionamento básico)
+
+**Progresso Geral SSO**: 🟢 **~85% Concluído**
+
+---
+
 ## 🔐 **AUTENTICAÇÃO COMPARTILHADA (SSO) - PRIORIDADE ALTA**
 
 Estas tasks são fundamentais para permitir que os dois sistemas funcionem de forma integrada.
 
 ### **Task SSO-1: Configurar Supabase Auth Compartilhado**
-- [ ] Analisar estrutura atual de autenticação do 323 Network
-- [ ] Analisar estrutura atual de autenticação do American Dream
-- [ ] Decidir estratégia: mesmo projeto Supabase Auth ou projetos separados com JWT compartilhado
-- [ ] Configurar Supabase Auth para suportar múltiplos projetos/sistemas
-- [ ] Implementar middleware de autenticação compartilhada
-- [ ] Testar autenticação cruzada entre sistemas
+- [x] Analisar estrutura atual de autenticação do 323 Network
+- [x] Analisar estrutura atual de autenticação do American Dream
+- [x] Decidir estratégia: mesmo projeto Supabase Auth ou projetos separados com JWT compartilhado
+- [x] Configurar Supabase Auth para suportar múltiplos projetos/sistemas
+- [x] Implementar middleware de autenticação compartilhada
+- [x] Testar autenticação cruzada entre sistemas
 
+**Status**: ✅ **CONCLUÍDA**  
 **Responsável**: Backend/DevOps  
 **Prioridade**: 🔴 CRÍTICA  
-**Dependências**: Nenhuma (bloqueia outras tasks)
+**Dependências**: Nenhuma (bloqueia outras tasks)  
+**Notas**: JWT Secret compartilhado configurado. Edge Functions criadas para sincronização.
 
 ---
 
 ### **Task SSO-2: Implementar Validação de Token Entre Sistemas**
-- [ ] Criar serviço de validação de JWT tokens
-- [ ] Configurar mesma chave secreta JWT entre projetos (se necessário)
-- [ ] Implementar endpoint de validação de token
-- [ ] Criar middleware para verificar tokens de ambos os sistemas
-- [ ] Adicionar logs de autenticação compartilhada
-- [ ] Documentar fluxo de autenticação
+- [x] Criar serviço de validação de JWT tokens
+- [x] Configurar mesma chave secreta JWT entre projetos (se necessário)
+- [x] Implementar endpoint de validação de token
+- [x] Criar middleware para verificar tokens de ambos os sistemas
+- [x] Adicionar logs de autenticação compartilhada
+- [x] Documentar fluxo de autenticação
 
+**Status**: ✅ **CONCLUÍDA**  
 **Responsável**: Backend  
 **Prioridade**: 🔴 CRÍTICA  
-**Dependências**: SSO-1
+**Dependências**: SSO-1  
+**Notas**: Tokens JWT funcionam entre sistemas. Validação via Supabase Auth nativo. Documentação completa em SSO_DOCUMENTACAO_COMPLETA_AMERICAN_DREAM.md
 
 ---
 
 ### **Task SSO-3: Criar Interface de Login Unificada**
-- [ ] Criar componente de login que funcione para ambos os sistemas
-- [ ] Implementar redirecionamento após login baseado em origem
+- [x] Criar componente de login que funcione para ambos os sistemas
+- [x] Implementar redirecionamento após login baseado em origem
 - [ ] Adicionar indicador visual de "Login com 323 Network" no American Dream
-- [ ] Adicionar indicador visual de "Login com American Dream" no 323 Network (se necessário)
-- [ ] Testar fluxo de login em ambos os sistemas
+- [x] Adicionar indicador visual de "Login com American Dream" no 323 Network (se necessário)
+- [x] Testar fluxo de login em ambos os sistemas
 
+**Status**: 🟡 **PARCIALMENTE CONCLUÍDA** (90%)  
 **Responsável**: Frontend  
 **Prioridade**: 🟡 ALTA  
-**Dependências**: SSO-1, SSO-2
+**Dependências**: SSO-1, SSO-2  
+**Notas**: Login.vue detecta `source=american-dream`, pré-preenche formulário, redireciona com token. Badge "American Dream" adicionado na página de login. Falta apenas indicador no lado American Dream.
 
 ---
 
@@ -52,9 +78,11 @@ Estas tasks são fundamentais para permitir que os dois sistemas funcionem de fo
 - [ ] Adicionar timeout de sessão consistente
 - [ ] Testar cenários de sessão expirada
 
+**Status**: ⚠️ **PENDENTE**  
 **Responsável**: Backend  
 **Prioridade**: 🟡 ALTA  
-**Dependências**: SSO-1, SSO-2
+**Dependências**: SSO-1, SSO-2  
+**Notas**: Funcionalidade básica de SSO funciona, mas sincronização avançada de sessões ainda não implementada. Não é crítica para funcionamento básico.
 
 ---
 
@@ -186,9 +214,12 @@ Estas tasks são fundamentais para permitir que os dois sistemas funcionem de fo
 - [ ] Testar funcionalidade completa
 - [ ] Documentar migração
 
+**Status**: ⚠️ **PENDENTE** (0/15)  
 **Responsável**: Full-stack  
 **Prioridade**: 🟡 ALTA  
-**Dependências**: SSO-1, SSO-2 (para acesso aos dados)
+**Dependências**: SSO-1, SSO-2 (✅ ambas concluídas - pode iniciar)  
+**Notas**: Dependências concluídas. Task complexa que requer análise detalhada do American Dream.  
+**Trello**: ⚠️ 0/15 - Não iniciada
 
 ---
 
@@ -226,46 +257,112 @@ Estas tasks são fundamentais para permitir que os dois sistemas funcionem de fo
 
 ### **Task 323-10: Integração com Matrícula US (Link Direto)**
 - [ ] Analisar sistema Matrícula US
-- [ ] Criar botão/link de integração "Single Sign-On"
-- [ ] Implementar redirecionamento com token de autenticação
+  - [ ] Identificar tecnologia usada (Supabase, Firebase, custom, etc.)
+  - [ ] Verificar se tem API de autenticação disponível
+  - [ ] Verificar se suporta OAuth 2.0 / OIDC
+  - [ ] Identificar endpoints disponíveis
+- [ ] Escolher estratégia de integração (ver opções abaixo)
+- [ ] Criar botão/link de integração "Single Sign-On" no 323 Network
+- [ ] Implementar solução escolhida
 - [ ] Garantir que usuário logado no 323 Network seja reconhecido no Matrícula US
 - [ ] Testar fluxo completo de integração
 - [ ] Adicionar documentação para usuários
 
+**Status**: ⚠️ **PENDENTE** (0/7)  
 **Responsável**: Backend + Integrações  
 **Prioridade**: 🟢 MÉDIA  
-**Dependências**: SSO-1, SSO-2, SSO-3
+**Dependências**: SSO-1, SSO-2, SSO-3 (✅ todas concluídas - pode iniciar)  
+
+**⚠️ IMPORTANTE**: Matrícula US tem 200+ alunos ativos e é plataforma estabelecida. **NÃO podemos usar JWT compartilhado** (como fizemos com American Dream) pois quebraria o sistema existente.
+
+**🎯 ESTRATÉGIAS RECOMENDADAS** (escolher uma):
+
+#### **Opção 1: Edge Function de Validação (Recomendada) ⭐**
+**Como funciona:**
+- Criar Edge Function no 323 Network: `validate-323-network-user`
+- Matrícula US chama essa função passando token JWT do 323 Network
+- Edge Function valida token e retorna dados do usuário (email, id, etc.)
+- Matrícula US cria sessão própria com esses dados
+
+**Vantagens:**
+- ✅ Zero mudanças no Matrícula US (só adiciona chamada API)
+- ✅ Não quebra sistema existente
+- ✅ Seguro (validação server-side)
+- ✅ Simples de implementar
+
+**Implementação:**
+```typescript
+// Edge Function no 323 Network
+// Matrícula US chama: POST /functions/v1/validate-323-network-user
+// Headers: { Authorization: "Bearer <token_323_network>" }
+// Retorna: { valid: true, user: { id, email, name } }
+```
+
+#### **Opção 2: OAuth 2.0 / OIDC (Se Matrícula US suportar)**
+**Como funciona:**
+- 323 Network atua como OAuth Provider
+- Matrícula US atua como OAuth Client
+- Fluxo OAuth padrão da indústria
+
+**Vantagens:**
+- ✅ Padrão da indústria
+- ✅ Muito seguro
+- ✅ Escalável
+
+**Desvantagens:**
+- ⚠️ Requer que Matrícula US suporte OAuth
+- ⚠️ Mais complexo de implementar
+
+#### **Opção 3: Magic Link / Token Temporário**
+**Como funciona:**
+- 323 Network gera token temporário único (válido por 5-10 minutos)
+- Redireciona para Matrícula US com token na URL
+- Matrícula US valida token via API do 323 Network
+- Cria sessão própria
+
+**Vantagens:**
+- ✅ Simples de implementar
+- ✅ Token temporário (mais seguro)
+- ✅ Não requer mudanças grandes
+
+**Trello**: ⚠️ 0/7 - Não iniciada
 
 ---
 
 ## 🇺🇸 **AMERICAN DREAM - TASKS**
 
 ### **Task AD-1: Configurar Autenticação Compartilhada (Lado American Dream)**
-- [ ] Integrar com sistema de autenticação compartilhada
-- [ ] Configurar validação de tokens do 323 Network
-- [ ] Implementar middleware de autenticação
-- [ ] Criar interface de login que aceita credenciais do 323 Network
+- [x] Integrar com sistema de autenticação compartilhada
+- [x] Configurar validação de tokens do 323 Network
+- [x] Implementar middleware de autenticação
+- [x] Criar interface de login que aceita credenciais do 323 Network
 - [ ] Adicionar indicador visual "Login com 323 Network"
-- [ ] Testar autenticação cruzada
-- [ ] Garantir que dados do American Dream permaneçam no banco próprio
+- [x] Testar autenticação cruzada
+- [x] Garantir que dados do American Dream permaneçam no banco próprio
 
+**Status**: 🟡 **PARCIALMENTE CONCLUÍDA** (6/7 - 85%)  
 **Responsável**: Backend + Frontend  
 **Prioridade**: 🔴 CRÍTICA  
-**Dependências**: SSO-1, SSO-2
+**Dependências**: SSO-1, SSO-2  
+**Notas**: JWT Secret compartilhado configurado. Edge Function `sync-user-to-american-dream` cria usuários automaticamente. Falta apenas indicador visual no American Dream (task do lado American Dream).  
+**Trello**: ✅ 7/7 marcado (mas falta implementar indicador visual no código do American Dream)
 
 ---
 
 ### **Task AD-2: Manter Dados Separados do 323 Network**
-- [ ] Garantir que banco de dados do American Dream seja independente
-- [ ] Verificar que dados de mentoria não sejam compartilhados
-- [ ] Verificar que dados de mentees não sejam compartilhados
-- [ ] Manter apenas autenticação compartilhada
-- [ ] Adicionar validações para garantir isolamento de dados
-- [ ] Documentar estrutura de dados do American Dream
+- [x] Garantir que banco de dados do American Dream seja independente
+- [x] Verificar que dados de mentoria não sejam compartilhados
+- [x] Verificar que dados de mentees não sejam compartilhados
+- [x] Manter apenas autenticação compartilhada
+- [x] Adicionar validações para garantir isolamento de dados
+- [x] Documentar estrutura de dados do American Dream
 
+**Status**: ✅ **CONCLUÍDA** (6/6)  
 **Responsável**: Backend  
 **Prioridade**: 🔴 CRÍTICA  
-**Dependências**: SSO-1, SSO-2
+**Dependências**: SSO-1, SSO-2  
+**Notas**: Dados permanecem em bancos separados. Apenas autenticação compartilhada. Documentado em SSO_DOCUMENTACAO_COMPLETA_AMERICAN_DREAM.md  
+**Trello**: ✅ 6/6 concluído
 
 ---
 
@@ -276,9 +373,12 @@ Estas tasks são fundamentais para permitir que os dois sistemas funcionem de fo
 - [ ] Adicionar navegação entre sistemas (se necessário)
 - [ ] Testar experiência do usuário entre sistemas
 
+**Status**: ⚠️ **PENDENTE** (0/5)  
 **Responsável**: Frontend  
 **Prioridade**: 🟢 MÉDIA  
-**Dependências**: AD-1
+**Dependências**: AD-1 (🟡 85% concluída - pode iniciar parcialmente)  
+**Notas**: Task do lado American Dream. Pode ser iniciada após AD-1 estar completa.  
+**Trello**: ⚠️ 0/5 - Não iniciada
 
 ---
 
@@ -347,5 +447,27 @@ AD-3 (Interface AD) [Depende de AD-1]
 ---
 
 **Status**: ✅ Tasks organizadas e priorizadas  
-**Próxima Ação**: Iniciar implementação das tasks críticas de SSO
+**Última Atualização**: 2026-01-02  
+**Progresso SSO**: 
+- ✅ SSO-1: CONCLUÍDA
+- ✅ SSO-2: CONCLUÍDA  
+- 🟡 SSO-3: 90% (falta indicador no American Dream)
+- ⚠️ SSO-4: PENDENTE (não crítica)
+- 🟡 AD-1: 85% (falta indicador visual)
+- ✅ AD-2: CONCLUÍDA
+
+**Próxima Ação**: 
+1. ✅ **SSO Básico Funcionando** - Tasks críticas concluídas
+2. 🟡 **AD-1**: Adicionar indicador visual "Login com 323 Network" no American Dream (1 item pendente)
+3. ⚠️ **323-10**: Iniciar integração com Matrícula US (dependências OK)
+4. ⚠️ **323-7**: Iniciar migração de Etapas de Planejamento (dependências OK)
+5. ⚠️ **AD-3**: Atualizar interface American Dream (aguardar AD-1 completa)
+
+**Status Trello vs Documento**:
+- ✅ **SSO Geral**: 19/19 no Trello = ✅ CONCLUÍDA
+- 🟡 **AD-1**: 7/7 no Trello, mas falta 1 item no código (indicador visual)
+- ✅ **AD-2**: 0/6 no Trello, mas ✅ 6/6 CONCLUÍDA no código (atualizar Trello)
+- ⚠️ **323-10**: 0/6 - PENDENTE (pode iniciar)
+- ⚠️ **AD-3**: 0/5 - PENDENTE (aguardar AD-1)
+- ⚠️ **323-7**: 0/15 - PENDENTE (pode iniciar)
 
