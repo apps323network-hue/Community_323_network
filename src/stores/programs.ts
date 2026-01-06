@@ -7,6 +7,7 @@ import type {
     UpdateProgramData,
     EnrollInProgramData,
     SubmitReviewData,
+    EnrollmentStatus,
 } from '@/types/programs'
 
 interface ProgramsState {
@@ -34,16 +35,21 @@ export const useProgramsStore = defineStore('programs', {
     },
 
     actions: {
-        // Fetch all published programs
-        async fetchPrograms() {
+        // Fetch programs (defaults to only published for public, or all for admin)
+        async fetchPrograms(adminMode = false) {
             this.loading = true
             this.error = null
 
             try {
-                const { data, error } = await supabase
+                let query = supabase
                     .from('programs')
                     .select('*')
-                    .eq('status', 'published')
+
+                if (!adminMode) {
+                    query = query.eq('status', 'published')
+                }
+
+                const { data, error } = await query
                     .order('featured', { ascending: false })
                     .order('created_at', { ascending: false })
 
@@ -325,11 +331,19 @@ export const useProgramsStore = defineStore('programs', {
                 const { data: { user } } = await supabase.auth.getUser()
                 if (!user) throw new Error('User not authenticated')
 
+                // Sanitize data - remove computed fields and non-db columns
+                const {
+                    average_rating,
+                    total_reviews,
+                    user_enrollment,
+                    ...insertData
+                } = data as any
+
                 const { data: program, error } = await supabase
                     .from('programs')
                     .insert({
-                        ...data,
-                        created_by: user.id,
+                        ...insertData,
+                        created_by: insertData.created_by || user.id,
                         current_students: 0,
                     })
                     .select()
@@ -337,7 +351,7 @@ export const useProgramsStore = defineStore('programs', {
 
                 if (error) throw error
 
-                await this.fetchPrograms()
+                await this.fetchPrograms(true)
 
                 return program
             } catch (err: any) {
@@ -355,7 +369,16 @@ export const useProgramsStore = defineStore('programs', {
             this.error = null
 
             try {
-                const { id, ...updateData } = data
+                // Sanitize data - remove computed fields and non-db columns
+                const {
+                    id,
+                    created_at,
+                    updated_at,
+                    average_rating,
+                    total_reviews,
+                    user_enrollment,
+                    ...updateData
+                } = data as any
 
                 const { data: program, error } = await supabase
                     .from('programs')
@@ -369,7 +392,7 @@ export const useProgramsStore = defineStore('programs', {
 
                 if (error) throw error
 
-                await this.fetchPrograms()
+                await this.fetchPrograms(true)
 
                 return program
             } catch (err: any) {
@@ -451,6 +474,31 @@ export const useProgramsStore = defineStore('programs', {
             } catch (err: any) {
                 this.error = err.message
                 console.error('Error issuing certificate:', err)
+                throw err
+            } finally {
+                this.loading = false
+            }
+        },
+
+        // Admin: Update enrollment status
+        async updateEnrollmentStatus(enrollmentId: string, status: EnrollmentStatus) {
+            this.loading = true
+            this.error = null
+
+            try {
+                const { data, error } = await supabase
+                    .from('program_enrollments')
+                    .update({ status, updated_at: new Date().toISOString() })
+                    .eq('id', enrollmentId)
+                    .select()
+                    .single()
+
+                if (error) throw error
+
+                return data
+            } catch (err: any) {
+                this.error = err.message
+                console.error('Error updating enrollment status:', err)
                 throw err
             } finally {
                 this.loading = false

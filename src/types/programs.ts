@@ -2,7 +2,7 @@
 
 export type ProgramCategory = 'curso' | 'mentoria' | 'workshop' | 'evento_premium' | 'servico_especializado'
 export type ProgramStatus = 'draft' | 'published' | 'archived'
-export type DifficultyLevel = 'iniciante' | 'intermediario' | 'avancado'
+
 export type EnrollmentStatus = 'pending' | 'active' | 'completed' | 'cancelled'
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded'
 export type ReviewStatus = 'pending' | 'approved' | 'rejected'
@@ -50,7 +50,7 @@ export interface Program {
 
     // Additional info
     duration_hours?: number
-    difficulty_level?: DifficultyLevel
+
     instructor_name?: string
     instructor_bio?: string
     prerequisites_pt?: string
@@ -160,7 +160,7 @@ export interface CreateProgramData {
     thumbnail_url?: string
     banner_url?: string
     duration_hours?: number
-    difficulty_level?: DifficultyLevel
+
     instructor_name?: string
     instructor_bio?: string
     prerequisites_pt?: string
@@ -169,6 +169,7 @@ export interface CreateProgramData {
     curriculum_en?: CurriculumModule[]
     status?: ProgramStatus
     featured?: boolean
+    created_by?: string
 }
 
 export interface UpdateProgramData extends Partial<CreateProgramData> {

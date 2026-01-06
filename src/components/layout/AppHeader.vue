@@ -226,6 +226,14 @@
                     {{ t('navigation.myServices') }}
                   </RouterLink>
                   <RouterLink
+                    to="/meus-programas"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-surface-lighter transition-colors"
+                    @click="showUserMenu = false"
+                  >
+                    <span class="material-symbols-outlined text-[20px]">school</span>
+                    {{ t('programs.myPrograms') }}
+                  </RouterLink>
+                  <RouterLink
                     to="/perfil"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-surface-lighter transition-colors"
                     @click="showUserMenu = false"
@@ -501,6 +509,14 @@
                   >
                     <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
                     {{ t('navigation.myServices') }}
+                  </RouterLink>
+                  <RouterLink
+                    to="/meus-programas"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-surface-lighter transition-colors"
+                    @click="showUserMenu = false"
+                  >
+                    <span class="material-symbols-outlined text-[20px]">school</span>
+                    {{ t('programs.myPrograms') }}
                   </RouterLink>
                   <RouterLink
                     to="/perfil"

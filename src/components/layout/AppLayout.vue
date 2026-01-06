@@ -4,9 +4,10 @@
 
     <main
       :class="[
-        'mx-auto flex-1 pb-20 lg:pb-8 min-h-[calc(100vh-200px)]',
+        'mx-auto flex-1 min-h-[calc(100vh-200px)]',
+        fluid ? 'pb-20 lg:pb-0' : 'pb-20 lg:pb-8',
         hideSidebars 
-          ? `w-full ${isHeroHeroPage ? 'pt-0' : 'pt-8'} px-4 sm:px-6 lg:px-8` 
+          ? `w-full ${isHeroHeroPage ? 'pt-0' : 'pt-8'} ${fluid ? 'px-0' : 'px-4 sm:px-6 lg:px-8'}` 
           : 'max-w-7xl py-8 px-4 sm:px-6 lg:pl-0 lg:pr-8'
       ]"
     >
@@ -19,7 +20,7 @@
         </div>
 
         <!-- Conteúdo Principal -->
-        <div :class="hideSidebars ? `w-full max-w-[1400px] mx-auto ${isHeroHeroPage ? 'pt-0' : ''}` : 'lg:col-span-8'">
+        <div :class="hideSidebars ? `w-full ${fluid ? '' : 'max-w-[1400px]'} mx-auto ${isHeroHeroPage ? 'pt-0' : ''}` : 'lg:col-span-8'">
           <slot />
         </div>
 
@@ -81,6 +82,7 @@ import AppFooter from './AppFooter.vue'
 
 const props = defineProps<{
   hideSidebars?: boolean
+  fluid?: boolean
 }>()
 
 const router = useRouter()
@@ -107,7 +109,8 @@ const isHeroHeroPage = computed(() => {
   return route.path === '/eventos' || 
          route.path.startsWith('/eventos/') ||
          route.path === '/programas' ||
-         route.path.startsWith('/programas/')
+         route.path.startsWith('/programas/') ||
+         route.path === '/pagamento/sucesso'
 })
 
 function handleEditProfile() {
@@ -118,7 +121,7 @@ const mobileMenuItems = [
   { path: '/', label: 'Home', icon: 'home' },
   { path: '/comunidade', label: 'Comunidade', icon: 'people' },
   { path: '/eventos', label: 'Eventos', icon: 'event' },
+  { path: '/programas', label: 'Programas', icon: 'school' },
   { path: '/servicos', label: 'Serviços', icon: 'business_center' },
-  { path: '/beneficios', label: 'Benefícios', icon: 'card_giftcard' },
 ]
 </script>

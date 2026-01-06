@@ -46,92 +46,117 @@
         <form @submit.prevent="handleSubmit" class="p-6">
           
           <!-- TAB 1: Basic Info -->
-          <div v-show="currentTab === 'basic'" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Titles -->
-              <div class="space-y-4">
-                <div class="bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-lg border border-blue-100 dark:border-blue-800/30">
-                  <h3 class="font-bold text-blue-900 dark:text-blue-300 mb-4 flex items-center gap-2">
-                    <span class="material-icons text-sm">language</span> Português (Principal)
-                  </h3>
-                  <div class="space-y-4">
-                    <div>
-                      <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Título (PT) *</label>
-                      <input v-model="form.title_pt" required type="text" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white" />
+          <div v-show="currentTab === 'basic'" class="space-y-8">
+            <!-- Top Section: Photo & Quick Info -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              <!-- Photo Upload (4/12) -->
+              <div class="lg:col-span-5 xl:col-span-4 space-y-2">
+                <label class="block text-sm font-bold text-slate-700 dark:text-gray-300 uppercase letter-spacing-1">
+                  Foto do Programa
+                </label>
+                <div 
+                  @click="imageInput?.click()"
+                  class="relative aspect-video rounded-2xl border-2 border-dashed border-slate-300 dark:border-gray-700 hover:border-primary dark:hover:border-secondary transition-all cursor-pointer overflow-hidden bg-slate-50 dark:bg-white/5 flex flex-col items-center justify-center group shadow-inner"
+                >
+                  <img v-if="imagePreview || form.thumbnail_url" :src="imagePreview || form.thumbnail_url" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <div v-if="imagePreview || form.thumbnail_url" class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
+                    <span class="material-icons text-4xl mb-2">cloud_upload</span>
+                    <span class="text-sm font-bold uppercase tracking-widest">Alterar Foto</span>
+                  </div>
+                  
+                  <template v-if="!imagePreview && !form.thumbnail_url">
+                    <div class="text-center p-6">
+                      <div class="w-16 h-16 bg-slate-200 dark:bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        <span class="material-icons text-3xl text-slate-400">image</span>
+                      </div>
+                      <p class="text-sm text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider">Selecionar Foto</p>
+                      <p class="text-[10px] text-slate-400 mt-2">JPG, PNG • Máx 5MB</p>
                     </div>
-                    <div>
-                      <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Curta Descrição (PT) *</label>
-                      <textarea v-model="form.short_description_pt" required rows="2" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white"></textarea>
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Descrição Completa (PT) *</label>
-                      <textarea v-model="form.description_pt" required rows="6" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white"></textarea>
-                    </div>
+                  </template>
+                </div>
+                <input ref="imageInput" type="file" accept="image/*" class="hidden" @change="handleFileSelect" />
+              </div>
+
+              <!-- Quick Meta (8/12) -->
+              <div class="lg:col-span-7 xl:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Categoria *</label>
+                    <select v-model="form.category" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                      <option value="curso">Curso</option>
+                      <option value="mentoria">Mentoria</option>
+                      <option value="workshop">Workshop</option>
+                      <option value="evento_premium">Evento Premium</option>
+                      <option value="servico_especializado">Serviço Especializado</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Professor (Instrutor) *</label>
+                    <select 
+                      v-model="form.created_by" 
+                      @change="handleProfessorChange"
+                      required
+                      class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                    >
+                      <option value="">Selecione um professor</option>
+                      <option v-for="prof in professors" :key="prof.id" :value="prof.id">
+                        {{ prof.nome }} ({{ prof.email }})
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                   <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Título (PT) *</label>
+                    <input v-model="form.title_pt" required type="text" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white font-bold" placeholder="Nome do programa em Português" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Title (EN) *</label>
+                    <input v-model="form.title_en" required type="text" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white font-bold" placeholder="Program name in English" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="h-px bg-slate-200 dark:bg-white/10 w-full"></div>
+
+            <!-- Detailed Content Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <!-- Português -->
+              <div class="space-y-6">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="material-icons text-primary/60">translate</span>
+                  <h3 class="font-black text-slate-900 dark:text-white uppercase tracking-wider text-sm">Conteúdo em Português</h3>
+                </div>
+                <div class="space-y-4 bg-slate-50/50 dark:bg-white/5 p-6 rounded-2xl border border-slate-200 dark:border-white/5">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Curta Descrição (PT) *</label>
+                    <textarea v-model="form.short_description_pt" required rows="2" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white text-sm" placeholder="Um resumo rápido chamativo..."></textarea>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Descrição Completa (PT) *</label>
+                    <textarea v-model="form.description_pt" required rows="8" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white text-sm leading-relaxed" placeholder="Explique todos os detalhes do programa..."></textarea>
                   </div>
                 </div>
               </div>
 
               <!-- English -->
-              <div class="space-y-4">
-                <div class="bg-indigo-50/50 dark:bg-indigo-900/10 p-4 rounded-lg border border-indigo-100 dark:border-indigo-800/30">
-                  <h3 class="font-bold text-indigo-900 dark:text-indigo-300 mb-4 flex items-center gap-2">
-                    <span class="material-icons text-sm">language</span> English (Translations)
-                  </h3>
-                  <div class="space-y-4">
-                    <div>
-                      <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Title (EN) *</label>
-                      <input v-model="form.title_en" required type="text" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white" />
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Short Description (EN) *</label>
-                      <textarea v-model="form.short_description_en" required rows="2" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white"></textarea>
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Full Description (EN) *</label>
-                      <textarea v-model="form.description_en" required rows="6" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white"></textarea>
-                    </div>
+              <div class="space-y-6">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="material-icons text-primary/60">language</span>
+                  <h3 class="font-black text-slate-900 dark:text-white uppercase tracking-wider text-sm">English Content</h3>
+                </div>
+                <div class="space-y-4 bg-slate-50/50 dark:bg-white/5 p-6 rounded-2xl border border-slate-200 dark:border-white/5">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Short Description (EN) *</label>
+                    <textarea v-model="form.short_description_en" required rows="2" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white text-sm" placeholder="A catchy short summary..."></textarea>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Full Description (EN) *</label>
+                    <textarea v-model="form.description_en" required rows="8" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white text-sm leading-relaxed" placeholder="Explain all program details..."></textarea>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <!-- Categorization -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Categoria *</label>
-                <select v-model="form.category" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white">
-                  <option value="curso">Curso</option>
-                  <option value="mentoria">Mentoria</option>
-                  <option value="workshop">Workshop</option>
-                  <option value="evento_premium">Evento Premium</option>
-                  <option value="servico_especializado">Serviço Especializado</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Dificuldade</label>
-                <select v-model="form.difficulty_level" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white">
-                  <option value="iniciante">Iniciante</option>
-                  <option value="intermediario">Intermediário</option>
-                  <option value="avancado">Avançado</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Instrutor</label>
-                <input v-model="form.instructor_name" type="text" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white" placeholder="Nome do instrutor" />
-              </div>
-            </div>
-
-            <!-- Media -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">URL da Thumbnail (Capa)</label>
-                <input v-model="form.thumbnail_url" type="text" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white" placeholder="https://..." />
-                <p class="text-xs text-slate-500 mt-1">Recomendado: 800x600px</p>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">URL do Banner</label>
-                <input v-model="form.banner_url" type="text" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white" placeholder="https://..." />
-                <p class="text-xs text-slate-500 mt-1">Recomendado: 1920x600px</p>
               </div>
             </div>
           </div>
@@ -148,13 +173,6 @@
                     <div class="relative">
                       <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
                       <input v-model.number="form.price_usd" required type="number" step="0.01" class="w-full pl-8 pr-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white" />
-                    </div>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">Preço (BRL) - Opcional</label>
-                    <div class="relative">
-                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">R$</span>
-                      <input v-model.number="form.price_brl" type="number" step="0.01" class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white" />
                     </div>
                   </div>
                   <div>
@@ -330,6 +348,14 @@ const saving = ref(false)
 const testingInvite = ref(false)
 const currentTab = ref('basic')
 
+// Image Upload
+const imageFile = ref<File | null>(null)
+const imagePreview = ref<string | null>(null)
+const imageInput = ref<HTMLInputElement | null>(null)
+
+// Professors list
+const professors = ref<any[]>([])
+
 const tabs = [
   { id: 'basic', label: 'Informações Básicas' },
   { id: 'settings', label: 'Configurações e Preço' },
@@ -352,13 +378,13 @@ const form = ref<CreateProgramData>({
   status: 'draft',
   featured: false,
   classroom_enabled: false,
-  difficulty_level: 'iniciante',
   duration_hours: undefined,
   classroom_course_id: '',
   classroom_invite_link: '',
   thumbnail_url: '',
   banner_url: '',
   instructor_name: '',
+  created_by: '',
   prerequisites_pt: '',
   prerequisites_en: '',
   enrollment_start_date: '',
@@ -366,6 +392,20 @@ const form = ref<CreateProgramData>({
 })
 
 onMounted(async () => {
+  // Fetch professors list
+  try {
+    const { data: profs, error } = await supabase
+      .from('profiles')
+      .select('id, nome, email, bio')
+      .eq('role', 'professor')
+      .order('nome')
+
+    if (error) throw error
+    professors.value = profs || []
+  } catch (error) {
+    console.error('Error fetching professors:', error)
+  }
+
   if (isEditMode.value) {
     // If edit mode, load program data
     const programId = route.params.id as string
@@ -380,23 +420,91 @@ onMounted(async () => {
   }
 })
 
+const handleProfessorChange = () => {
+  const selectedProf = professors.value.find(p => p.id === form.value.created_by)
+  if (selectedProf) {
+    form.value.instructor_name = selectedProf.nome
+    form.value.instructor_bio = selectedProf.bio
+  }
+}
+
+const handleFileSelect = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
+  if (!file.type.startsWith('image/')) {
+    toast.error('Por favor, selecione apenas arquivos de imagem')
+    return
+  }
+
+  // Max 5MB
+  if (file.size > 5 * 1024 * 1024) {
+    toast.error('A imagem deve ter no máximo 5MB')
+    return
+  }
+
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    imageFile.value = file
+    imagePreview.value = e.target?.result as string
+  }
+  reader.readAsDataURL(file)
+}
+
+const uploadImage = async (file: File, path: string) => {
+  try {
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${Math.random()}.${fileExt}`
+    const filePath = `${path}/${fileName}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('program-images')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      })
+
+    if (uploadError) throw uploadError
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('program-images')
+      .getPublicUrl(filePath)
+
+    return publicUrl
+  } catch (err: any) {
+    console.error(`Error uploading ${path}:`, err)
+    throw new Error(`Erro ao fazer upload: ${err.message}`)
+  }
+}
+
 const handleSubmit = async () => {
   try {
     saving.value = true
-    
+
+    // 1. Upload image if selected
+    if (imageFile.value) {
+      const publicUrl = await uploadImage(imageFile.value, 'programs')
+      form.value.thumbnail_url = publicUrl
+      form.value.banner_url = publicUrl // Use the same image for both to ensure consistency
+    }
+
+    // 2. Save program data
     if (isEditMode.value) {
       await programsStore.updateProgram({
         id: route.params.id as string,
         ...form.value
       })
+      toast.success('Programa atualizado com sucesso!')
     } else {
       await programsStore.createProgram(form.value)
+      toast.success('Programa criado com sucesso!')
     }
 
     router.push('/admin/programas')
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error saving program:', error)
-    alert('Erro ao salvar o programa. Verifique o console para mais detalhes.')
+    toast.error(error.message || 'Erro ao salvar o programa. Verifique o console.')
   } finally {
     saving.value = false
   }
