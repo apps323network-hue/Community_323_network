@@ -1,6 +1,6 @@
 <template>
   <AppLayout hideSidebars fluid>
-    <div class="bg-background-dark min-h-screen flex flex-col text-white">
+    <div class="bg-slate-50 dark:bg-background-dark min-h-screen flex flex-col text-slate-900 dark:text-white">
       <!-- Loading State -->
       <div v-if="programsStore.loading" class="flex items-center justify-center h-[calc(100vh-80px)] gap-4">
         <div class="animate-spin rounded-full h-12 w-12 border-4 border-secondary border-t-transparent"></div>
@@ -21,10 +21,10 @@
         />
 
         <!-- Content Area -->
-        <main class="relative z-20 -mt-20 md:-mt-32 space-y-10 pl-4 md:pl-10 pb-20 max-w-[1800px] mx-auto w-full">
+        <main class="relative z-20 -mt-20 md:-mt-32 space-y-10 px-4 md:px-12 pb-20 w-full">
           <!-- Category Filters -->
           <div class="flex gap-3 overflow-x-auto py-4 scrollbar-hide pr-4 items-center">
-            <span class="text-white font-bold mr-2 whitespace-nowrap hidden md:block">Categorias:</span>
+            <span class="text-slate-900 dark:text-white font-bold mr-2 whitespace-nowrap hidden md:block">{{ t('programs.categories') }}:</span>
             <button
               v-for="category in categories"
               :key="category.value || 'all'"
@@ -32,8 +32,8 @@
               :class="[
                 'whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-all backdrop-blur-sm',
                 selectedCategory === category.value
-                  ? 'bg-white text-black font-bold hover:bg-white/90'
-                  : 'bg-black/40 border border-white/30 text-gray-200 hover:border-white hover:text-white'
+                  ? 'bg-slate-900 dark:bg-white text-white dark:text-black font-bold hover:bg-slate-800 dark:hover:bg-white/90'
+                  : 'bg-white/80 dark:bg-black/40 border border-slate-300 dark:border-white/30 text-slate-700 dark:text-gray-200 hover:border-slate-900 dark:hover:border-white hover:text-slate-900 dark:hover:text-white'
               ]"
             >
               {{ category.label }}
@@ -41,13 +41,13 @@
           </div>
 
           <!-- Search Bar (Compact) -->
-          <div class="hidden lg:flex h-9 items-center rounded-sm bg-black/50 border border-white/20 focus-within:border-white focus-within:bg-black transition-all w-64">
-            <div class="pl-2 pr-2 text-white">
+          <div class="hidden lg:flex h-9 items-center rounded-sm bg-white dark:bg-black/50 border border-slate-300 dark:border-white/20 focus-within:border-slate-900 dark:focus-within:border-white focus-within:bg-slate-50 dark:focus-within:bg-black transition-all w-64">
+            <div class="pl-2 pr-2 text-slate-600 dark:text-white">
               <span class="material-symbols-outlined text-[20px]">search</span>
             </div>
             <input
               v-model="searchQuery"
-              class="w-full bg-transparent border-none text-white placeholder-text-muted focus:ring-0 text-sm h-full"
+              class="w-full bg-transparent border-none text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-text-muted focus:ring-0 text-sm h-full"
               :placeholder="t('programs.searchPlaceholder')"
             />
           </div>
@@ -55,7 +55,7 @@
           <!-- Continue Watching (If enrolled in any) -->
           <ProgramCarousel
             v-if="enrolledPrograms.length > 0"
-            title="Continuar Assistindo"
+            :title="t('programs.continueWatching')"
             :programs="enrolledPrograms"
           />
 
@@ -71,7 +71,7 @@
             <!-- Courses -->
             <ProgramCarousel
               v-if="programsByCategory.curso.length"
-              :title="t('programs.filterCourse') + ' em Destaque'"
+              :title="t('programs.filterCourse') + ' ' + t('programs.featuredSuffix')"
               :programs="programsByCategory.curso"
             />
 
@@ -113,18 +113,18 @@
             <div class="bg-secondary/10 p-8 rounded-full mb-6">
               <span class="material-symbols-outlined text-7xl text-secondary">search_off</span>
             </div>
-            <h3 class="text-2xl font-black text-white mb-2">
+            <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-2">
               {{ t('programs.noProgramsFound') }}
             </h3>
-            <p class="text-gray-400 max-w-md mx-auto font-medium">
+            <p class="text-slate-600 dark:text-gray-400 max-w-md mx-auto font-medium">
               {{ t('programs.noProgramsFoundDesc') }}
             </p>
             <button
               v-if="searchQuery || selectedCategory"
               @click="clearFilters"
-              class="mt-8 px-8 py-3 bg-white/5 text-white font-black rounded-xl hover:bg-secondary hover:text-black transition-all"
+              class="mt-8 px-8 py-3 bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white font-black rounded-xl hover:bg-secondary hover:text-white dark:hover:text-black transition-all"
             >
-              Limpar Filtros
+              {{ t('programs.clearFilters') }}
             </button>
           </div>
         </main>
@@ -156,7 +156,7 @@ const featuredProgram = computed(() => {
 })
 
 const categories = computed(() => [
-  { value: null, label: 'Todos' },
+  { value: null, label: t('programs.all') },
   { value: 'curso', label: t('programs.filterCourse') },
   { value: 'mentoria', label: t('programs.filterMentoring') },
   { value: 'workshop', label: t('programs.filterWorkshop') },

@@ -5,14 +5,15 @@
       <PostForm v-if="isAuthenticated" @post-created="handlePostCreated" @event-created="handleEventCreated" />
       
       <!-- Guest Banner -->
-      <div v-else class="bg-gradient-to-r from-secondary/10 to-primary/10 border border-secondary/20 rounded-xl p-6 text-center">
-        <h3 class="text-xl font-bold text-white mb-2">Junte-se à Comunidade</h3>
-        <p class="text-gray-300 mb-4">Conecte-se com brasileiros nos EUA e compartilhe suas experiências</p>
+      <div v-else class="bg-gradient-to-r from-secondary/10 to-primary/10 border border-secondary/20 dark:border-white/5 rounded-2xl p-8 text-center shadow-premium dark:shadow-none">
+        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Junte-se à Comunidade</h3>
+        <p class="text-slate-600 dark:text-gray-300 mb-6 font-medium">Conecte-se com brasileiros nos EUA e compartilhe suas experiências</p>
         <button 
           @click="showAuthModal('signup')"
-          class="px-6 py-2 bg-gradient-to-r from-secondary to-primary text-white font-bold rounded-lg hover:shadow-lg transition-all"
+          class="px-8 py-3 bg-gradient-to-r from-secondary to-primary text-white font-black rounded-xl hover:shadow-lg transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-2 mx-auto"
         >
-          Criar Conta Grátis
+          {{ t('auth.register') || 'Criar Conta Grátis' }}
+          <span class="material-icons-outlined text-sm">arrow_forward</span>
         </button>
       </div>
 

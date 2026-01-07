@@ -7,7 +7,7 @@
           <div class="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
           <div class="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
-        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs animate-pulse">Carregando Programa...</p>
+        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs animate-pulse">{{ t('programs.loadingProgram') }}</p>
       </div>
 
       <!-- Program Content -->
@@ -50,14 +50,14 @@
                     </div>
                   </div>
                   <div>
-                    <p class="text-[8px] font-bold uppercase tracking-wider text-white/50 leading-none mb-1">Instrutor</p>
+                    <p class="text-[8px] font-bold uppercase tracking-wider text-white/50 leading-none mb-1">{{ t('programs.instructorLabel') }}</p>
                     <p class="font-bold text-xs md:text-base text-white">{{ program.instructor_name }}</p>
                   </div>
                 </div>
 
                 <div v-if="program.duration_hours" class="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-xl backdrop-blur-sm border border-white/5">
                   <span class="material-icons text-primary text-xs md:text-sm">schedule</span>
-                  <span class="font-bold text-[10px] md:text-sm">{{ program.duration_hours }} Horas</span>
+                  <span class="font-bold text-[10px] md:text-sm">{{ program.duration_hours }} {{ t('programs.hoursLabel') }}</span>
                 </div>
               </div>
             </div>
@@ -92,7 +92,7 @@
                   <div class="relative space-y-6">
                     <div class="text-center space-y-2">
                       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest">
-                        Melhor Oferta do Dia
+                        {{ t('programs.bestOffer') }}
                       </div>
                       <div class="flex justify-center items-baseline gap-1">
                         <span class="text-2xl font-black text-slate-900 dark:text-white leading-none">$</span>

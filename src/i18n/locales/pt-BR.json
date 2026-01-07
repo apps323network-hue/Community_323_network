@@ -1046,6 +1046,33 @@
         "noProgramsFoundDesc": "Não há programas disponíveis no momento.",
         "noEnrollmentsFound": "Você ainda não está matriculado em nenhum programa",
         "explorePrograms": "Explorar Programas",
+        "categories": "Categorias",
+        "all": "Todos",
+        "continueWatching": "Continuar Assistindo",
+        "featuredSuffix": "em Destaque",
+        "clearFilters": "Limpar Filtros",
+        "noPrograms": "Nenhum programa",
+        "loadingProgram": "Carregando Programa...",
+        "instructorLabel": "Instrutor",
+        "hoursLabel": "Horas",
+        "hoursOfContent": "h de conteúdo",
+        "bestOffer": "Melhor Oferta do Dia",
+        "badges": {
+            "new": "Novo",
+            "newUpper": "NOVO",
+            "featured": "DESTAQUE"
+        },
+        "categoryBadges": {
+            "curso": "Curso Premium",
+            "mentoria": "Mentoria Exclusiva",
+            "workshop": "Workshop Intensivo",
+            "evento_premium": "Evento Premium",
+            "servico_especializado": "Serviço Especializado"
+        },
+        "actions": {
+            "accessNow": "Acessar Agora",
+            "secureMySpot": "Quero Garantir Minha Vaga"
+        },
         "admin": {
             "createProgram": "Criar Programa",
             "editProgram": "Editar Programa",

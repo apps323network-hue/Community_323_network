@@ -1045,6 +1045,33 @@
         "noProgramsFoundDesc": "There are no programs available at the moment.",
         "noEnrollmentsFound": "You are not enrolled in any programs yet",
         "explorePrograms": "Explore Programs",
+        "categories": "Categories",
+        "all": "All",
+        "continueWatching": "Continue Watching",
+        "featuredSuffix": "Featured",
+        "clearFilters": "Clear Filters",
+        "noPrograms": "No programs",
+        "loadingProgram": "Loading Program...",
+        "instructorLabel": "Instructor",
+        "hoursLabel": "Hours",
+        "hoursOfContent": "h of content",
+        "bestOffer": "Best Offer of the Day",
+        "badges": {
+            "new": "New",
+            "newUpper": "NEW",
+            "featured": "FEATURED"
+        },
+        "categoryBadges": {
+            "curso": "Premium Course",
+            "mentoria": "Exclusive Mentoring",
+            "workshop": "Intensive Workshop",
+            "evento_premium": "Premium Event",
+            "servico_especializado": "Specialized Service"
+        },
+        "actions": {
+            "accessNow": "Access Now",
+            "secureMySpot": "Secure My Spot"
+        },
         "admin": {
             "createProgram": "Create Program",
             "editProgram": "Edit Program",

@@ -2,14 +2,14 @@
   <div class="space-y-3 group/row">
     <!-- Row Title -->
     <h3 
-      class="text-xl md:text-2xl font-bold text-gray-100 hover:text-secondary transition-colors flex items-center gap-2 cursor-pointer group-hover/row:text-secondary"
+      class="text-xl md:text-2xl font-bold text-slate-900 dark:text-gray-100 hover:text-primary dark:hover:text-secondary transition-colors flex items-center gap-2 cursor-pointer group-hover/row:text-primary dark:group-hover/row:text-secondary"
       @click="$emit('viewAll')"
     >
       {{ title }}
     </h3>
 
     <!-- Carousel Container -->
-    <div class="flex overflow-x-auto gap-6 md:gap-8 py-12 scrollbar-hide snap-x pr-10 pl-4">
+    <div class="flex overflow-x-auto gap-6 md:gap-8 py-12 scrollbar-hide snap-x px-1">
       <ProgramCard
         v-for="program in programs"
         :key="program.id"
@@ -26,9 +26,9 @@
       <!-- Empty State -->
       <div 
         v-if="programs.length === 0"
-        class="flex-none w-72 md:w-80 aspect-video rounded-md bg-gray-800/50 border border-white/5 flex items-center justify-center"
+        class="flex-none w-72 md:w-80 aspect-video rounded-md bg-slate-100 dark:bg-gray-800/50 border border-slate-200 dark:border-white/5 flex items-center justify-center"
       >
-        <span class="text-gray-500 text-sm">Nenhum programa</span>
+        <span class="text-slate-500 dark:text-gray-500 text-sm">{{ t('programs.noPrograms') }}</span>
       </div>
     </div>
   </div>
@@ -37,7 +37,10 @@
 <script setup lang="ts">
 import { useProgramsStore } from '@/stores/programs'
 import { useRouter } from 'vue-router'
+import { useLocale } from '@/composables/useLocale'
 import ProgramCard from './ProgramCard.vue'
+
+const { t } = useLocale()
 
 interface Props {
   title: string
@@ -67,11 +70,11 @@ function getBadge(program: any): string {
     const created = new Date(program.created_at)
     const now = new Date()
     const diffDays = (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)
-    if (diffDays < 30) return 'NOVO'
+    if (diffDays < 30) return t('programs.badges.newUpper')
   }
   
   // Check if featured
-  if (program.featured) return 'DESTAQUE'
+  if (program.featured) return t('programs.badges.featured')
   
   return ''
 }

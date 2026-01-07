@@ -1,5 +1,5 @@
 <template>
-  <div class="relative rounded-xl overflow-hidden shadow-2xl group cursor-pointer h-72 border border-gray-800 hover:border-secondary/30 transition-all">
+  <div class="relative rounded-2xl overflow-hidden shadow-premium hover:shadow-premium-hover group cursor-pointer h-72 border border-slate-200/60 dark:border-white/5 transition-all duration-300">
     <!-- Background Image -->
     <img
       v-if="event.image_url"

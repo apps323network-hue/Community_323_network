@@ -7,7 +7,7 @@
     @click="$emit('click')"
   >
     <div 
-      class="w-full h-full rounded-md overflow-hidden bg-gray-900 shadow-lg transition-all duration-300"
+      class="w-full h-full rounded-md overflow-hidden bg-slate-100 dark:bg-gray-900 shadow-lg transition-all duration-300"
       :class="hoverShadow"
     >
       <!-- Thumbnail -->
@@ -31,7 +31,7 @@
     <!-- Hover Overlay (Landscape) -->
     <div
       v-if="aspectRatio !== 'poster'"
-      class="absolute inset-0 flex flex-col justify-end p-4 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+      class="absolute inset-0 flex flex-col justify-end p-4 bg-gradient-to-t from-black via-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
     >
       <div class="flex gap-2 mb-2">
         <button 
@@ -55,11 +55,11 @@
       </div>
       <h4 class="font-bold text-white text-sm">{{ title }}</h4>
       <div class="flex items-center gap-2 text-[10px] font-medium text-green-400 mt-1">
-        <span v-if="isNew">Novo</span>
-        <span class="text-gray-300">{{ duration }}</span>
+        <span v-if="isNew" class="text-green-500">{{ t('programs.badges.new') }}</span>
+        <span class="text-slate-600 dark:text-gray-300">{{ duration }}</span>
       </div>
       <div class="flex items-center gap-2 mt-1 text-[10px] text-gray-400">
-        <span>{{ categoryLabel }}</span>
+        <span class="text-slate-500 dark:text-gray-400">{{ categoryLabel }}</span>
       </div>
     </div>
 

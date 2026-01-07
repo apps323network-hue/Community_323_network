@@ -10,17 +10,17 @@
         :style="{ backgroundImage: `url(${program.banner_url || program.thumbnail_url || '/program_placeholder.png'})` }"
       ></div>
       <!-- Gradient Overlays -->
-      <div class="absolute inset-0 bg-gradient-to-r from-background-dark via-background-dark/60 to-transparent"></div>
-      <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/10 to-transparent"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-slate-50 via-slate-50/60 to-transparent dark:from-background-dark dark:via-background-dark/60 dark:to-transparent"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-50 via-slate-50/10 to-transparent dark:from-background-dark dark:via-background-dark/10 dark:to-transparent"></div>
     </div>
 
     <!-- Content -->
-    <div class="relative z-10 w-full max-w-[1800px] mx-auto px-4 md:px-10 flex flex-col justify-center h-full pt-10 pb-20">
+    <div class="relative z-10 w-full px-4 md:px-12 flex flex-col justify-center h-full pt-10 pb-20">
       <div class="max-w-2xl animate-fade-in-up space-y-6">
         <!-- Category Badge -->
         <div class="flex items-center gap-2 mb-2">
           <div class="bg-gradient-to-r from-secondary to-primary w-1 h-10 rounded-full"></div>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-white font-black tracking-[0.2em] uppercase text-xl md:text-2xl drop-shadow-[0_0_10px_rgba(0,240,255,0.5)]">
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-primary dark:to-white font-black tracking-[0.2em] uppercase text-xl md:text-2xl drop-shadow-[0_0_10px_rgba(0,240,255,0.5)]">
             {{ getCategoryBadge(program.category) }}
           </span>
         </div>
@@ -40,7 +40,7 @@
 
         <!-- Meta Info -->
         <div class="flex items-center flex-wrap gap-4 text-sm md:text-base font-medium text-gray-200">
-          <span v-if="program.duration_hours">{{ program.duration_hours }}h de conteúdo</span>
+          <span v-if="program.duration_hours">{{ program.duration_hours }}{{ t('programs.hoursOfContent') }}</span>
           <span v-if="program.duration_hours && program.category" class="text-gray-400">•</span>
           <span>{{ getCategoryLabel(program.category) }}</span>
         </div>
@@ -59,7 +59,7 @@
             <span class="material-symbols-outlined text-3xl fill-current">
               {{ isEnrolled ? 'play_arrow' : 'shopping_cart' }}
             </span>
-            {{ isEnrolled ? 'Acessar Agora' : (isAuthenticated ? 'Quero Garantir Minha Vaga' : t('auth.login')) }}
+            {{ isEnrolled ? t('programs.actions.accessNow') : (isAuthenticated ? t('programs.actions.secureMySpot') : t('auth.login')) }}
           </button>
         </div>
       </div>
@@ -121,14 +121,8 @@ const getCategoryLabel = (catValue: string) => {
 }
 
 const getCategoryBadge = (catValue: string) => {
-  const badges: Record<string, string> = {
-    'curso': 'Curso Premium',
-    'mentoria': 'Mentoria Exclusiva',
-    'workshop': 'Workshop Intensivo',
-    'evento_premium': 'Evento Premium',
-    'servico_especializado': 'Serviço Especializado'
-  }
-  return badges[catValue] || 'Programa'
+  const badgeKey = `programs.categoryBadges.${catValue}` as any
+  return t(badgeKey)
 }
 </script>
 
