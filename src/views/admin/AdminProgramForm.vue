@@ -2,21 +2,32 @@
   <AdminLayout>
     <div class="space-y-6">
       <!-- Header -->
-      <div class="flex items-center gap-4">
-        <RouterLink
-          to="/admin/programas"
-          class="flex items-center justify-center p-2 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition"
-        >
-          <span class="material-icons">arrow_back</span>
-        </RouterLink>
-        <div>
-          <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
-            {{ isEditMode ? t('programs.admin.editProgram') : t('programs.admin.createProgram') }}
-          </h1>
-          <p class="text-slate-600 dark:text-gray-400 mt-1" v-if="isEditMode && form.title_pt">
-            Editando: {{ form.title_pt }}
-          </p>
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <RouterLink
+            to="/admin/programas"
+            class="flex items-center justify-center p-2 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition"
+          >
+            <span class="material-icons">arrow_back</span>
+          </RouterLink>
+          <div>
+            <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
+              {{ isEditMode ? t('programs.admin.editProgram') : t('programs.admin.createProgram') }}
+            </h1>
+            <p class="text-slate-600 dark:text-gray-400 mt-1" v-if="isEditMode && form.title_pt">
+              Editando: {{ form.title_pt }}
+            </p>
+          </div>
         </div>
+
+        <button
+          @click="handleSubmit"
+          :disabled="saving"
+          class="px-8 py-2.5 bg-primary dark:bg-secondary text-white font-bold rounded-lg hover:opacity-90 transition shadow-lg flex items-center gap-2"
+        >
+          <span v-if="saving" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+          {{ saving ? 'Salvando...' : (isEditMode ? 'Atualizar Programa' : 'Criar Programa') }}
+        </button>
       </div>
 
       <!-- Main Form Container -->
@@ -369,24 +380,7 @@
             </div>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="mt-8 flex justify-end gap-4 pt-6 border-t border-slate-200 dark:border-white/10">
-            <button
-              type="button"
-              @click="$router.push('/admin/programas')"
-              class="px-6 py-2.5 rounded-lg border border-slate-300 dark:border-white/10 text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              :disabled="saving"
-              class="px-8 py-2.5 bg-primary dark:bg-secondary text-white font-bold rounded-lg hover:opacity-90 transition shadow-lg flex items-center gap-2"
-            >
-              <span v-if="saving" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-              {{ saving ? 'Salvando...' : (isEditMode ? 'Atualizar Programa' : 'Criar Programa') }}
-            </button>
-          </div>
+
         </form>
       </div>
     </div>
