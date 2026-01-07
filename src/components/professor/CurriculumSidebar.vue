@@ -95,7 +95,7 @@
 <script setup lang="ts">
 import { useLocale } from '@/composables/useLocale'
 
-const props = defineProps<{
+defineProps<{
   modules: any[]
   selectedId: string | null
 }>()

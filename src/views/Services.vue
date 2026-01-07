@@ -341,7 +341,7 @@ function formatPrice(cents: number, currency: string = 'USD'): string {
 // Taxas Stripe (conforme GUIA_RAPIDO_STRIPE.md)
 const CARD_FEE_PERCENTAGE = 0.039 // 3.9%
 const CARD_FEE_FIXED = 30 // $0.30 em centavos
-const PIX_FEE_PERCENTAGE = 0.0179 // ~1.8%
+
 
 function calculateFee(basePriceCents: number, method: 'card' | 'pix'): number {
   if (method === 'card') {

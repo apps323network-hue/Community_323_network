@@ -48,9 +48,8 @@ interface Props {
   aspectRatio?: 'landscape' | 'poster'
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  aspectRatio: 'landscape'
-})
+defineProps<Props>()
+
 
 defineEmits<{
   viewAll: []

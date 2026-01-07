@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia'
 import { supabase } from '@/lib/supabase'
 import { logAdminAction } from '@/lib/auditLog'
 import { useAdminBaseStore } from './base'
-import type { AdminUser, UserStats, UserStatus } from '@/types/admin'
+import type { AdminUser, UserStats, UserStatus, UserRole } from '@/types/admin'
 
 export const useAdminUsersStore = defineStore('admin-users', () => {
   const baseStore = useAdminBaseStore()
@@ -342,7 +342,7 @@ export const useAdminUsersStore = defineStore('admin-users', () => {
   }
 
   // Atualizar cargo do usuário
-  async function updateUserRole(userId: string, role: string) {
+  async function updateUserRole(userId: string, role: UserRole) {
     if (!authStore.user) {
       throw new Error('Usuário não autenticado')
     }

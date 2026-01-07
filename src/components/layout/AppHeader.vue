@@ -627,6 +627,7 @@ import { useLocale } from '@/composables/useLocale'
 import { useSSO } from '@/composables/useSSO'
 import Avatar from '@/components/ui/Avatar.vue'
 import AnimatedThemeToggler from '@/components/ui/AnimatedThemeToggler.vue'
+import { usePublicAccess } from '@/composables/usePublicAccess'
 
 interface Props {
   showNavigation?: boolean
@@ -652,7 +653,6 @@ const showMobileLanguageMenu = ref(false)
 const userMenuContainer = ref<HTMLElement | null>(null)
 const userMenuContainerMobile = ref<HTMLElement | null>(null)
 const languageMenuContainer = ref<HTMLElement | null>(null)
-const languageMenuContainerMobile = ref<HTMLElement | null>(null)
 
 const userStore = useUserStore()
 

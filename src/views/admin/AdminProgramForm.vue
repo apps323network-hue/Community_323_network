@@ -696,7 +696,7 @@ const handleTestInvite = async () => {
 
   try {
     testingInvite.value = true
-    const { data, error } = await supabase.functions.invoke('classroom_invite', {
+    const { error } = await supabase.functions.invoke('classroom_invite', {
       body: {
         courseId: form.value.classroom_course_id,
         studentEmail: authStore.user.email

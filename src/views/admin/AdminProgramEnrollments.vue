@@ -237,7 +237,7 @@ import { toast } from 'vue-sonner'
 import type { Program, ProgramEnrollment, EnrollmentStatus } from '@/types/programs'
 
 const route = useRoute()
-const { t, locale: currentLocale } = useLocale()
+const { locale: currentLocale } = useLocale()
 const programsStore = useProgramsStore()
 
 const program = ref<Program | null>(null)

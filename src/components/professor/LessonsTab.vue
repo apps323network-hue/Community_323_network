@@ -4,7 +4,7 @@
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-black text-slate-900 dark:text-white">Aulas do Programa</h2>
       <button
-        @click="openCreateModal"
+        @click="openCreateModal()"
         class="flex items-center gap-2 px-6 py-3 bg-secondary text-black font-bold rounded-xl hover:bg-secondary/90 transition-all shadow-lg hover:shadow-secondary/20"
       >
         <span class="material-symbols-outlined">add</span>
