@@ -95,7 +95,7 @@
                   class="flex items-center gap-1 text-gray-400 mt-2"
                 >
                   <span class="material-icons text-[18px]">place</span>
-                  {{ [member.cidade, member.pais].filter(Boolean).join(', ') }}
+                  {{ [member.cidade, member.estado, member.pais, member.nacionalidade].filter(Boolean).join(', ') }}
                 </div>
               </div>
 
@@ -216,20 +216,20 @@
               </h3>
             </div>
             <p class="text-white text-lg font-semibold">
-              {{ [member.cidade, member.pais].filter(Boolean).join(', ') || 'Não informado' }}
+              {{ [member.cidade, member.estado, member.pais, member.nacionalidade].filter(Boolean).join(', ') || 'Não informado' }}
             </p>
           </div>
         </div>
 
         <!-- Contact & Social Section -->
-        <div v-if="member.whatsapp || member.linkedin" class="bg-card-dark rounded-xl p-6 border border-white/5 shadow-lg">
+        <div v-if="(member.show_whatsapp && member.whatsapp) || member.linkedin || (member.show_email && member.email)" class="bg-card-dark rounded-xl p-6 border border-white/5 shadow-lg">
           <h3 class="text-white font-bold mb-6 flex items-center gap-2 text-lg">
             <span class="material-icons text-secondary">link</span>
             <span>Redes Sociais e Contato</span>
           </h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <a
-              v-if="member.whatsapp"
+              v-if="member.show_whatsapp && member.whatsapp"
               :href="whatsappLink"
               target="_blank"
               rel="noopener noreferrer"
@@ -244,6 +244,7 @@
               </div>
               <span class="material-icons text-gray-400 group-hover:text-green-400 transition-colors">open_in_new</span>
             </a>
+            
             <a
               v-if="member.linkedin"
               :href="linkedinLink"
@@ -260,6 +261,38 @@
               </div>
               <span class="material-icons text-gray-400 group-hover:text-blue-400 transition-colors">open_in_new</span>
             </a>
+
+            <a
+              v-if="member.show_email && member.email"
+              :href="`mailto:${member.email}`"
+              class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-orange-500/10 to-orange-600/10 border border-orange-500/20 hover:border-orange-500/40 hover:bg-orange-500/20 transition-all group"
+            >
+              <div class="p-3 rounded-lg bg-orange-500/20 group-hover:bg-orange-500/30 transition-colors">
+                <span class="material-icons text-orange-400 text-2xl">mail</span>
+              </div>
+              <div class="flex-1">
+                <p class="text-gray-400 text-sm uppercase tracking-wide">Email</p>
+                <p class="text-white font-semibold truncate">{{ member.email }}</p>
+              </div>
+              <span class="material-icons text-gray-400 group-hover:text-orange-400 transition-colors">open_in_new</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Interests Section -->
+        <div v-if="member.tags && member.tags.length > 0" class="bg-card-dark rounded-xl p-6 border border-white/5 shadow-lg">
+          <h3 class="text-white font-bold mb-4 flex items-center gap-2 text-lg">
+            <span class="material-icons text-secondary">interests</span>
+            <span>Interesses</span>
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            <span
+              v-for="tag in member.tags"
+              :key="tag"
+              class="px-3 py-1.5 rounded-lg bg-secondary/10 border border-secondary/30 text-secondary text-sm font-medium"
+            >
+              #{{ tag }}
+            </span>
           </div>
         </div>
 
