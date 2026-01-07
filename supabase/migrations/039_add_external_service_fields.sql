@@ -25,3 +25,5 @@ COMMENT ON COLUMN public.services.sso_callback_path IS 'Caminho de callback no s
 CREATE INDEX IF NOT EXISTS idx_services_is_external ON public.services(is_external) WHERE is_external = TRUE;
 CREATE INDEX IF NOT EXISTS idx_services_sso_enabled ON public.services(sso_enabled) WHERE sso_enabled = TRUE;
 
+
+

@@ -22,3 +22,5 @@ COMMENT ON COLUMN public.profiles.role IS 'Role do usuário: user (padrão), par
 
 
 
+
+

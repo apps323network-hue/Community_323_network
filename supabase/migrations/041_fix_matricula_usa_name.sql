@@ -11,3 +11,5 @@ SELECT id, nome, is_external, external_url, sso_enabled
 FROM public.services
 WHERE nome = 'MatrículaUSA' AND is_external = true;
 
+
+

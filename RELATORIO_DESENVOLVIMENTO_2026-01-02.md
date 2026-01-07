@@ -538,3 +538,5 @@ A integração com MatrículaUSA está aguardando apenas a implementação da p�
 **Relatório gerado em**: 2026-01-02  
 **Próxima revisão**: Após implementação do callback no MatrículaUSA
 
+
+
