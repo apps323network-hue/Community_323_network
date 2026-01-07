@@ -1,5 +1,5 @@
 <template>
-  <Card variant="white" class="p-0 overflow-hidden shadow-sm hover:shadow-lg transition-shadow dark:bg-surface-dark dark:border-gray-800">
+  <Card variant="white" class="p-0 overflow-hidden shadow-premium hover:shadow-premium-hover transition-all duration-300 dark:bg-surface-dark dark:border-white/5 rounded-2xl">
     <!-- Pinned Badge -->
     <div v-if="post.fixado" class="px-5 pt-4 pb-2">
       <Badge variant="primary" size="sm">
@@ -13,7 +13,7 @@
       <div class="flex gap-3">
 
         <RouterLink :to="`/comunidade/${post.user_id}`" class="relative group no-underline">
-          <div class="absolute -inset-0.5 bg-gradient-to-b from-primary to-purple-600 rounded-full blur opacity-50 group-hover:opacity-100 transition-opacity"></div>
+          <div class="absolute -inset-0.5 bg-gradient-to-b from-primary to-purple-600 rounded-full blur opacity-20 dark:opacity-50 group-hover:opacity-100 transition-opacity"></div>
           <Avatar
             :src="authorAvatar"
             :name="authorName"

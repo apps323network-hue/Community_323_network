@@ -56,6 +56,7 @@
           @unban="handleUnban"
           @unsuspend="handleUnsuspend"
           @view-history="handleViewHistory"
+          @update-role="handleUpdateRole"
         />
       </div>
 
@@ -137,7 +138,7 @@ import AdminPendingUsersList from '@/components/admin/AdminPendingUsersList.vue'
 import AdminUsersList from '@/components/admin/AdminUsersList.vue'
 import UserApprovalModal from '@/components/admin/UserApprovalModal.vue'
 import Modal from '@/components/ui/Modal.vue'
-import type { AdminUser } from '@/types/admin'
+import type { AdminUser, UserRole } from '@/types/admin'
 import { toast } from 'vue-sonner'
 
 const router = useRouter()
@@ -301,6 +302,16 @@ function handleUnsuspend(_userId: string) {
 
 function handleViewHistory(userId: string) {
   router.push({ name: 'UserHistory', params: { userId } })
+}
+
+async function handleUpdateRole(userId: string, role: string) {
+  try {
+    await adminStore.updateUserRole(userId, role as UserRole)
+    toast.success('Cargo do usuário atualizado!')
+  } catch (error: any) {
+    toast.error(error.message || 'Erro ao atualizar cargo')
+    console.error('Error updating user role:', error)
+  }
 }
 
 onMounted(async () => {

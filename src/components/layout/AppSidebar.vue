@@ -1,14 +1,17 @@
 <template>
-  <aside class="lg:sticky lg:top-20 h-fit space-y-6">
-    <!-- Profile Card -->
-    <div class="bg-white dark:bg-surface-dark rounded-xl p-6 relative overflow-hidden shadow-xl border-t border-slate-200 dark:border-gray-800 group">
+  <aside class="lg:sticky lg:top-24 h-fit space-y-8">
+    <!-- Profile Card (Authenticated) -->
+    <div v-if="isAuthenticated" class="bg-white dark:bg-surface-dark rounded-2xl p-6 relative overflow-hidden shadow-premium dark:shadow-2xl border border-slate-200/60 dark:border-white/5 group">
       <!-- Neon glow effects -->
       <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full -mr-10 -mt-10 group-hover:bg-primary/20 transition-all duration-500"></div>
       <div class="absolute bottom-0 left-0 w-24 h-24 bg-secondary/10 blur-3xl rounded-full -ml-10 -mb-10 group-hover:bg-secondary/20 transition-all duration-500"></div>
       
       <div class="relative z-10">
         <h2 class="text-xl font-bold mb-1 text-slate-900 dark:text-white">{{ t('common.hello') }}, {{ userName }}!</h2>
-        <p class="text-sm text-slate-500 dark:text-gray-400 mb-6">{{ t('profile.memberSince') }} {{ memberSinceYear }}</p>
+        <div class="flex flex-col mb-6">
+          <p class="text-sm font-semibold text-primary dark:text-secondary">{{ userTitle }}</p>
+          <p class="text-xs text-slate-500 dark:text-gray-400">{{ t('profile.memberSince') }} {{ memberSinceYear }}</p>
+        </div>
         
         <button
           class="w-full bg-transparent border border-secondary text-secondary hover:bg-secondary hover:text-black font-bold py-2.5 px-4 rounded-lg transition-all shadow-lg shadow-secondary/10 hover:shadow-secondary/40"
@@ -19,8 +22,23 @@
       </div>
     </div>
 
+    <!-- Register CTA (Guest) -->
+    <div v-else class="bg-gradient-to-br from-indigo-900 via-slate-900 to-black rounded-xl p-6 relative overflow-hidden shadow-2xl border border-white/10 group">
+      <div class="absolute -top-10 -right-10 w-32 h-32 bg-secondary/20 blur-3xl rounded-full group-hover:bg-secondary/30 transition-all"></div>
+      <div class="relative z-10">
+        <h2 class="text-xl font-black text-white mb-2 leading-tight">Faça parte da Rede 323</h2>
+        <p class="text-sm text-gray-300 mb-6">Conecte-se, aprenda e cresça com brasileiros nos EUA.</p>
+        <button
+          class="w-full bg-gradient-to-r from-secondary to-primary text-white font-black py-3 px-4 rounded-lg transition-all shadow-lg hover:shadow-secondary/40 hover:scale-[1.02]"
+          @click="showAuthModal('signup')"
+        >
+          Criar Conta Grátis
+        </button>
+      </div>
+    </div>
+
     <!-- Navigation Menu Card -->
-    <div class="bg-white dark:bg-surface-dark rounded-xl p-4 shadow-xl border-t border-slate-200 dark:border-gray-800">
+    <div class="bg-white dark:bg-surface-dark rounded-2xl p-4 shadow-premium dark:shadow-2xl border border-slate-200/60 dark:border-white/5">
       <nav class="space-y-2">
         <RouterLink
           to="/"
@@ -98,6 +116,21 @@
           {{ t('navigation.savedEvents') }}
         </RouterLink>
         <RouterLink
+          to="/meus-programas"
+          class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all"
+          :class="$route.path === '/meus-programas' 
+            ? 'font-semibold bg-slate-100 dark:bg-surface-lighter text-primary dark:text-white border-l-4 border-secondary shadow-neon-blue/10' 
+            : 'text-slate-500 dark:text-gray-400 hover:bg-slate-50 dark:hover:bg-surface-lighter hover:text-slate-900 dark:hover:text-white group'"
+        >
+          <span 
+            class="material-icons-outlined mr-3 transition-colors"
+            :class="$route.path === '/meus-programas' ? 'text-secondary' : 'text-gray-500 group-hover:text-secondary'"
+          >
+            school
+          </span>
+          {{ t('programs.myPrograms') }}
+        </RouterLink>
+        <RouterLink
           to="/meus-pedidos"
           class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all"
           :class="$route.path === '/meus-pedidos' 
@@ -122,6 +155,17 @@
           </span>
           {{ t('navigation.benefits') }}
         </RouterLink>
+
+        <!-- Professor Area -->
+        <div v-if="isProfessor" class="pt-2 mt-2 border-t border-slate-100 dark:border-white/5">
+          <RouterLink
+            to="/professor"
+            class="flex items-center px-4 py-3 text-sm font-semibold rounded-lg bg-primary/10 dark:bg-secondary/10 text-primary dark:text-secondary hover:bg-primary/20 dark:hover:bg-secondary/20 transition-all"
+          >
+            <span class="material-icons-outlined mr-3">school</span>
+            {{ t('navigation.dashboardProfessor') }}
+          </RouterLink>
+        </div>
       </nav>
     </div>
   </aside>
@@ -133,6 +177,7 @@ import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/user'
+import { usePublicAccess } from '@/composables/usePublicAccess'
 
 defineEmits<{
   'edit-profile': []
@@ -141,6 +186,7 @@ defineEmits<{
 const authStore = useAuthStore()
 const userStore = useUserStore()
 const { t } = useI18n()
+const { isAuthenticated, showAuthModal } = usePublicAccess()
 
 // Pegar o primeiro nome do perfil, ou fallback para email
 const userName = computed(() => {
@@ -161,6 +207,14 @@ const memberSinceYear = computed(() => {
   }
   // Fallback para ano atual se não tiver created_at
   return new Date().getFullYear()
+})
+
+const isProfessor = computed(() => ['admin', 'professor'].includes(userStore.profile?.role || ''))
+
+const userTitle = computed(() => {
+  if (userStore.profile?.role === 'professor') return 'Professor'
+  if (userStore.profile?.role === 'admin') return 'Administrador'
+  return userStore.profile?.area_atuacao || 'Membro'
 })
 
 // Carregar perfil quando componente for montado

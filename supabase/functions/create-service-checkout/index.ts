@@ -64,15 +64,22 @@ Deno.serve(async (req) => {
         console.log(`Environment: ${isProduction ? 'PRODUCTION' : 'TEST'} (${siteUrl})`)
 
         // 5. Setup Stripe
-        const stripeKey = isProduction
-            ? Deno.env.get('STRIPE_SECRET_KEY_LIVE')
+        const origin = req.headers.get('origin') || ''
+        const isDevelopment = origin.includes('localhost') || origin.includes('127.0.0.1')
+
+        // Selecionar a chave do Stripe baseada no ambiente
+        const stripeKey = isDevelopment
+            ? Deno.env.get('STRIPE_TEST_SECRET_KEY')
             : Deno.env.get('STRIPE_SECRET_KEY')
 
         if (!stripeKey) {
-            throw new Error(`Stripe key not configured for ${isProduction ? 'production' : 'test'} environment`)
+            throw new Error(`Stripe Secret Key não configurada para o ambiente: ${isDevelopment ? 'TEST' : 'PROD'}`)
         }
 
-        const stripe = new Stripe(stripeKey, { apiVersion: '2023-10-16' })
+        const stripe = new Stripe(stripeKey, {
+            apiVersion: '2023-10-16',
+            httpClient: Stripe.createFetchHttpClient(),
+        })
 
         // 6. Buscar Serviço
         const { data: service, error: serviceError } = await supabase
@@ -98,8 +105,12 @@ Deno.serve(async (req) => {
                 throw new Error('Taxa de câmbio é obrigatória para PIX')
             }
             currency = 'brl'
-            const baseAmountBRL = (service.preco / 100) * exchange_rate
-            const grossAmountBRL = baseAmountBRL / (1 - PIX_FEE_PERCENTAGE)
+            // Fórmula: (Base USD * Taxa * 1.04) / (1 - 0.0179)
+            const RATE_MARGIN = 1.04
+            const rateWithMargin = exchange_rate * RATE_MARGIN
+            const netAmountBRL = (service.preco / 100) * rateWithMargin
+            const grossAmountBRL = netAmountBRL / (1 - PIX_FEE_PERCENTAGE)
+
             finalAmount = Math.round(grossAmountBRL * 100)
         } else {
             currency = 'usd'

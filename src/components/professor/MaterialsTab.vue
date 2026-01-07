@@ -1,0 +1,474 @@
+<template>
+  <div class="space-y-8">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3">
+          <span class="w-1.5 h-6 sm:h-8 bg-red-500 rounded-full"></span>
+          Materiais de Apoio
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-gray-400 font-medium mt-1">Gerencie arquivos PDF e documentos complementares</p>
+      </div>
+      <button
+        type="button"
+        @click.prevent="openUploadModal"
+        :disabled="modules.length === 0"
+        class="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white dark:bg-white dark:text-black font-black rounded-xl hover:scale-105 active:scale-95 transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
+      >
+        <span class="material-symbols-outlined text-lg">upload_file</span>
+        Novo Material
+      </button>
+    </div>
+
+    <!-- No modules state -->
+    <div v-if="modules.length === 0" class="text-center py-16 sm:py-24 bg-white dark:bg-surface-dark rounded-[32px] border border-slate-200 dark:border-white/5 shadow-xl">
+      <div class="bg-secondary/10 p-8 rounded-full w-fit mx-auto mb-6">
+        <span class="material-symbols-outlined text-5xl sm:text-6xl text-secondary">folder_open</span>
+      </div>
+      <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white mb-2">Crie módulos primeiro</h3>
+      <p class="text-slate-600 dark:text-gray-400 text-sm sm:text-base max-w-sm mx-auto px-4">
+        Você precisa organizar sua grade curricular antes de fazer o upload de materiais.
+      </p>
+    </div>
+
+    <!-- Hierarchical Materials List -->
+    <div v-else-if="materials.length === 0" class="text-center py-16 sm:py-24 bg-white dark:bg-surface-dark rounded-[32px] border border-slate-200 dark:border-white/5 shadow-xl">
+      <div class="bg-slate-100 dark:bg-white/5 p-8 rounded-full w-fit mx-auto mb-6">
+        <span class="material-symbols-outlined text-5xl sm:text-6xl text-slate-400">description</span>
+      </div>
+      <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white mb-2">Nenhum material ainda</h3>
+      <p class="text-slate-600 dark:text-gray-400 text-sm sm:text-base mb-6 max-w-sm mx-auto px-4">
+        Comece enviando PDFs, slides ou apostilas para enriquecer suas aulas.
+      </p>
+      <button
+        type="button"
+        @click.prevent="openUploadModal"
+        class="px-8 py-3 bg-secondary text-black font-black rounded-xl hover:bg-secondary/90 transition-all shadow-lg shadow-secondary/20 inline-flex items-center gap-2 text-xs sm:text-sm"
+      >
+        <span class="material-symbols-outlined text-lg">add_circle</span>
+        Upload do Primeiro Material
+      </button>
+    </div>
+
+    <!-- Hierarchical Accordion View -->
+    <div v-else class="space-y-4">
+      <!-- Module Groups -->
+      <div
+        v-for="module in modules"
+        :key="module.id"
+        class="bg-white dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-white/5 shadow-lg overflow-hidden"
+      >
+        <!-- Module Header -->
+        <button
+          type="button"
+          @click.prevent="toggleModule(module.id)"
+          class="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
+        >
+          <div class="flex items-center gap-4">
+            <div class="bg-secondary/10 p-2 rounded-lg">
+              <span class="material-symbols-outlined text-secondary">folder</span>
+            </div>
+            <div class="text-left">
+              <h3 class="text-base font-black text-slate-900 dark:text-white">{{ getModuleTitle(module) }}</h3>
+              <p class="text-xs text-slate-500 font-medium">{{ getModuleMaterialCount(module.id) }} materiais</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-slate-400 transition-transform" :class="{ 'rotate-180': expandedModules.includes(module.id) }">
+            expand_more
+          </span>
+        </button>
+
+        <!-- Module Content (Lessons + Materials) -->
+        <div v-show="expandedModules.includes(module.id)" class="border-t border-slate-200 dark:border-white/10">
+          <!-- Module-level materials -->
+          <div v-if="getModuleLevelMaterials(module.id).length > 0" class="p-4 bg-slate-50/50 dark:bg-black/10">
+            <p class="text-xs font-black text-slate-500 uppercase tracking-wider mb-3 px-2">Materiais do Módulo</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <MaterialCard
+                v-for="material in getModuleLevelMaterials(module.id)"
+                :key="material.id"
+                :material="material"
+                @download="downloadMaterial"
+                @delete="confirmDelete"
+              />
+            </div>
+          </div>
+
+          <!-- Lessons with materials -->
+          <div class="divide-y divide-slate-200 dark:divide-white/5">
+            <div
+              v-for="lesson in getModuleLessons(module.id)"
+              :key="lesson.id"
+              class="p-4"
+            >
+              <div class="flex items-center gap-3 mb-3">
+                <span class="material-symbols-outlined text-primary text-sm">play_circle</span>
+                <h4 class="text-sm font-bold text-slate-700 dark:text-gray-300">{{ getLessonTitle(lesson) }}</h4>
+                <span class="text-xs text-slate-400 font-medium">({{ getLessonMaterialCount(lesson.id) }})</span>
+              </div>
+              <div v-if="getLessonMaterials(lesson.id).length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-3 pl-6">
+                <MaterialCard
+                  v-for="material in getLessonMaterials(lesson.id)"
+                  :key="material.id"
+                  :material="material"
+                  @download="downloadMaterial"
+                  @delete="confirmDelete"
+                />
+              </div>
+              <p v-else class="text-xs text-slate-400 italic pl-6">Nenhum material nesta aula</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- General materials (not attached to any module) -->
+      <div v-if="getGeneralMaterials().length > 0" class="bg-white dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-white/5 shadow-lg p-6">
+        <h3 class="text-base font-black text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-slate-400">description</span>
+          Materiais Gerais
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <MaterialCard
+            v-for="material in getGeneralMaterials()"
+            :key="material.id"
+            :material="material"
+            @download="downloadMaterial"
+            @delete="confirmDelete"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div
+      v-if="showModal"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      @click.self="closeModal"
+    >
+      <div class="bg-white dark:bg-surface-dark rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 dark:border-white/10">
+        <div class="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
+          <h3 class="text-xl font-black text-slate-900 dark:text-white">Upload de Material</h3>
+          <button
+            type="button"
+            @click="closeModal"
+            class="text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+          >
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div class="p-6 space-y-6">
+          <!-- File Upload -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2">
+              Arquivo PDF *
+            </label>
+            <input
+              type="file"
+              accept=".pdf"
+              @change="handleFileSelect"
+              required
+              class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-slate-900 dark:text-white focus:ring-2 focus:ring-secondary outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-secondary/10 file:text-secondary hover:file:bg-secondary/20"
+            />
+            <p class="text-xs text-slate-500 dark:text-gray-400 mt-2">
+              Máximo 10MB por arquivo
+            </p>
+          </div>
+
+          <!-- Title PT -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2">
+              Título (Português) *
+            </label>
+            <input
+              v-model="formData.title_pt"
+              type="text"
+              required
+              class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-slate-900 dark:text-white focus:ring-2 focus:ring-secondary outline-none transition-all"
+              placeholder="Ex: Slides da Aula 1"
+            />
+          </div>
+
+          <!-- Title EN -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2">
+              Título (Inglês) *
+            </label>
+            <input
+              v-model="formData.title_en"
+              type="text"
+              required
+              class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-slate-900 dark:text-white focus:ring-2 focus:ring-secondary outline-none transition-all"
+              placeholder="Ex: Lesson 1 Slides"
+            />
+          </div>
+
+          <!-- Module Selection -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2">
+              Vincular ao Módulo *
+            </label>
+            <select
+              v-model="formData.module_id"
+              @change="handleModuleChange"
+              required
+              class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-slate-900 dark:text-white focus:ring-2 focus:ring-secondary outline-none transition-all"
+            >
+              <option value="">Selecione um módulo</option>
+              <option v-for="module in modules" :key="module.id" :value="module.id">
+                {{ getModuleTitle(module) }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Lesson Selection (optional, shown when module is selected) -->
+          <div v-if="formData.module_id">
+            <label class="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2">
+              Vincular à Aula (Opcional)
+            </label>
+            <select
+              v-model="formData.lesson_id"
+              class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-slate-900 dark:text-white focus:ring-2 focus:ring-secondary outline-none transition-all"
+            >
+              <option value="">Material do módulo (não vinculado a aula específica)</option>
+              <option v-for="lesson in getModuleLessons(formData.module_id)" :key="lesson.id" :value="lesson.id">
+                {{ getLessonTitle(lesson) }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center justify-end gap-4 pt-4 border-t border-slate-200 dark:border-white/10">
+            <button
+              type="button"
+              @click="closeModal"
+              class="px-6 py-3 bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-white/10 transition-all"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              @click="uploadMaterial"
+              :disabled="modulesStore.loading || !selectedFile"
+              class="px-6 py-3 bg-secondary text-black font-bold rounded-xl hover:bg-secondary/90 transition-all shadow-lg hover:shadow-secondary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ modulesStore.loading ? 'Enviando...' : 'Upload Material' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div
+    v-if="showDeleteModal"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    @click.self="handleDeleteCancel"
+  >
+    <div class="bg-white dark:bg-surface-dark rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 dark:border-white/10">
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-white/10">
+        <h3 class="text-xl font-black text-slate-900 dark:text-white">Confirmar Exclusão</h3>
+      </div>
+
+      <div class="p-6">
+        <div class="bg-red-500/10 p-4 rounded-xl mb-4 flex items-start gap-3">
+          <span class="material-symbols-outlined text-red-500 text-2xl">warning</span>
+          <div>
+            <p class="text-sm font-bold text-slate-900 dark:text-white mb-1">Esta ação não pode ser desfeita</p>
+            <p class="text-xs text-slate-600 dark:text-gray-400">
+              O material será permanentemente removido do sistema.
+            </p>
+          </div>
+        </div>
+        
+        <p class="text-sm text-slate-700 dark:text-gray-300">
+          Deseja realmente excluir o material <span class="font-bold">"{{ materialToDelete ? (currentLocale === 'pt-BR' ? materialToDelete.title_pt : materialToDelete.title_en) : '' }}"</span>?
+        </p>
+      </div>
+
+      <div class="px-6 py-4 border-t border-slate-200 dark:border-white/10 flex items-center justify-end gap-3">
+        <button
+          type="button"
+          @click.prevent="handleDeleteCancel"
+          class="px-6 py-2.5 bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-white/10 transition-all"
+        >
+          Cancelar
+        </button>
+        <button
+          @click="handleDeleteConfirm"
+          :disabled="modulesStore.loading"
+          type="button"
+          class="px-6 py-2.5 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        >
+          <span class="material-symbols-outlined text-sm">delete</span>
+          {{ modulesStore.loading ? 'Excluindo...' : 'Excluir Material' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { useLocale } from '@/composables/useLocale'
+import { useModulesStore } from '@/stores/modules'
+import type { ProgramModule, ProgramMaterial } from '@/types/modules'
+import MaterialCard from './MaterialCard.vue'
+
+const props = defineProps<{
+  programId: string
+}>()
+
+const { locale: currentLocale } = useLocale()
+const modulesStore = useModulesStore()
+
+const showModal = ref(false)
+const selectedFile = ref<File | null>(null)
+const expandedModules = ref<string[]>([])
+const showDeleteModal = ref(false)
+const materialToDelete = ref<ProgramMaterial | null>(null)
+const formData = ref({
+  title_pt: '',
+  title_en: '',
+  module_id: '',
+  lesson_id: ''
+})
+
+const modules = computed(() => modulesStore.getModulesByProgram(props.programId))
+const materials = computed(() => modulesStore.materials)
+
+const getModuleTitle = (module: ProgramModule) => {
+  return currentLocale.value === 'pt-BR' ? module.title_pt : module.title_en
+}
+
+const getLessonTitle = (lesson: any) => {
+  return currentLocale.value === 'pt-BR' ? lesson.title_pt : lesson.title_en
+}
+
+const getModuleLessons = (moduleId: string) => {
+  const module = modules.value.find(m => m.id === moduleId)
+  return module?.lessons || []
+}
+
+const getModuleLevelMaterials = (moduleId: string) => {
+  return materials.value.filter(m => m.module_id === moduleId && !m.lesson_id)
+}
+
+const getLessonMaterials = (lessonId: string) => {
+  return materials.value.filter(m => m.lesson_id === lessonId)
+}
+
+const getGeneralMaterials = () => {
+  return materials.value.filter(m => !m.module_id && !m.lesson_id)
+}
+
+const getModuleMaterialCount = (moduleId: string) => {
+  const moduleMaterials = getModuleLevelMaterials(moduleId).length
+  const lessons = getModuleLessons(moduleId)
+  const lessonMaterials = lessons.reduce((sum, lesson) => sum + getLessonMaterials(lesson.id).length, 0)
+  return moduleMaterials + lessonMaterials
+}
+
+const getLessonMaterialCount = (lessonId: string) => {
+  return getLessonMaterials(lessonId).length
+}
+
+function toggleModule(moduleId: string) {
+  const index = expandedModules.value.indexOf(moduleId)
+  if (index > -1) {
+    expandedModules.value.splice(index, 1)
+  } else {
+    expandedModules.value.push(moduleId)
+  }
+}
+
+function handleFileSelect(event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files.length > 0) {
+    selectedFile.value = target.files[0]
+  }
+}
+
+function handleModuleChange() {
+  formData.value.lesson_id = ''
+}
+
+function openUploadModal() {
+  formData.value = {
+    title_pt: '',
+    title_en: '',
+    module_id: '',
+    lesson_id: ''
+  }
+  selectedFile.value = null
+  showModal.value = true
+}
+
+function closeModal() {
+  showModal.value = false
+  selectedFile.value = null
+}
+
+async function uploadMaterial() {
+  if (!selectedFile.value) return
+
+  try {
+    const nextOrder = materials.value.length
+    await modulesStore.uploadMaterial(
+      selectedFile.value,
+      props.programId,
+      formData.value.lesson_id || null,
+      formData.value.module_id || null,
+      {
+        ...formData.value,
+        order_index: nextOrder
+      }
+    )
+    closeModal()
+    await modulesStore.fetchMaterials(props.programId)
+  } catch (error) {
+    console.error('Error uploading material:', error)
+  }
+}
+
+async function downloadMaterial(material: ProgramMaterial) {
+  try {
+    const url = await modulesStore.getMaterialDownloadUrl(material.file_path)
+    if (url) {
+      window.open(url, '_blank')
+    }
+  } catch (error) {
+    console.error('Error downloading material:', error)
+  }
+}
+
+function confirmDelete(material: ProgramMaterial) {
+  materialToDelete.value = material
+  showDeleteModal.value = true
+}
+
+async function handleDeleteConfirm() {
+  if (!materialToDelete.value) return
+  
+  try {
+    await modulesStore.deleteMaterial(materialToDelete.value.id, materialToDelete.value.file_path)
+    showDeleteModal.value = false
+    materialToDelete.value = null
+  } catch (error) {
+    console.error('Error deleting material:', error)
+  }
+}
+
+function handleDeleteCancel() {
+  showDeleteModal.value = false
+  materialToDelete.value = null
+}
+
+onMounted(async () => {
+  await modulesStore.fetchModulesWithLessons(props.programId)
+  await modulesStore.fetchMaterials(props.programId)
+  // Expand all modules by default
+  expandedModules.value = modules.value.map(m => m.id)
+})
+</script>

@@ -71,6 +71,7 @@ export const useAdminStore = defineStore('admin', () => {
     rejectUser: usersStore.rejectUser,
     banUser: usersStore.banUser,
     unbanUser: usersStore.unbanUser,
+    updateUserRole: usersStore.updateUserRole,
     fetchUserStats: usersStore.fetchUserStats,
 
     // Posts

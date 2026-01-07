@@ -1,13 +1,8 @@
 <template>
   <header
-    class="sticky top-0 z-50 bg-white/90 dark:bg-surface-dark/90 backdrop-blur-md border-b border-slate-200 dark:border-gray-800/50 shadow-sm w-full"
+    class="sticky top-0 z-50 bg-white/95 dark:bg-surface-dark/95 backdrop-blur-md border-b border-slate-200/60 dark:border-white/10 shadow-premium dark:shadow-none w-full"
   >
-    <nav :class="[
-      'w-full mx-auto px-4 sm:px-6 lg:px-8',
-      (route.path === '/' || route.path === '/comunidade' || route.path.startsWith('/comunidade/') || route.path === '/servicos' || route.path === '/beneficios' || route.path === '/eventos' || route.path.startsWith('/eventos/') || route.path === '/perfil')
-        ? 'max-w-[1400px]'
-        : 'max-w-7xl'
-    ]">
+    <nav class="w-full mx-auto px-4 sm:px-6 lg:px-8 max-w-[1440px]">
       <div class="flex items-center justify-between h-20">
         <!-- Logo -->
         <RouterLink v-if="props.showLogo" to="/" class="flex-shrink-0 flex items-center gap-2 cursor-pointer group">
@@ -92,6 +87,25 @@
               ></span>
             </RouterLink>
             <RouterLink
+              to="/programas"
+              class="relative px-3 py-2 text-sm font-medium transition-colors group"
+              :class="
+                route.path === '/programas' || route.path.startsWith('/programas/')
+                  ? 'text-slate-900 dark:text-white'
+                  : 'text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary'
+              "
+            >
+              {{ t('navigation.programs') }}
+              <span
+                v-if="route.path === '/programas' || route.path.startsWith('/programas/')"
+                class="absolute bottom-0 left-0 w-full h-0.5 bg-primary dark:bg-secondary transform scale-x-100 transition-transform"
+              ></span>
+              <span
+                v-else
+                class="absolute bottom-0 left-0 w-full h-0.5 bg-primary dark:bg-secondary transform scale-x-0 group-hover:scale-x-100 transition-transform"
+              ></span>
+            </RouterLink>
+            <RouterLink
               to="/servicos"
               class="relative px-3 py-2 text-sm font-medium transition-colors group"
               :class="
@@ -132,10 +146,24 @@
           </div>
         </div>
 
-        <!-- Mobile Menu - Notifications, User -->
-        <div v-if="props.showNavigation" class="md:hidden flex items-center gap-3">
-          <!-- Notifications Mobile -->
-          <NotificationsDropdown />
+        <!-- Auth Actions - Desktop -->
+        <div v-if="!isAuthenticated && props.showNavigation" class="hidden md:flex items-center gap-3">
+          <button
+            @click="showAuthModal('login')"
+            class="px-4 py-2 text-sm font-bold text-slate-600 dark:text-gray-300 hover:text-primary dark:hover:text-secondary transition-colors"
+          >
+            {{ t('auth.login') || 'Entrar' }}
+          </button>
+          <button
+            @click="showAuthModal('signup')"
+            class="px-5 py-2 text-sm font-bold bg-gradient-to-r from-secondary to-primary text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+          >
+            {{ t('auth.register') || 'Cadastrar' }}
+          </button>
+        </div>
+
+        <!-- Mobile Menu - User -->
+        <div v-if="isAuthenticated && props.showNavigation" class="md:hidden flex items-center gap-3">
           
           <!-- User Menu Mobile -->
           <div class="relative" ref="userMenuContainerMobile">
@@ -205,6 +233,14 @@
                   >
                     <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
                     {{ t('navigation.myServices') }}
+                  </RouterLink>
+                  <RouterLink
+                    to="/meus-programas"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-surface-lighter transition-colors"
+                    @click="showUserMenu = false"
+                  >
+                    <span class="material-symbols-outlined text-[20px]">school</span>
+                    {{ t('programs.myPrograms') }}
                   </RouterLink>
                   <RouterLink
                     to="/perfil"
@@ -303,6 +339,31 @@
                   <!-- Divider -->
                   <div class="border-t border-slate-200 dark:border-white/10 mt-2"></div>
                   
+                  <!-- American Dream Link -->
+                  <button
+                    @click="goToAmericanDream"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-surface-lighter transition-colors w-full text-left"
+                    @click.stop="showUserMenu = false"
+                  >
+                    <span class="material-symbols-outlined text-[20px]">launch</span>
+                    {{ t('navigation.americanDream') }}
+                  </button>
+                  
+                  <!-- Divider -->
+                  <div class="border-t border-slate-200 dark:border-white/10 mt-2"></div>
+                  
+                  <!-- Dashboard Professor (para profs e admins) -->
+                  <div v-if="isProfessor" class="border-t border-slate-200 dark:border-white/10 mt-1 pt-1">
+                    <RouterLink
+                      to="/professor"
+                      class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-primary dark:text-secondary hover:bg-primary/10 dark:hover:bg-secondary/10 transition-colors"
+                      @click="showUserMenu = false"
+                    >
+                      <span class="material-symbols-outlined text-[20px]">school</span>
+                      {{ t('navigation.dashboardProfessor') }}
+                    </RouterLink>
+                  </div>
+
                   <!-- Dashboard Admin (apenas para admins) -->
                   <div v-if="isAdmin" class="border-t border-slate-200 dark:border-white/10 mt-1 pt-1">
                     <RouterLink
@@ -427,9 +488,8 @@
             </Transition>
           </div>
           
-          <!-- Notifications and User Menu (only when logged in) -->
-          <template v-if="props.showNavigation">
-            <NotificationsDropdown />
+          <!-- User Menu (only when logged in) -->
+          <template v-if="isAuthenticated && props.showNavigation">
             <div class="relative group cursor-pointer" ref="userMenuContainer">
             <div class="flex items-center gap-2 lg:gap-3" @click.stop="toggleUserMenu">
               <div class="relative">
@@ -485,6 +545,14 @@
                     {{ t('navigation.myServices') }}
                   </RouterLink>
                   <RouterLink
+                    to="/meus-programas"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-surface-lighter transition-colors"
+                    @click="showUserMenu = false"
+                  >
+                    <span class="material-symbols-outlined text-[20px]">school</span>
+                    {{ t('programs.myPrograms') }}
+                  </RouterLink>
+                  <RouterLink
                     to="/perfil"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-surface-lighter transition-colors"
                     @click="showUserMenu = false"
@@ -508,6 +576,18 @@
                     <span class="material-symbols-outlined text-[20px]">bookmark</span>
                     {{ t('navigation.savedPosts') }}
                   </RouterLink>
+                  <!-- Dashboard Professor (para profs e admins) -->
+                  <div v-if="isProfessor" class="border-t border-slate-200 dark:border-white/10 mt-1 pt-1">
+                    <RouterLink
+                      to="/professor"
+                      class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-primary dark:text-secondary hover:bg-primary/10 dark:hover:bg-secondary/10 transition-colors"
+                      @click="showUserMenu = false"
+                    >
+                      <span class="material-symbols-outlined text-[20px]">school</span>
+                      {{ t('navigation.dashboardProfessor') }}
+                    </RouterLink>
+                  </div>
+
                   <!-- Dashboard Admin (apenas para admins) -->
                   <div v-if="isAdmin" class="border-t border-slate-200 dark:border-white/10 mt-1 pt-1">
                     <RouterLink
@@ -547,7 +627,7 @@ import { useLocale } from '@/composables/useLocale'
 import { useSSO } from '@/composables/useSSO'
 import Avatar from '@/components/ui/Avatar.vue'
 import AnimatedThemeToggler from '@/components/ui/AnimatedThemeToggler.vue'
-import NotificationsDropdown from '@/components/layout/NotificationsDropdown.vue'
+import { usePublicAccess } from '@/composables/usePublicAccess'
 
 interface Props {
   showNavigation?: boolean
@@ -562,6 +642,7 @@ const props = withDefaults(defineProps<Props>(), {
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const { isAuthenticated, showAuthModal } = usePublicAccess()
 const { locale: currentLocale, setLocale, availableLocales, t } = useLocale()
 const { redirectToAmericanDream } = useSSO()
 // Theme toggle is now handled by AnimatedThemeToggler component
@@ -572,7 +653,6 @@ const showMobileLanguageMenu = ref(false)
 const userMenuContainer = ref<HTMLElement | null>(null)
 const userMenuContainerMobile = ref<HTMLElement | null>(null)
 const languageMenuContainer = ref<HTMLElement | null>(null)
-const languageMenuContainerMobile = ref<HTMLElement | null>(null)
 
 const userStore = useUserStore()
 
@@ -581,8 +661,13 @@ const userAvatar = computed(
   () => userStore.profile?.avatar_url || authStore.user?.user_metadata?.avatar_url || ''
 )
 const userDisplayName = computed(() => userStore.profile?.nome || userName.value)
-const userTitle = computed(() => userStore.profile?.area_atuacao || 'Membro')
+const userTitle = computed(() => {
+  if (userStore.profile?.role === 'professor') return 'Professor'
+  if (userStore.profile?.role === 'admin') return 'Administrador'
+  return userStore.profile?.area_atuacao || 'Membro'
+})
 const isAdmin = computed(() => userStore.profile?.role === 'admin')
+const isProfessor = computed(() => ['admin', 'professor'].includes(userStore.profile?.role || ''))
 
 function toggleUserMenu() {
   showUserMenu.value = !showUserMenu.value

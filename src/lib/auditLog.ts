@@ -27,6 +27,7 @@ export type AdminAction =
     | 'unban_user'
     | 'suspend_user'
     | 'unsuspend_user'
+    | 'update_user_role'
     | 'add_strike'
     // Post actions
     | 'approve_post'
@@ -223,6 +224,7 @@ export const actionLabels: Record<AdminAction, string> = {
     reject_user: 'Usuário Rejeitado',
     ban_user: 'Usuário Banido',
     unban_user: 'Usuário Desbanido',
+    update_user_role: 'Cargo Alterado',
     suspend_user: 'Usuário Suspenso',
     unsuspend_user: 'Suspensão Removida',
     add_strike: 'Strike Adicionado',
