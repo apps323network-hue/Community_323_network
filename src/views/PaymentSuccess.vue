@@ -104,10 +104,6 @@
           <span v-else>Estamos validando sua transação com a operadora.</span>
           Isso geralmente leva menos de um minuto. Não feche esta página.
         </p>
-        <div class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
-           <div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-           <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sincronizando com Stripe Dashboard</span>
-        </div>
       </div>
 
       <!-- Error/Failed State -->

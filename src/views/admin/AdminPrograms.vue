@@ -8,7 +8,7 @@
             {{ t('programs.admin.programList') }}
           </h1>
           <p class="text-slate-600 dark:text-gray-400 mt-1">
-            Gerencie todos os cursos, mentorias e workshops da plataforma
+            Gerencie todos os conteúdos, mentorias e workshops da plataforma
           </p>
         </div>
         <RouterLink
@@ -47,7 +47,7 @@
           class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none"
         >
           <option value="all">Todas as Categorias</option>
-          <option value="curso">Cursos</option>
+          <option value="curso">Conteúdo</option>
           <option value="mentoria">Mentorias</option>
           <option value="workshop">Workshops</option>
           <option value="evento_premium">Eventos Premium</option>
