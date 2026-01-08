@@ -12,7 +12,7 @@
           </p>
         </div>
         <RouterLink
-          to="/admin/programas/criar"
+          to="/admin/programs/criar"
           class="flex items-center gap-2 px-6 py-3 bg-primary dark:bg-secondary text-white rounded-xl font-bold shadow-lg hover:shadow-primary/25 dark:hover:shadow-secondary/25 transition-all hover:-translate-y-0.5"
         >
           <span class="material-icons">add</span>
@@ -134,14 +134,14 @@
                 <td class="p-4 text-right">
                   <div class="flex items-center justify-end gap-2">
                     <RouterLink
-                      :to="`/admin/programas/${program.id}/matriculas`"
+                      :to="`/admin/programs/${program.id}/matriculas`"
                       class="p-2 text-slate-500 hover:text-primary dark:hover:text-secondary bg-slate-100 dark:bg-white/5 rounded-lg hover:bg-white dark:hover:bg-white/10 transition-all border border-transparent hover:border-slate-200 dark:hover:border-white/10"
                       title="Matrículas"
                     >
                       <span class="material-icons text-sm">people</span>
                     </RouterLink>
                     <RouterLink
-                      :to="`/admin/programas/${program.id}/editar`"
+                      :to="`/admin/programs/${program.id}/editar`"
                       class="p-2 text-slate-500 hover:text-blue-500 bg-slate-100 dark:bg-white/5 rounded-lg hover:bg-white dark:hover:bg-white/10 transition-all border border-transparent hover:border-slate-200 dark:hover:border-white/10"
                       title="Editar"
                     >

@@ -5,7 +5,7 @@
       <div class="flex items-center justify-between gap-4">
         <div class="flex items-center gap-4">
           <RouterLink
-            to="/admin/programas"
+            to="/admin/programs"
             class="flex items-center justify-center p-2 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition"
           >
             <span class="material-icons">arrow_back</span>
@@ -506,7 +506,7 @@ onMounted(async () => {
       await modulesStore.fetchMaterials(programId)
     } else {
       // Handle not found
-      router.push('/admin/programas')
+      router.push('/admin/programs')
     }
   }
 })
@@ -689,7 +689,7 @@ const handleSubmit = async () => {
       toast.success('Programa criado com sucesso!')
     }
 
-    router.push('/admin/programas')
+    router.push('/admin/programs')
   } catch (error: any) {
     console.error('Error saving program:', error)
     toast.error(error.message || 'Erro ao salvar o programa. Verifique o console.')
