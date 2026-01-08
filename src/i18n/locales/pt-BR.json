@@ -96,6 +96,7 @@
             "processing": "Processando autenticação...",
             "pleaseWait": "Por favor, aguarde"
         },
+        "loginRequired": "Faça login para acessar este serviço",
         "iAm": "Eu sou...",
         "selectPlaceholder": "Selecione...",
         "createAccount": "Criar Conta",
@@ -326,6 +327,10 @@
         "contract": "Contratar",
         "request": "Solicitar",
         "contracting": "Você está contratando",
+        "contractService": "Contratar Serviço",
+        "requestSupport": "Solicitar Suporte",
+        "accessService": "Acessar Serviço",
+        "redirecting": "Redirecionando...",
         "requesting": "Você está solicitando atendimento para",
         "partnerContact": "O parceiro responsável entrará em contato em breve.",
         "serviceValue": "Valor do serviço",

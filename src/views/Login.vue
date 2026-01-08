@@ -23,12 +23,21 @@
       ></div>
       <div class="relative z-10 flex flex-col items-center text-center max-w-lg">
         <div class="mb-10">
-            <img
-              alt="323 Network Logo"
-              class="w-56 h-auto object-contain drop-shadow-lg"
+          <img
+            alt="323 Network Logo"
+            class="w-56 h-auto object-contain drop-shadow-lg"
             src="/logo-removebg-preview.png"
-            />
+          />
+          <!-- American Dream - Minimalista abaixo da logo -->
+          <div v-if="source === 'american-dream'" class="mt-4">
+            <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-100/50 dark:bg-slate-800/30 border border-slate-200/50 dark:border-slate-700/50">
+              <div class="w-2 h-2 rounded-full bg-primary dark:bg-secondary"></div>
+              <span class="text-sm font-medium text-slate-600 dark:text-slate-400 tracking-wide">
+                American Dream
+              </span>
+            </div>
           </div>
+        </div>
         <h1 class="text-5xl font-black text-slate-900 dark:text-white mb-6 leading-tight tracking-tight">
           {{ t('auth.tagline') }} <br />
           <span
@@ -54,12 +63,21 @@
       ></div>
       <div class="w-full max-w-md space-y-8 relative z-10">
         <!-- Logo Mobile -->
-        <div class="lg:hidden flex justify-center mb-6">
+        <div class="lg:hidden flex flex-col items-center mb-6">
           <img
             alt="323 Network Logo"
             class="w-40 h-auto object-contain drop-shadow-lg"
             src="/logo-removebg-preview.png"
           />
+          <!-- American Dream - Minimalista abaixo da logo (mobile) -->
+          <div v-if="source === 'american-dream'" class="mt-3">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100/50 dark:bg-slate-800/30 border border-slate-200/50 dark:border-slate-700/50">
+              <div class="w-1.5 h-1.5 rounded-full bg-primary dark:bg-secondary"></div>
+              <span class="text-xs font-medium text-slate-600 dark:text-slate-400 tracking-wide">
+                American Dream
+              </span>
+            </div>
+          </div>
         </div>
         
         <!-- Tabs -->
@@ -226,7 +244,7 @@
             </div>
             <div>
               <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1" for="reg-email"
-                >{{ t('auth.professionalEmail') }}</label
+                >{{ t('auth.email') }}</label
               >
               <input
                 id="reg-email"
