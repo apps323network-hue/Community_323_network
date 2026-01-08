@@ -1,11 +1,11 @@
 <template>
-  <div class="group relative flex flex-col justify-between gap-2.5 sm:gap-3 md:gap-4 rounded-lg sm:rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-surface-card backdrop-blur-sm p-3 sm:p-4 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:border-secondary/50 hover:shadow-[0_0_30px_-5px_rgba(0,243,255,0.15)]">
+  <div class="group relative flex flex-col justify-between gap-2.5 sm:gap-3 md:gap-4 rounded-xl border border-slate-200/60 dark:border-white/5 bg-white dark:bg-surface-card backdrop-blur-sm p-3 sm:p-4 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:border-secondary/50 shadow-premium dark:shadow-none hover:shadow-premium-hover">
     <!-- Featured Badge -->
     <div
       v-if="service.destaque"
       class="absolute top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 z-10 opacity-100 group-hover:opacity-0 transition-opacity"
     >
-      <span class="bg-primary/20 text-primary text-[8px] sm:text-[9px] md:text-[10px] font-bold px-1 sm:px-1.5 md:px-2 py-0.5 rounded uppercase tracking-wide border border-primary/20 shadow-[0_0_10px_rgba(244,37,244,0.3)]">
+      <span class="bg-primary/20 text-primary dark:text-pink-400 text-[8px] sm:text-[9px] md:text-[10px] font-bold px-1 sm:px-1.5 md:px-2 py-0.5 rounded uppercase tracking-wide border border-primary/20 shadow-sm">
         {{ t('services.featured') }}
       </span>
     </div>
@@ -32,9 +32,17 @@
       </p>
 
       <!-- Price Section -->
-      <div v-if="service.preco" class="flex items-baseline gap-2 mb-4">
-        <span class="text-2xl font-bold text-slate-900 dark:text-white">{{ formatPrice(service.preco, service.moeda) }}</span>
-        <span class="text-xs text-slate-500 dark:text-gray-500 uppercase">{{ service.moeda || 'USD' }}</span>
+      <div v-if="service.preco" class="mb-4">
+        <div v-if="isAuthenticated" class="flex items-baseline gap-2">
+          <span class="text-2xl font-bold text-slate-900 dark:text-white">{{ formatPrice(service.preco, service.moeda) }}</span>
+          <span class="text-xs text-slate-500 dark:text-gray-500 uppercase">{{ service.moeda || 'USD' }}</span>
+        </div>
+        <div v-else class="flex items-center gap-2">
+          <div class="px-3 py-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md backdrop-blur-sm grayscale opacity-50 select-none cursor-pointer" @click="showAuthModal('signup')">
+            <span class="text-sm font-bold text-slate-400 dark:text-white/50 blur-[2px]">$99.99</span>
+          </div>
+          <span class="text-[10px] font-bold text-secondary dark:text-secondary uppercase tracking-tight">Login para ver preço</span>
+        </div>
       </div>
 
       <!-- Benefit Section -->
@@ -53,10 +61,9 @@
     <button
       class="mt-2 w-full rounded-lg py-2.5 text-center text-sm font-bold transition-all duration-300"
       :class="service.preco 
-        ? 'bg-gradient-to-r from-primary to-secondary text-black hover:shadow-[0_0_20px_rgba(244,37,244,0.4)]' 
-        : 'border border-secondary/50 bg-transparent text-secondary group-hover:bg-secondary group-hover:text-black hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]'"
-      @click="handleServiceClick"
-      :disabled="isRedirecting"
+        ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-md hover:shadow-[0_0_20px_rgba(244,37,244,0.4)] hover:scale-[1.02] active:scale-95' 
+        : 'border border-secondary/50 bg-transparent text-secondary-dark dark:text-secondary hover:bg-secondary hover:text-white dark:hover:text-black hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]'"
+      @click="handleAction"
     >
       <span v-if="isRedirecting" class="flex items-center justify-center gap-2">
         <span class="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></span>
@@ -72,18 +79,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
-import { useSSO } from '@/composables/useSSO'
-import { useAuthStore } from '@/stores/auth'
-import { toast } from 'vue-sonner'
-import type { AdminService } from '@/types/admin'
+import { usePublicAccess } from '@/composables/usePublicAccess'
 
 const { t } = useI18n()
-const router = useRouter()
-const { generateSSOUrl } = useSSO()
-const authStore = useAuthStore()
-
-const isRedirecting = ref(false)
+const { isAuthenticated, showAuthModal } = usePublicAccess()
 
 interface Service extends AdminService {
   id: string
@@ -156,5 +155,13 @@ function formatPrice(cents: number, currency: string = 'USD'): string {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount)
   }
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
+}
+
+function handleAction() {
+  if (!isAuthenticated.value) {
+    showAuthModal('signup')
+    return
+  }
+  emit('request-service', props.service)
 }
 </script>

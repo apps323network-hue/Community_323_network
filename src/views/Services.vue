@@ -18,7 +18,7 @@
         
         <div class="relative z-10 flex flex-col gap-3 sm:gap-4 md:gap-6 px-3 sm:px-4 md:px-6 lg:px-12 py-6 sm:py-8 md:py-12 lg:py-16 xl:py-20 text-center md:text-left items-center md:items-start">
           <div class="flex flex-col gap-2 sm:gap-3 max-w-2xl w-full">
-            <div class="inline-flex items-center gap-1 sm:gap-1.5 sm:gap-2 self-center md:self-start px-2 sm:px-2.5 md:px-3 py-0.5 sm:py-1 rounded-full bg-secondary/10 border border-secondary/20 backdrop-blur-sm shadow-[0_0_15px_rgba(0,243,255,0.1)]">
+            <div class="inline-flex items-center gap-1 sm:gap-2 self-center md:self-start px-2 sm:px-2.5 md:px-3 py-0.5 sm:py-1 rounded-full bg-secondary/10 border border-secondary/20 backdrop-blur-sm shadow-[0_0_15px_rgba(0,243,255,0.1)]">
               <span class="material-symbols-outlined text-secondary text-sm sm:text-base md:text-[18px]">verified</span>
               <span class="text-secondary text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider">{{ t('services.exclusiveForMembers') }}</span>
             </div>
@@ -279,6 +279,7 @@ import TestimonialCard from '@/components/features/services/TestimonialCard.vue'
 import Modal from '@/components/ui/Modal.vue'
 import FlickeringGrid from '@/components/ui/FlickeringGrid.vue'
 import { toast } from 'vue-sonner'
+import { fetchExchangeRate, calculatePixAmount } from '@/lib/exchange'
 
 const { supabase } = useSupabase()
 const { t } = useI18n()
@@ -340,16 +341,17 @@ function formatPrice(cents: number, currency: string = 'USD'): string {
 // Taxas Stripe (conforme GUIA_RAPIDO_STRIPE.md)
 const CARD_FEE_PERCENTAGE = 0.039 // 3.9%
 const CARD_FEE_FIXED = 30 // $0.30 em centavos
-const PIX_FEE_PERCENTAGE = 0.0179 // ~1.8%
+
 
 function calculateFee(basePriceCents: number, method: 'card' | 'pix'): number {
   if (method === 'card') {
     // Taxa cartão: 3.9% + $0.30
     return Math.round((basePriceCents * CARD_FEE_PERCENTAGE) + CARD_FEE_FIXED)
   } else {
-    // PIX: converter para BRL e aplicar taxa
-    const baseAmountBRL = (basePriceCents / 100) * exchangeRate.value
-    const grossAmountBRL = baseAmountBRL / (1 - PIX_FEE_PERCENTAGE)
+    // PIX: converter para BRL e aplicar taxa com margem
+    const usdAmount = basePriceCents / 100
+    const grossAmountBRL = calculatePixAmount(usdAmount, exchangeRate.value)
+    const baseAmountBRL = usdAmount * exchangeRate.value // Valor base sem margem
     const feeAmountBRL = grossAmountBRL - baseAmountBRL
     return Math.round(feeAmountBRL * 100) // em centavos de BRL
   }
@@ -361,8 +363,8 @@ function calculateTotal(basePriceCents: number, method: 'card' | 'pix'): number 
     return basePriceCents + calculateFee(basePriceCents, method)
   } else {
     // Total em BRL
-    const baseAmountBRL = (basePriceCents / 100) * exchangeRate.value
-    const grossAmountBRL = baseAmountBRL / (1 - PIX_FEE_PERCENTAGE)
+    const usdAmount = basePriceCents / 100
+    const grossAmountBRL = calculatePixAmount(usdAmount, exchangeRate.value)
     return Math.round(grossAmountBRL * 100) // em centavos de BRL
   }
 }
@@ -468,8 +470,11 @@ async function submitRequest() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   fetchServices()
+  // Buscar taxa de câmbio real
+  const rate = await fetchExchangeRate()
+  exchangeRate.value = rate
 })
 
 function exploreServices() {

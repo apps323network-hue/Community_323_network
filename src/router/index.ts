@@ -10,7 +10,7 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'Home',
     component: () => import('@/views/Home.vue'),
-    meta: { requiresAuth: true },
+    meta: { publicAccess: true, limitedForGuests: true },
   },
   {
     path: '/posts-salvos',
@@ -82,7 +82,7 @@ const routes: RouteRecordRaw[] = [
     path: '/comunidade',
     name: 'Members',
     component: () => import('@/views/Members.vue'),
-    meta: { requiresAuth: true },
+    meta: { publicAccess: true, limitedForGuests: true },
   },
   {
     path: '/comunidade/:id',
@@ -94,13 +94,13 @@ const routes: RouteRecordRaw[] = [
     path: '/eventos',
     name: 'Events',
     component: () => import('@/views/Events.vue'),
-    meta: { requiresAuth: true },
+    meta: { publicAccess: true },
   },
   {
     path: '/eventos/:id',
     name: 'EventDetail',
     component: () => import('@/views/EventDetail.vue'),
-    meta: { requiresAuth: true },
+    meta: { publicAccess: true },
   },
   {
     path: '/eventos/calendario',
@@ -112,7 +112,7 @@ const routes: RouteRecordRaw[] = [
     path: '/servicos',
     name: 'Services',
     component: () => import('@/views/Services.vue'),
-    meta: { requiresAuth: true },
+    meta: { publicAccess: true },
   },
   {
     path: '/meus-servicos',
@@ -136,7 +136,7 @@ const routes: RouteRecordRaw[] = [
     path: '/beneficios',
     name: 'Benefits',
     component: () => import('@/views/Benefits.vue'),
-    meta: { requiresAuth: true },
+    meta: { publicAccess: true, limitedForGuests: true },
   },
   {
     path: '/perfil',
@@ -179,6 +179,44 @@ const routes: RouteRecordRaw[] = [
     name: 'Leaderboard',
     component: () => import('@/views/Leaderboard.vue'),
     meta: { requiresAuth: true },
+  },
+  // Programs routes
+  {
+    path: '/programas',
+    name: 'Programs',
+    component: () => import('@/views/Programs.vue'),
+    meta: { publicAccess: true },
+  },
+  {
+    path: '/programas/:id',
+    name: 'ProgramDetail',
+    component: () => import('@/views/ProgramDetail.vue'),
+    meta: { publicAccess: true },
+  },
+  {
+    path: '/meus-programas',
+    name: 'MyPrograms',
+    component: () => import('@/views/MyPrograms.vue'),
+    meta: { requiresAuth: true },
+  },
+  // Professor routes
+  {
+    path: '/professor',
+    name: 'ProfessorDashboard',
+    component: () => import('@/views/professor/ProfessorDashboard.vue'),
+    meta: { requiresAuth: true, requiresRole: 'professor' },
+  },
+  {
+    path: '/professor/programa/:id',
+    name: 'ManageProgram',
+    component: () => import('@/views/professor/ManageProgram.vue'),
+    meta: { requiresAuth: true, requiresRole: 'professor' },
+  },
+  {
+    path: '/programas/:id/assistir',
+    name: 'ProgramPlayer',
+    component: () => import('@/views/ProgramPlayer.vue'),
+    meta: { requiresAuth: false, publicAccess: true },
   },
   {
     path: '/admin',
@@ -228,6 +266,31 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/admin/AdminChallenges.vue'),
     meta: { requiresAuth: true, requiresRole: 'admin' },
   },
+  // Admin Programs routes
+  {
+    path: '/admin/programas',
+    name: 'AdminPrograms',
+    component: () => import('@/views/admin/AdminPrograms.vue'),
+    meta: { requiresAuth: true, requiresRole: 'admin' },
+  },
+  {
+    path: '/admin/programas/criar',
+    name: 'AdminCreateProgram',
+    component: () => import('@/views/admin/AdminProgramForm.vue'),
+    meta: { requiresAuth: true, requiresRole: 'admin' },
+  },
+  {
+    path: '/admin/programas/:id/editar',
+    name: 'AdminEditProgram',
+    component: () => import('@/views/admin/AdminProgramForm.vue'),
+    meta: { requiresAuth: true, requiresRole: 'admin' },
+  },
+  {
+    path: '/admin/programas/:id/matriculas',
+    name: 'AdminProgramEnrollments',
+    component: () => import('@/views/admin/AdminProgramEnrollments.vue'),
+    meta: { requiresAuth: true, requiresRole: 'admin' },
+  },
   {
     path: '/admin/users/:userId/history',
     name: 'UserHistory',
@@ -251,6 +314,13 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(_to, _from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0 }
+    }
+  },
 })
 
 // Guard de autenticação
@@ -291,12 +361,20 @@ router.beforeEach(async (to, _from, next) => {  // Detectar se é uma URL de rec
 
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
   const requiresGuest = to.matched.some(record => record.meta.requiresGuest)
+  const publicAccess = to.matched.some(record => record.meta.publicAccess)
   const requiresPlan = to.matched.some(record => record.meta.requiresPlan) ?
     (to.matched.find(record => record.meta.requiresPlan)?.meta.requiresPlan as string) : undefined
 
   // Páginas públicas que podem ser acessadas mesmo logado (forgot-password, reset-password)
   const publicPages = ['/forgot-password', '/reset-password']
   const isPublicPage = publicPages.includes(to.path)
+
+  // Allow public access routes even without authentication
+  // Components will handle showing limited content
+  if (publicAccess && !authStore.user) {
+    next()
+    return
+  }
 
   // Verificar se precisa de autenticação
   if (requiresAuth && !authStore.user) {
@@ -352,17 +430,10 @@ router.beforeEach(async (to, _from, next) => {  // Detectar se é uma URL de rec
 
     const userRole: string = userStore.profile?.role || 'user'
 
-    // Admin pode acessar tudo
-    if (userRole !== 'admin') {
-      // Verificar se tem a role necessária
-      if (requiresRole === 'admin') {
-        next({ name: 'Home' })
-        return
-      }
-      if (requiresRole === 'partner' && userRole !== 'partner') {
-        next({ name: 'Home' })
-        return
-      }
+    // Admin pode acessar tudo, caso contrário verifica a role específica
+    if (userRole !== 'admin' && userRole !== requiresRole) {
+      next({ name: 'Home' })
+      return
     }
   }
 
