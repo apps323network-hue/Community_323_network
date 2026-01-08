@@ -89,6 +89,11 @@ export interface AdminService {
   created_at: string
   updated_at?: string
   partner_name?: string
+  // SSO fields for external services
+  is_external?: boolean
+  external_url?: string
+  sso_enabled?: boolean
+  sso_callback_path?: string
 }
 
 export interface ServiceStats {

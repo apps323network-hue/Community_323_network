@@ -38,6 +38,9 @@
             <div class="flex-1 flex flex-col gap-1.5 sm:gap-2 min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
                 <h3 class="text-white text-sm sm:text-base md:text-lg font-bold truncate">{{ item.service?.nome }}</h3>
+                <span v-if="item.payment?.source === 'american_dream'" class="text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" title="Pagamento do American Dream">
+                  American Dream
+                </span>
                 <span :class="getStatusClasses(item.request?.status)">
                   {{ getStatusLabel(item.request?.status) }}
                 </span>
@@ -96,6 +99,9 @@
             <span class="text-base sm:text-lg font-bold text-white">{{ selectedService.service?.nome }}</span>
           </div>
           <div class="flex gap-2 flex-wrap">
+            <span v-if="selectedService.payment?.source === 'american_dream'" class="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" title="Pagamento do American Dream">
+              American Dream
+            </span>
             <span :class="getStatusClasses(selectedService.request?.status)">
               {{ getStatusLabel(selectedService.request?.status) }}
             </span>
@@ -129,7 +135,14 @@
           </div>
           <div class="flex justify-between items-center text-sm">
             <span class="text-gray-400">{{ t('myServices.labels.method') }}</span>
-            <span class="text-white font-medium capitalize">{{ selectedService.payment.payment_method === 'card' ? t('myServices.paymentMethods.card') : selectedService.payment.payment_method?.toUpperCase() }}</span>
+            <span class="text-white font-medium capitalize">
+              {{ selectedService.payment.payment_method === 'card' ? t('myServices.paymentMethods.card') : selectedService.payment.payment_method?.toUpperCase() }}
+              <span v-if="selectedService.payment.payment_method === 'zelle'" class="ml-1 text-xs text-gray-400">(Zelle)</span>
+            </span>
+          </div>
+          <div v-if="selectedService.payment.source === 'american_dream'" class="flex justify-between items-center text-sm">
+            <span class="text-gray-400">Origem</span>
+            <span class="text-blue-400 font-medium">American Dream</span>
           </div>
           <div class="flex justify-between items-center text-sm">
             <span class="text-gray-400">{{ t('myServices.labels.paymentStatus') }}</span>
@@ -200,6 +213,8 @@ async function fetchServices() {
         currency,
         payment_method,
         status,
+        source,
+        external_payment_id,
         created_at,
         service_id,
         service_request_id,
@@ -245,6 +260,8 @@ async function fetchServices() {
           currency: payment.currency,
           payment_method: payment.payment_method,
           status: payment.status,
+          source: payment.source || '323_network',
+          external_payment_id: payment.external_payment_id,
           created_at: payment.created_at
         },
         service: service || null,

@@ -65,26 +65,33 @@
         : 'border border-secondary/50 bg-transparent text-secondary-dark dark:text-secondary hover:bg-secondary hover:text-white dark:hover:text-black hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]'"
       @click="handleAction"
     >
-      {{ service.preco ? t('services.contractService') : t('services.requestSupport') }}
+      <span v-if="isRedirecting" class="flex items-center justify-center gap-2">
+        <span class="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></span>
+        {{ t('services.redirecting') || 'Redirecionando...' }}
+      </span>
+      <span v-else>
+        {{ getButtonText() }}
+      </span>
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { usePublicAccess } from '@/composables/usePublicAccess'
 
 const { t } = useI18n()
 const { isAuthenticated, showAuthModal } = usePublicAccess()
 
-interface Service {
+interface Service extends AdminService {
   id: string
   nome: string
-  descricao: string
-  categoria: string
-  beneficio_membro: string
+  descricao?: string
+  categoria?: string
+  beneficio_membro?: string
   destaque: boolean
-  parceiro_id: string
+  parceiro_id?: string
   preco?: number
   moeda?: string
 }
@@ -96,6 +103,41 @@ const props = defineProps<{
 const emit = defineEmits<{
   'request-service': [service: Service]
 }>()
+
+async function handleServiceClick() {
+  // Se for serviço externo com SSO habilitado, redirecionar com SSO
+  if (props.service.is_external && props.service.sso_enabled) {
+    // Verificar se usuário está logado
+    if (!authStore.isAuthenticated) {
+      toast.error(t('auth.loginRequired') || 'Faça login para acessar este serviço')
+      router.push({ name: 'Login', query: { redirect: router.currentRoute.value.fullPath } })
+      return
+    }
+
+    try {
+      isRedirecting.value = true
+      const ssoUrl = await generateSSOUrl(props.service)
+      console.log('[ServiceCard] Redirecionando para serviço externo com SSO')
+      window.location.href = ssoUrl
+    } catch (error: any) {
+      console.error('[ServiceCard] Erro ao gerar URL SSO:', error)
+      toast.error(error.message || 'Erro ao acessar serviço externo')
+      isRedirecting.value = false
+    }
+  } else {
+    // Comportamento padrão para serviços internos
+    emit('request-service', props.service)
+  }
+}
+
+function getButtonText(): string {
+  if (props.service.is_external && props.service.sso_enabled) {
+    return t('services.accessService') || 'Acessar Serviço'
+  }
+  return props.service.preco 
+    ? t('services.contractService') 
+    : t('services.requestSupport')
+}
 
 function getIcon(category: string) {
   switch (category) {
