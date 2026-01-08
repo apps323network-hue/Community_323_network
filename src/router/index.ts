@@ -266,6 +266,18 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/admin/AdminChallenges.vue'),
     meta: { requiresAuth: true, requiresRole: 'admin' },
   },
+  {
+    path: '/admin/cupons',
+    name: 'AdminCoupons',
+    component: () => import('@/views/admin/AdminCoupons.vue'),
+    meta: { requiresAuth: true, requiresRole: 'admin' },
+  },
+  {
+    path: '/admin/cupons/historico',
+    name: 'AdminCouponUsage',
+    component: () => import('@/views/admin/CouponUsageHistory.vue'),
+    meta: { requiresAuth: true, requiresRole: 'admin' },
+  },
   // Admin Programs routes
   {
     path: '/admin/programas',

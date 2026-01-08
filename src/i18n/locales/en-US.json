@@ -1162,5 +1162,19 @@
             "uploadAnother": "Upload another video",
             "metadataSynced": "Video metadata synced successfully!"
         }
+    },
+    "coupons": {
+        "title": "Discount Coupons",
+        "createNew": "Create New Coupon",
+        "code": "Discount Coupon",
+        "applied": "Coupon applied successfully!",
+        "errors": {
+            "invalid": "Invalid or expired coupon",
+            "expired": "This coupon has expired",
+            "notYetValid": "This coupon is not yet valid",
+            "maxUsesReached": "This coupon has reached its usage limit",
+            "alreadyUsed": "You have already used this coupon",
+            "notApplicable": "This coupon is not applicable to this program"
+        }
     }
 }

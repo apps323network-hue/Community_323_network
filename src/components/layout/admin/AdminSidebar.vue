@@ -95,6 +95,13 @@ const menuItems = computed(() => [
     badgeClass: '',
   },
   {
+    path: '/admin/cupons',
+    label: 'Cupons',
+    icon: 'local_offer',
+    badge: undefined,
+    badgeClass: '',
+  },
+  {
     path: '/admin/palavras-proibidas',
     label: 'Palavras Proibidas',
     icon: 'block',
