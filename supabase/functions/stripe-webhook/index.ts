@@ -353,18 +353,24 @@ Deno.serve(async (req) => {
                         .from('subscriptions')
                         .update(updateData)
                         .eq('user_id', userId)
-                        .eq('plan_type', subscription.metadata?.plan_type || 'service_publisher')
+                        .eq('plan_type', subscription.metadata?.plan_type || 'premium')
 
                     if (error) console.error('Error updating subscription by user_id:', error)
                 }
 
                 // Send notification on activation (English for user)
                 if (status === 'active') {
+                    // Update User Profile Plan
+                    await supabase
+                        .from('profiles')
+                        .update({ plano: 'Premium' })
+                        .eq('id', userId)
+
                     await supabase.from('notifications').insert({
                         user_id: userId,
                         type: 'subscription_activated',
                         title: 'Subscription activated! 🎉',
-                        content: 'Your subscription has been activated successfully. You can now publish your services!',
+                        content: 'Your subscription has been activated successfully. You can now enjoy all Premium benefits!',
                         metadata: { subscription_id: subscription.id }
                     })
 
@@ -373,7 +379,7 @@ Deno.serve(async (req) => {
                     await notifyAdmins(
                         'admin_subscription_activated',
                         'Assinatura Ativada',
-                        `O usuário ${userName} ativou com sucesso a assinatura Publisher.`,
+                        `O usuário ${userName} ativou com sucesso a assinatura Premium.`,
                         { user_id: userId, stripe_subscription_id: subscription.id }
                     );
                 }
@@ -412,6 +418,12 @@ Deno.serve(async (req) => {
                     .eq('stripe_subscription_id', subscription.id)
 
                 if (error) console.error('Error canceling subscription:', error)
+
+                // Revert User Profile Plan to Free
+                await supabase
+                    .from('profiles')
+                    .update({ plano: 'Free' })
+                    .eq('id', userId)
 
                 // Notify user (English)
                 await supabase.from('notifications').insert({
@@ -452,7 +464,7 @@ Deno.serve(async (req) => {
 
                 if (error) console.error('Error updating subscription to past_due:', error)
 
-                // Get user from subscription
+                // Get user from subscription to revert plan
                 const { data: sub } = await supabase
                     .from('subscriptions')
                     .select('user_id')
@@ -460,6 +472,12 @@ Deno.serve(async (req) => {
                     .single()
 
                 if (sub?.user_id) {
+                    // Revert User Profile Plan to Free on delinquency
+                    await supabase
+                        .from('profiles')
+                        .update({ plano: 'Free' })
+                        .eq('id', sub.user_id)
+
                     await supabase.from('notifications').insert({
                         user_id: sub.user_id,
                         type: 'payment_failed',

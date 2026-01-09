@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
             .from('subscriptions')
             .select('*')
             .eq('user_id', user.id)
-            .eq('plan_type', 'service_publisher')
+            .eq('plan_type', 'premium')
             .in('status', ['active', 'pending'])
             .single()
 
@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
         const { data: priceConfig, error: priceError } = await supabase
             .from('subscription_prices')
             .select('*')
-            .eq('plan_type', 'service_publisher')
+            .eq('plan_type', 'premium')
             .eq('active', true)
             .single()
 
@@ -136,7 +136,7 @@ Deno.serve(async (req) => {
         if (isDevelopment) {
             // Tentar buscar um preço de teste já criado para este plano
             const products = await stripe.products.list({ limit: 10 })
-            const product = products.data.find((p: any) => p.metadata.plan_type === 'service_publisher')
+            const product = products.data.find((p: any) => p.metadata.plan_type === 'premium')
             
             if (product) {
                 const prices = await stripe.prices.list({ product: product.id, active: true, limit: 1 })
@@ -153,12 +153,12 @@ Deno.serve(async (req) => {
 
         if (!stripePriceId) {
             // Criar produto e preço no Stripe (English)
-            const productName = isDevelopment ? '[TEST] 323 Network - Publisher Subscription' : '323 Network - Publisher Subscription'
+            const productName = isDevelopment ? '[TEST] 323 Network - Premium Subscription' : '323 Network - Premium Subscription'
             const product = await stripe.products.create({
                 name: productName,
                 description: 'Publish your services on 323 Network',
                 metadata: {
-                    plan_type: 'service_publisher',
+                    plan_type: 'premium',
                     environment: isDevelopment ? 'test' : 'production'
                 }
             })
@@ -171,7 +171,7 @@ Deno.serve(async (req) => {
                     interval: 'month'
                 },
                 metadata: {
-                    plan_type: 'service_publisher'
+                    plan_type: 'premium'
                 }
             })
 
@@ -192,7 +192,7 @@ Deno.serve(async (req) => {
             .from('subscriptions')
             .upsert({
                 user_id: user.id,
-                plan_type: 'service_publisher',
+                plan_type: 'premium',
                 status: 'pending',
                 stripe_customer_id: stripeCustomerId,
                 price_cents: priceConfig.price_cents,
@@ -225,17 +225,17 @@ Deno.serve(async (req) => {
                 type: 'subscription_payment',
                 user_id: user.id,
                 subscription_id: subscription.id,
-                plan_type: 'service_publisher'
+                plan_type: 'premium'
             },
             subscription_data: {
                 product_data: {
-                    name: '323 Network - Publisher Subscription', // Assuming a generic name for the product in checkout
+                    name: '323 Network - Premium Subscription', // Assuming a generic name for the product in checkout
                     description: 'Publish your services on 323 Network',
                 },
                 metadata: {
                     user_id: user.id,
                     subscription_id: subscription.id,
-                    plan_type: 'service_publisher'
+                    plan_type: 'premium'
                 }
             }
         })

@@ -30,10 +30,10 @@
 
         <div class="space-y-4 mb-10">
           <h1 class="text-4xl md:text-5xl font-black text-white leading-tight tracking-tighter uppercase">
-            Assinatura <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Ativada!</span>
+            Sua Autoridade <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Subiu de Nível!</span>
           </h1>
           <p class="text-slate-400 text-lg max-w-md mx-auto leading-relaxed">
-            Parabéns! Agora você pode publicar seus serviços e alcançar toda a comunidade 323 Network.
+            Parabéns! Você agora é um membro Premium. Sua presença na comunidade 323 Network agora tem o destaque que merece.
           </p>
         </div>
 
@@ -47,10 +47,10 @@
               <p class="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1">
                 Próximo Passo
               </p>
-              <h3 class="text-xl md:text-2xl font-black text-white tracking-tight">Publique seu primeiro serviço</h3>
+              <h3 class="text-xl md:text-2xl font-black text-white tracking-tight">Explore seus benefícios</h3>
             </div>
-            <div class="hidden md:block px-4 py-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 text-[10px] font-black uppercase tracking-widest">
-              Pronto para começar
+            <div class="hidden md:block px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
+              Nível Premium Ativo
             </div>
           </div>
         </div>
@@ -58,13 +58,13 @@
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
           <RouterLink
-            to="/servicos"
+            to="/perfil"
             class="group relative px-8 py-5 rounded-2xl font-black text-black overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-primary/20"
           >
             <div class="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-gradient-x"></div>
             <span class="relative flex items-center justify-center gap-3 uppercase tracking-widest text-sm">
-              <span class="material-icons">add_circle</span>
-              Publicar Serviço Agora
+              <span class="material-icons">account_circle</span>
+              Ver Meu Perfil Verificado
             </span>
           </RouterLink>
 

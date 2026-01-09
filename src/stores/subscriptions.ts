@@ -71,7 +71,7 @@ export const useSubscriptionsStore = defineStore('subscriptions', () => {
         .from('subscriptions')
         .select('*')
         .eq('user_id', authStore.user.id)
-        .eq('plan_type', 'service_publisher')
+        .eq('plan_type', 'premium')
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle()
@@ -91,7 +91,7 @@ export const useSubscriptionsStore = defineStore('subscriptions', () => {
       const { data, error: queryError } = await supabase
         .from('subscription_prices')
         .select('*')
-        .eq('plan_type', 'service_publisher')
+        .eq('plan_type', 'premium')
         .eq('active', true)
         .single()
 
@@ -102,7 +102,7 @@ export const useSubscriptionsStore = defineStore('subscriptions', () => {
       // Use default price
       price.value = {
         id: 'default',
-        plan_type: 'service_publisher',
+        plan_type: 'premium',
         price_cents: 1000,
         currency: 'USD',
         stripe_price_id: null,

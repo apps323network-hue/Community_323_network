@@ -122,9 +122,16 @@ Deno.serve(async (req) => {
                     if (subscriptionDbId) {
                         await supabase.from('subscriptions').update(updateData).eq('id', subscriptionDbId)
                     } else {
-                        await supabase.from('subscriptions').update(updateData).eq('user_id', userId).eq('plan_type', 'service_publisher')
+                        await supabase.from('subscriptions').update(updateData).eq('user_id', userId).eq('plan_type', 'premium')
                     }
-                    console.log(`Subscription self-healed for user ${userId}`)
+
+                    // Update User Profile Plan
+                    await supabase
+                        .from('profiles')
+                        .update({ plano: 'Premium' })
+                        .eq('id', userId)
+
+                    console.log(`Subscription self-healed and profile updated to Premium for user ${userId}`)
                 }
             } else {
                 // Default: Service Payment

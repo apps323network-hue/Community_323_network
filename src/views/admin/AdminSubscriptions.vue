@@ -313,7 +313,7 @@ async function fetchPriceConfig() {
     const { data, error } = await supabase
       .from('subscription_prices')
       .select('*')
-      .eq('plan_type', 'service_publisher')
+      .eq('plan_type', 'premium')
       .eq('active', true)
       .single()
 

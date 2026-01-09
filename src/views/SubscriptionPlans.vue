@@ -17,10 +17,10 @@
 
         <div class="space-y-4 mb-10">
           <h1 class="text-4xl md:text-5xl font-black text-white leading-tight tracking-tighter uppercase">
-            Você já é <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Publisher!</span>
+            Você é um Membro <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Premium!</span>
           </h1>
           <p class="text-slate-400 text-lg max-w-md mx-auto leading-relaxed">
-            Sua assinatura está ativa. Publique seus serviços e alcance toda a comunidade 323 Network.
+            Sua assinatura está ativa. Aproveite todos os benefícios exclusivos e destaque-se na comunidade 323 Network.
           </p>
           <div v-if="subscriptionEndDate" class="text-sm text-slate-500">
             Próxima renovação: {{ formatDate(subscriptionEndDate) }}
@@ -33,8 +33,8 @@
         >
           <div class="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-gradient-x"></div>
           <span class="relative flex items-center justify-center gap-3 uppercase tracking-widest text-sm">
-            <span class="material-icons">add_circle</span>
-            Publicar Meu Serviço
+            <span class="material-icons">dashboard</span>
+            Ver Meus Benefícios
           </span>
         </RouterLink>
       </div>
@@ -48,10 +48,10 @@
             <span class="text-secondary text-xs font-bold uppercase tracking-widest">Plano Premium</span>
           </div>
           <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tighter">
-            Publique seus <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Serviços</span>
+            Destaque-se na <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Comunidade</span>
           </h1>
           <p class="text-slate-400 text-lg max-w-xl mx-auto leading-relaxed">
-            Alcance toda a comunidade 323 Network e conecte-se com brasileiros nos EUA que precisam dos seus serviços.
+            Torne-se um membro Premium para desbloquear recursos exclusivos, ganhar autoridade e conectar-se com brasileiros em todo o mundo.
           </p>
         </div>
 
@@ -172,29 +172,26 @@ const subscriptionEndDate = computed(() => subscriptionsStore.subscriptionEndDat
 const openFaq = ref<string | null>(null)
 
 const benefits = [
-  'Publique serviços ilimitados na plataforma',
-  'Seja encontrado por toda a comunidade 323',
-  'Destaque nos resultados de busca',
-  'Badge de Verificado no seu perfil',
-  'Suporte prioritário via WhatsApp'
+  'Selo de Verificado (Badge Premium) no perfil',
+  'Publique serviços e oportunidades ilimitadas',
+  'Destaque priority em todas as buscas de membros',
+  'Acesso antecipado a novos recursos da plataforma',
+  'Perfil turbinado com links extras e galeria',
+  'Suporte prioritário via canal exclusivo'
 ]
 
 const faqs = [
   {
-    q: 'Posso cancelar a qualquer momento?',
-    a: 'Sim! Você pode cancelar sua assinatura quando quiser. O acesso permanece ativo até o fim do período pago.'
+    q: 'O que é o plano Premium?',
+    a: 'É o nosso plano premium para quem deseja ter mais visibilidade e credibilidade dentro da 323 Network, seja para oferecer serviços ou para se destacar como profissional na comunidade.'
   },
   {
-    q: 'Como funciona a publicação de serviços?',
-    a: 'Após assinar, você terá acesso a um botão "Publicar Serviço" na página de serviços. Preencha as informações e seu serviço ficará visível para toda a comunidade.'
+    q: 'Quais os reais benefícios do destaque?',
+    a: 'Membros Premium aparecem no topo das listas de profissionais e têm um selo visual que gera mais confiança para quem busca por serviços ou conexões na plataforma.'
   },
   {
-    q: 'Quais formas de pagamento são aceitas?',
-    a: 'Aceitamos todos os principais cartões de crédito e débito através do Stripe, a plataforma de pagamentos mais segura do mundo.'
-  },
-  {
-    q: 'Preciso de aprovação para publicar?',
-    a: 'Serviços passam por uma breve análise para garantir a qualidade da plataforma. A aprovação geralmente leva algumas horas.'
+    q: 'Como funciona o cancelamento?',
+    a: 'Você pode cancelar a qualquer momento diretamente pelo seu painel de faturamento. O acesso aos benefícios permanece ativo até o fim do ciclo mensal já pago.'
   }
 ]
 
