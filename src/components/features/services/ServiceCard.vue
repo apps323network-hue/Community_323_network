@@ -27,7 +27,7 @@
       </h3>
 
       <!-- Description -->
-      <p class="text-slate-600 dark:text-gray-400 text-[11px] sm:text-xs md:text-sm font-normal leading-relaxed mb-2.5 sm:mb-3 md:mb-4 line-clamp-2">
+      <p class="text-slate-600 dark:text-gray-400 text-[11px] sm:text-xs md:text-sm font-normal leading-relaxed mb-2.5 sm:mb-3 md:mb-4 line-clamp-4">
         {{ currentLocale === 'pt-BR' ? service.descricao_pt : (service.descricao_en || service.descricao_pt) }}
       </p>
 
@@ -108,11 +108,25 @@ function getButtonText(): string {
 
 function getIcon(category: string | undefined): string {
   if (!category) return 'hub'
-  switch (category) {
-    case 'legal': return 'domain'
-    case 'finance': return 'account_balance'
-    case 'mentoring': return 'badge'
+  const cat = category.toLowerCase()
+  switch (cat) {
+    case 'legal':
+    case 'jurídico': return 'gavel'
+    case 'finance':
+    case 'finanças': return 'account_balance'
+    case 'mentoring':
+    case 'mentoria': return 'school'
     case 'marketing': return 'campaign'
+    case 'tech':
+    case 'tecnologia': return 'terminal'
+    case 'serviços':
+    case 'services': return 'category'
+    case 'tradução':
+    case 'translation': return 'translate'
+    case 'imigração':
+    case 'immigration': return 'public'
+    case 'visto':
+    case 'visa': return 'assignment_ind'
     default: return 'hub'
   }
 }

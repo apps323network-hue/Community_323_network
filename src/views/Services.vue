@@ -369,6 +369,7 @@ import { useI18n } from 'vue-i18n'
 import { useSupabase } from '@/composables/useSupabase'
 import { useSubscriptionsStore } from '@/stores/subscriptions'
 import { useAuthStore } from '@/stores/auth'
+import { useSSO } from '@/composables/useSSO'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import ServiceCard from '@/components/features/services/ServiceCard.vue'
 import TestimonialCard from '@/components/features/services/TestimonialCard.vue'
@@ -503,7 +504,27 @@ const filteredServices = computed(() => {
   return services.value.filter(s => s.categoria === activeFilter.value)
 })
 
-function handleRequestService(service: any) {
+async function handleRequestService(service: any) {
+  // Se for serviço externo com SSO habilitado, redirecionar com token
+  if (service.is_external && service.sso_enabled) {
+    try {
+      const { generateSSOUrl } = useSSO()
+      const ssoUrl = await generateSSOUrl(service)
+      window.open(ssoUrl, '_blank')
+      return
+    } catch (error: any) {
+      console.error('Erro ao gerar URL SSO:', error)
+      toast.error(error.message || 'Erro ao redirecionar para o serviço')
+    }
+  }
+
+  // Se for um serviço externo sem preço, abrir o link externo diretamente
+  if (service.is_external && !service.preco && service.external_url) {
+    window.open(service.external_url, '_blank')
+    return
+  }
+
+  // Comportamento padrão: abrir modal de solicitação
   selectedService.value = service
   paymentMethod.value = null
   requestMessage.value = ''
