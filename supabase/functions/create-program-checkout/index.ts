@@ -171,7 +171,7 @@ Deno.serve(async (req) => {
             }],
             mode: 'payment',
             success_url: `${siteUrl}/pagamento/sucesso?type=program&session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${siteUrl}/programas/${program.id}`,
+            cancel_url: `${siteUrl}/programs/${program.id}`,
             metadata: {
                 type: 'program_payment',
                 program_id: program.id,

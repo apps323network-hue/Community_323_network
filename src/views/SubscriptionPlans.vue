@@ -17,13 +17,13 @@
 
         <div class="space-y-4 mb-10">
           <h1 class="text-4xl md:text-5xl font-black text-white leading-tight tracking-tighter uppercase">
-            Você é um Membro <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Premium!</span>
+            {{ t('subscriptions.alreadySubscribed.title').split(' ')[0] }} {{ t('subscriptions.alreadySubscribed.title').split(' ')[1] }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{{ t('subscriptions.alreadySubscribed.title').split(' ').slice(2).join(' ') }}</span>
           </h1>
           <p class="text-slate-400 text-lg max-w-md mx-auto leading-relaxed">
-            Sua assinatura está ativa. Aproveite todos os benefícios exclusivos e destaque-se na comunidade 323 Network.
+            {{ t('subscriptions.alreadySubscribed.description') }}
           </p>
           <div v-if="subscriptionEndDate" class="text-sm text-slate-500">
-            Próxima renovação: {{ formatDate(subscriptionEndDate) }}
+            {{ t('subscriptions.alreadySubscribed.nextRenewal', { date: formatDate(subscriptionEndDate) }) }}
           </div>
         </div>
 
@@ -34,7 +34,7 @@
           <div class="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-gradient-x"></div>
           <span class="relative flex items-center justify-center gap-3 uppercase tracking-widest text-sm">
             <span class="material-icons">dashboard</span>
-            Ver Meus Benefícios
+            {{ t('subscriptions.viewBenefits') }}
           </span>
         </RouterLink>
       </div>
@@ -45,20 +45,20 @@
         <div class="space-y-4 mb-12">
           <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/20 backdrop-blur-sm">
             <span class="material-icons text-secondary text-lg">workspace_premium</span>
-            <span class="text-secondary text-xs font-bold uppercase tracking-widest">Plano Premium</span>
+            <span class="text-secondary text-xs font-bold uppercase tracking-widest">{{ t('subscriptions.plans.premium.badge') }}</span>
           </div>
           <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tighter">
-            Destaque-se na <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Comunidade</span>
+            {{ t('subscriptions.plans.premium.title').split(' ').slice(0, -1).join(' ') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{{ t('subscriptions.plans.premium.title').split(' ').slice(-1)[0] }}</span>
           </h1>
           <p class="text-slate-400 text-lg max-w-xl mx-auto leading-relaxed">
-            Torne-se um membro Premium para desbloquear recursos exclusivos, ganhar autoridade e conectar-se com brasileiros em todo o mundo.
+            {{ t('subscriptions.plans.premium.description') }}
           </p>
         </div>
 
         <!-- Canceled Notice -->
         <div v-if="route.query.canceled" class="mb-8 px-6 py-4 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm">
           <span class="material-icons text-base align-middle mr-2">info</span>
-          Checkout cancelado. Você pode tentar novamente quando quiser.
+          {{ t('subscriptions.canceledNotice') }}
         </div>
 
         <!-- Pricing Card -->
@@ -67,16 +67,22 @@
             <div class="bg-slate-900/95 backdrop-blur-xl rounded-[30px] p-8 border border-white/5">
               <!-- Price -->
               <div class="text-center mb-8">
-                <div class="flex items-baseline justify-center gap-1 mb-2">
-                  <span class="text-5xl md:text-6xl font-black text-white">{{ formattedPrice }}</span>
-                  <span class="text-slate-400 text-lg">/mês</span>
+                <div class="flex items-baseline justify-center gap-1 mb-1">
+                  <span class="text-5xl md:text-6xl font-black text-white">{{ displayTotalWithFees }}</span>
+                  <span class="text-slate-400 text-lg">{{ t('subscriptions.plans.premium.monthly') }}</span>
                 </div>
-                <p class="text-slate-500 text-sm">Cancele quando quiser</p>
+                <div class="flex flex-col items-center gap-1">
+                  <p class="text-primary text-[10px] font-bold uppercase tracking-widest">{{ t('subscriptions.plans.premium.feesIncluded') }}</p>
+                  <p class="text-slate-500 text-[9px] opacity-70">
+                    {{ t('subscriptions.plans.premium.priceWithFees', { total: displayTotalWithFees, base: displayBasePrice, fees: displayStripeFee }) }}
+                  </p>
+                </div>
+                <p class="text-slate-500 text-sm mt-4">{{ t('subscriptions.plans.premium.cancelAnytime') }}</p>
               </div>
 
               <!-- Benefits -->
               <ul class="space-y-4 mb-8">
-                <li v-for="benefit in benefits" :key="benefit" class="flex items-start gap-3">
+                <li v-for="benefit in benefitsList" :key="benefit" class="flex items-start gap-3">
                   <div class="w-6 h-6 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center shrink-0 mt-0.5">
                     <span class="material-icons text-black text-sm">check</span>
                   </div>
@@ -94,11 +100,11 @@
                 <span class="relative flex items-center justify-center gap-3 uppercase tracking-widest text-sm">
                   <template v-if="loading">
                     <span class="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
-                    Processando...
+                    {{ t('subscriptions.actions.processing') }}
                   </template>
                   <template v-else>
                     <span class="material-icons">rocket_launch</span>
-                    Começar Agora
+                    {{ t('subscriptions.actions.subscribe') }}
                   </template>
                 </span>
               </button>
@@ -110,24 +116,24 @@
         <div class="flex flex-wrap items-center justify-center gap-6 text-slate-500 text-sm">
           <div class="flex items-center gap-2">
             <span class="material-icons text-lg">lock</span>
-            <span>Pagamento Seguro</span>
+            <span>{{ t('subscriptions.badges.secure') }}</span>
           </div>
           <div class="flex items-center gap-2">
             <span class="material-icons text-lg">credit_card</span>
-            <span>Stripe Checkout</span>
+            <span>{{ t('subscriptions.badges.stripe') }}</span>
           </div>
           <div class="flex items-center gap-2">
             <span class="material-icons text-lg">autorenew</span>
-            <span>Cancele a Qualquer Momento</span>
+            <span>{{ t('subscriptions.badges.cancelAnytime') }}</span>
           </div>
         </div>
 
         <!-- FAQ Section -->
         <div class="mt-16 w-full max-w-2xl">
-          <h3 class="text-xl font-black text-white mb-6 uppercase tracking-wider">Perguntas Frequentes</h3>
+          <h3 class="text-xl font-black text-white mb-6 uppercase tracking-wider">{{ t('subscriptions.faq.title') }}</h3>
           <div class="space-y-4">
             <div 
-              v-for="faq in faqs" 
+              v-for="faq in faqsList" 
               :key="faq.q"
               class="bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-white/5 overflow-hidden"
             >
@@ -156,6 +162,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useSubscriptionsStore } from '@/stores/subscriptions'
 import { useAuthStore } from '@/stores/auth'
+import { useLocale } from '@/composables/useLocale'
+import { calculateStripeFee, calculateTotalWithFees, formatCurrency } from '@/lib/finance'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { toast } from 'vue-sonner'
 
@@ -163,44 +171,53 @@ const route = useRoute()
 const router = useRouter()
 const subscriptionsStore = useSubscriptionsStore()
 const authStore = useAuthStore()
+const { t, locale: currentLocale } = useLocale()
 
 const loading = computed(() => subscriptionsStore.loading)
 const hasActiveSubscription = computed(() => subscriptionsStore.hasActiveSubscription)
-const formattedPrice = computed(() => subscriptionsStore.formattedPrice)
 const subscriptionEndDate = computed(() => subscriptionsStore.subscriptionEndDate)
+
+// Pricing broken down
+const basePriceCents = computed(() => subscriptionsStore.price?.price_cents || 1000)
+const stripeFeeCents = computed(() => calculateStripeFee(basePriceCents.value))
+const totalWithFeesCents = computed(() => calculateTotalWithFees(basePriceCents.value))
+
+const displayBasePrice = computed(() => formatCurrency(basePriceCents.value, subscriptionsStore.price?.currency || 'USD', currentLocale.value))
+const displayStripeFee = computed(() => formatCurrency(stripeFeeCents.value, subscriptionsStore.price?.currency || 'USD', currentLocale.value))
+const displayTotalWithFees = computed(() => formatCurrency(totalWithFeesCents.value, subscriptionsStore.price?.currency || 'USD', currentLocale.value))
 
 const openFaq = ref<string | null>(null)
 
-const benefits = [
-  'Selo de Verificado (Badge Premium) no perfil',
-  'Publique serviços e oportunidades ilimitadas',
-  'Destaque priority em todas as buscas de membros',
-  'Acesso antecipado a novos recursos da plataforma',
-  'Perfil turbinado com links extras e galeria',
-  'Suporte prioritário via canal exclusivo'
-]
+const benefitsList = computed(() => [
+  t('subscriptions.benefits.verified'),
+  t('subscriptions.benefits.unlimitedServices'),
+  t('subscriptions.benefits.priorityHighlight'),
+  t('subscriptions.benefits.earlyAccess'),
+  t('subscriptions.benefits.boostedProfile'),
+  t('subscriptions.benefits.prioritySupport')
+])
 
-const faqs = [
+const faqsList = computed(() => [
   {
-    q: 'O que é o plano Premium?',
-    a: 'É o nosso plano premium para quem deseja ter mais visibilidade e credibilidade dentro da 323 Network, seja para oferecer serviços ou para se destacar como profissional na comunidade.'
+    q: t('subscriptions.faq.items.whatIs.q'),
+    a: t('subscriptions.faq.items.whatIs.a')
   },
   {
-    q: 'Quais os reais benefícios do destaque?',
-    a: 'Membros Premium aparecem no topo das listas de profissionais e têm um selo visual que gera mais confiança para quem busca por serviços ou conexões na plataforma.'
+    q: t('subscriptions.faq.items.benefits.q'),
+    a: t('subscriptions.faq.items.benefits.a')
   },
   {
-    q: 'Como funciona o cancelamento?',
-    a: 'Você pode cancelar a qualquer momento diretamente pelo seu painel de faturamento. O acesso aos benefícios permanece ativo até o fim do ciclo mensal já pago.'
+    q: t('subscriptions.faq.items.cancel.q'),
+    a: t('subscriptions.faq.items.cancel.a')
   }
-]
+])
 
 function toggleFaq(q: string) {
   openFaq.value = openFaq.value === q ? null : q
 }
 
 function formatDate(date: Date) {
-  return date.toLocaleDateString('pt-BR', {
+  return date.toLocaleDateString(currentLocale.value, {
     day: '2-digit',
     month: 'long',
     year: 'numeric'
@@ -209,8 +226,8 @@ function formatDate(date: Date) {
 
 async function handleSubscribe() {
   if (!authStore.user) {
-    toast.error('Faça login para continuar')
-    router.push('/login?redirect=/subscription')
+    toast.error(t('auth.loginRequired'))
+    router.push(`/login?redirect=${route.path}`)
     return
   }
 
