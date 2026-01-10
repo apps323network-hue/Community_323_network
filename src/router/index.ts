@@ -85,6 +85,12 @@ const routes: RouteRecordRaw[] = [
     // Rota pública - não requer autenticação
   },
   {
+    path: '/venture-prep',
+    name: 'VenturePrep',
+    component: () => import('@/views/VenturePrep.vue'),
+    // Rota pública - não requer autenticação
+  },
+  {
     path: '/banned',
     name: 'Banned',
     component: () => import('@/views/Banned.vue'),
@@ -344,6 +350,25 @@ const routes: RouteRecordRaw[] = [
     name: 'PartnerEvents',
     component: () => import('@/views/partner/PartnerEvents.vue'),
     meta: { requiresAuth: true, requiresRole: 'partner' },
+  },
+  // Subscription routes
+  {
+    path: '/subscription',
+    name: 'Subscription',
+    component: () => import('@/views/SubscriptionPlans.vue'),
+    meta: { publicAccess: true },
+  },
+  {
+    path: '/subscription/success',
+    name: 'SubscriptionSuccess',
+    component: () => import('@/views/SubscriptionSuccess.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin/subscriptions',
+    name: 'AdminSubscriptions',
+    component: () => import('@/views/admin/AdminSubscriptions.vue'),
+    meta: { requiresAuth: true, requiresRole: 'admin' },
   },
   // Catch-all 404 route - must be last
   {

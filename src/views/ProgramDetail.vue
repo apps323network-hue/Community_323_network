@@ -119,7 +119,7 @@
                           </template>
                           <template v-else>
                             {{ isSoldOut ? t('programs.programFull') : (isAuthenticated ? t('programs.paymentModal.enroll') : t('programs.actions.secureMySpot')) }}
-                            <span class="material-icons text-sm font-bold group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            <span class="material-icons text-sm font-bold group-hover:translate-x-1 transition-transform">play_arrow</span>
                           </template>
                         </span>
                       </button>
@@ -326,7 +326,7 @@
                         </template>
                         <template v-else>
                           {{ isSoldOut ? t('programs.programFull') : (isAuthenticated ? t('programs.paymentModal.enroll') : t('programs.actions.secureMySpot')) }}
-                          <span class="material-icons font-bold group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                          <span class="material-icons font-bold group-hover:translate-x-1 transition-transform">play_arrow</span>
                         </template>
                       </span>
                     </button>
