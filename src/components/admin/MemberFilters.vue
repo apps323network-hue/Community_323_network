@@ -9,7 +9,7 @@
             :value="modelValue.search"
             @input="handleSearchInput"
             type="text"
-            placeholder="Buscar por nome ou email..."
+            placeholder="Search by name or email..."
             class="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-primary focus:ring-1 focus:ring-primary focus:shadow-[0_0_15px_rgba(244,37,244,0.3)] focus:outline-none transition-all"
           />
         </div>
@@ -127,7 +127,7 @@
         class="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2"
       >
         <span class="material-symbols-outlined text-lg">clear_all</span>
-        <span class="text-sm">Limpar</span>
+        <span class="text-sm">Clear</span>
       </button>
     </div>
   </div>
@@ -156,8 +156,8 @@ const statusDropdownRef = ref<HTMLElement | null>(null)
 const searchTimeout = ref<ReturnType<typeof setTimeout> | null>(null)
 
 const roleOptions = [
-  { value: 'user' as UserRole, label: 'Membro' },
-  { value: 'partner' as UserRole, label: 'Parceiro' },
+  { value: 'user' as UserRole, label: 'Member' },
+  { value: 'partner' as UserRole, label: 'Partner' },
   { value: 'admin' as UserRole, label: 'Admin' },
   { value: 'professor' as UserRole, label: 'Professor' }
 ]
@@ -169,26 +169,26 @@ const planOptions = [
 ]
 
 const statusOptions = [
-  { value: 'active' as UserStatus, label: 'Ativo' },
-  { value: 'suspended' as UserStatus, label: 'Suspenso' },
-  { value: 'banned' as UserStatus, label: 'Banido' }
+  { value: 'active' as UserStatus, label: 'Active' },
+  { value: 'suspended' as UserStatus, label: 'Suspended' },
+  { value: 'banned' as UserStatus, label: 'Banned' }
 ]
 
 const roleButtonText = computed(() => {
-  if (!props.modelValue.roles || props.modelValue.roles.length === 0) return 'Cargo'
+  if (!props.modelValue.roles || props.modelValue.roles.length === 0) return 'Role'
   if (props.modelValue.roles.length === 1) {
     const role = roleOptions.find(r => r.value === props.modelValue.roles![0])
-    return role?.label || 'Cargo'
+    return role?.label || 'Role'
   }
-  return `${props.modelValue.roles.length} cargos`
+  return `${props.modelValue.roles.length} roles`
 })
 
 const planButtonText = computed(() => {
-  if (!props.modelValue.plans || props.modelValue.plans.length === 0) return 'Plano'
+  if (!props.modelValue.plans || props.modelValue.plans.length === 0) return 'Plan'
   if (props.modelValue.plans.length === 1) {
     return props.modelValue.plans[0]
   }
-  return `${props.modelValue.plans.length} planos`
+  return `${props.modelValue.plans.length} plans`
 })
 
 const statusButtonText = computed(() => {

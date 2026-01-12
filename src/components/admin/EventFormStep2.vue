@@ -2,23 +2,23 @@
   <div class="space-y-4">
     <div>
       <div class="flex justify-between items-center mb-2">
-        <label class="block text-sm font-medium text-white">Data *</label>
+        <label class="block text-sm font-medium text-white">Date *</label>
         
-        <!-- Info Datas Programa -->
+        <!-- Program Date Info -->
         <span v-if="program" class="text-xs">
           <span v-if="isProgramExpired(program)" class="text-red-400 font-medium flex items-center gap-1">
              <span class="material-symbols-outlined text-[14px]">warning</span>
-             Expirado: {{ formatDate(program.program_end_date) }}
+             Expired: {{ formatDate(program.program_end_date) }}
           </span>
           <span v-else class="text-emerald-400 font-medium tracking-wide">
-             Validade: {{ formatDate(program.program_start_date) }} - {{ formatDate(program.program_end_date) }}
+             Validity: {{ formatDate(program.program_start_date) }} - {{ formatDate(program.program_end_date) }}
           </span>
         </span>
       </div>
 
       <div class="grid grid-cols-3 gap-3">
         <div>
-          <label class="block text-xs text-slate-600 dark:text-white/60 mb-1">Dia</label>
+          <label class="block text-xs text-slate-600 dark:text-white/60 mb-1">Day</label>
           <div class="relative">
             <select
               v-model="dateTime.day"
@@ -26,7 +26,7 @@
               class="custom-select w-full rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a040f] p-3 pr-10 text-slate-900 dark:text-white focus:border-secondary focus:ring-1 focus:ring-secondary focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] outline-none appearance-none cursor-pointer transition-all hover:border-secondary/50 dark:hover:border-white/20"
               @change="updateDateTime"
             >
-              <option value="">Dia</option>
+              <option value="">Day</option>
               <option v-for="d in 31" :key="d" :value="d.toString().padStart(2, '0')">
                 {{ d.toString().padStart(2, '0') }}
               </option>
@@ -56,7 +56,7 @@
           </div>
         </div>
         <div>
-          <label class="block text-xs text-white/60 mb-1">Ano</label>
+          <label class="block text-xs text-white/60 mb-1">Year</label>
           <div class="relative">
             <select
               v-model="dateTime.year"
@@ -64,7 +64,7 @@
               class="custom-select w-full rounded-lg border border-white/10 bg-surface-dark p-3 pr-10 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none appearance-none cursor-pointer transition-all hover:border-white/20"
               @change="updateDateTime"
             >
-              <option value="">Ano</option>
+              <option value="">Year</option>
               <option v-for="y in getYearOptions()" :key="y" :value="y">
                 {{ y }}
               </option>
@@ -78,10 +78,10 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-white mb-2">Hora *</label>
+      <label class="block text-sm font-medium text-white mb-2">Time *</label>
       <div class="grid grid-cols-2 gap-3">
         <div>
-          <label class="block text-xs text-white/60 mb-1">Hora</label>
+          <label class="block text-xs text-white/60 mb-1">Hour</label>
           <div class="relative">
             <select
               v-model="dateTime.hour"
@@ -89,7 +89,7 @@
               class="custom-select w-full rounded-lg border border-white/10 bg-surface-dark p-3 pr-10 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none appearance-none cursor-pointer transition-all hover:border-white/20"
               @change="updateDateTime"
             >
-              <option value="">Hora</option>
+              <option value="">Hour</option>
               <option v-for="h in 24" :key="h - 1" :value="(h - 1).toString().padStart(2, '0')">
                 {{ (h - 1).toString().padStart(2, '0') }}
               </option>
@@ -100,7 +100,7 @@
           </div>
         </div>
         <div>
-          <label class="block text-xs text-white/60 mb-1">Minuto</label>
+          <label class="block text-xs text-white/60 mb-1">Minute</label>
           <div class="relative">
             <select
               v-model="dateTime.minute"
@@ -108,7 +108,7 @@
               class="custom-select w-full rounded-lg border border-white/10 bg-surface-dark p-3 pr-10 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none appearance-none cursor-pointer transition-all hover:border-white/20"
               @change="updateDateTime"
             >
-              <option value="">Minuto</option>
+              <option value="">Minute</option>
               <option v-for="m in 60" :key="m - 1" :value="(m - 1).toString().padStart(2, '0')">
                 {{ (m - 1).toString().padStart(2, '0') }}
               </option>
@@ -133,7 +133,7 @@
         />
       </div>
       <div>
-        <label class="block text-sm font-medium text-white mb-2">Local / Link (EN)</label>
+        <label class="block text-sm font-medium text-white mb-2">Location / Link (EN)</label>
         <input
           v-model="formData.local_en"
           type="text"
@@ -171,9 +171,9 @@
         <div class="flex flex-col items-center justify-center pt-5 pb-6">
           <span class="material-symbols-outlined text-4xl text-slate-500 dark:text-white/60 mb-2">cloud_upload</span>
           <p class="mb-2 text-sm text-slate-600 dark:text-white/60">
-            <span class="font-semibold">Clique para fazer upload</span> ou arraste e solte
+            <span class="font-semibold">Click to upload</span> or drag and drop
           </p>
-          <p class="text-xs text-slate-500 dark:text-white/40">PNG, JPG ou WEBP (máx. 20MB)</p>
+          <p class="text-xs text-slate-500 dark:text-white/40">PNG, JPG or WEBP (max. 20MB)</p>
         </div>
         <input
           type="file"
@@ -194,7 +194,7 @@
           class="w-4 h-4 rounded border-white/10 bg-surface-dark text-primary focus:ring-primary"
           @change="$emit('update:formData', { ...formData })"
         />
-        <span class="text-sm text-slate-700 dark:text-white">Criar já aprovado</span>
+        <span class="text-sm text-slate-700 dark:text-white">Create already approved</span>
       </label>
     </div>
   </div>
@@ -251,7 +251,7 @@ watch(() => props.dateTime, (newVal) => {
 
 function formatDate(dateString: string | null) {
   if (!dateString) return 'Data indefinida'
-  return new Date(dateString).toLocaleDateString()
+  return new Date(dateString).toLocaleDateString('pt-BR')
 }
 
 function isProgramExpired(program: any) {
@@ -261,8 +261,8 @@ function isProgramExpired(program: any) {
 
 function getMonthName(month: number): string {
   const months = [
-    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
   ]
   return months[month - 1]
 }
@@ -287,12 +287,12 @@ function handleImageSelect(event: Event) {
   if (!file) return
 
   if (!file.type.startsWith('image/')) {
-    emit('image-error', 'Por favor, selecione apenas arquivos de imagem')
+    emit('image-error', 'Please select only image files')
     return
   }
 
   if (file.size > 20 * 1024 * 1024) {
-    emit('image-error', 'A imagem deve ter no máximo 20MB')
+    emit('image-error', 'Image must be at most 20MB')
     return
   }
 

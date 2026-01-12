@@ -7,10 +7,10 @@
         <!-- Hero Header -->
         <div class="mb-8">
           <h1 class="text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight mb-4">
-            Gestão de <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary animate-gradient-x bg-[length:200%_auto]">Membros</span>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary animate-gradient-x bg-[length:200%_auto]">Members</span> Management
           </h1>
           <p class="text-white/60 text-lg">
-            Gerencie, filtre e analise todos os membros da comunidade com métricas de engajamento em tempo real
+            Manage, filter and analyze all community members with real-time engagement metrics
           </p>
         </div>
 
@@ -23,8 +23,8 @@
                 <span class="material-symbols-outlined text-primary text-2xl">group</span>
               </div>
               <div>
-                <p class="text-white/50 text-xs font-medium mb-1">Total de Membros</p>
-                <p class="text-white text  -2xl font-black">{{ usersStore.userStats.total }}</p>
+                <p class="text-white/50 text-xs font-medium mb-1">Total Members</p>
+                <p class="text-white text-2xl font-black">{{ usersStore.userStats.total }}</p>
               </div>
             </div>
           </div>
@@ -36,7 +36,7 @@
                 <span class="material-symbols-outlined text-green-500 text-2xl">check_circle</span>
               </div>
               <div>
-                <p class="text-white/50 text-xs font-medium mb-1">Membros Ativos</p>
+                <p class="text-white/50 text-xs font-medium mb-1">Active Members</p>
                 <p class="text-white text-2xl font-black">{{ usersStore.userStats.active }}</p>
               </div>
             </div>
@@ -49,7 +49,7 @@
                 <span class="material-symbols-outlined text-yellow-500 text-2xl">pending_actions</span>
               </div>
               <div>
-                <p class="text-white/50 text-xs font-medium mb-1">Pendentes</p>
+                <p class="text-white/50 text-xs font-medium mb-1">Pending</p>
                 <p class="text-white text-2xl font-black">{{ usersStore.userStats.pending }}</p>
               </div>
             </div>
@@ -62,7 +62,7 @@
                 <span class="material-symbols-outlined text-secondary text-2xl">person_add</span>
               </div>
               <div>
-                <p class="text-white/50 text-xs font-medium mb-1">Novos Hoje</p>
+                <p class="text-white/50 text-xs font-medium mb-1">New Today</p>
                 <p class="text-white text-2xl font-black">{{ usersStore.userStats.newToday }}</p>
               </div>
             </div>
@@ -75,7 +75,7 @@
                 <span class="material-symbols-outlined text-purple-500 text-2xl">trending_up</span>
               </div>
               <div>
-                <p class="text-white/50 text-xs font-medium mb-1">Engajamento</p>
+                <p class="text-white/50 text-xs font-medium mb-1">Engagement</p>
                 <p class="text-white text-2xl font-black">{{ engagementRateText }}</p>
               </div>
             </div>
@@ -88,8 +88,8 @@
         <!-- Results Info -->
         <div class="flex items-center justify-between mb-6">
           <p class="text-white/60 text-sm">
-            Mostrando <span class="text-white font-bold">{{ usersStore.paginatedMembers.length }}</span> de 
-            <span class="text-white font-bold">{{ usersStore.pagination.totalItems }}</span> membros
+            Showing <span class="text-white font-bold">{{ usersStore.paginatedMembers.length }}</span> of 
+            <span class="text-white font-bold">{{ usersStore.pagination.totalItems }}</span> members
           </p>
 
           <!-- View Toggle -->
@@ -118,7 +118,7 @@
             <div class="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             <div class="absolute inset-0 rounded-full shadow-[0_0_30px_rgba(244,37,244,0.3)] animate-pulse"></div>
           </div>
-          <p class="text-white/60 font-medium animate-pulse tracking-widest uppercase text-sm">Carregando membros...</p>
+          <p class="text-white/60 font-medium animate-pulse tracking-widest uppercase text-sm">Loading members...</p>
         </div>
 
         <!-- Empty State -->
@@ -126,15 +126,15 @@
           <div class="w-20 h-20 rounded-[24px] bg-white/5 border border-white/10 flex items-center justify-center mb-4">
             <span class="material-symbols-outlined text-4xl text-white/40">search_off</span>
           </div>
-          <h3 class="text-2xl font-black text-white uppercase tracking-tight">Nenhum membro encontrado</h3>
+          <h3 class="text-2xl font-black text-white uppercase tracking-tight">No members found</h3>
           <p class="text-white/60 text-center max-w-md">
-            Não há membros que correspondam aos filtros selecionados. Tente ajustar os critérios de busca.
+            There are no members matching the selected filters. Try adjusting the search criteria.
           </p>
           <button
             @click="handleClearFilters"
             class="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-white hover:bg-white/10 transition-all"
           >
-            Limpar Filtros
+            Clear Filters
           </button>
         </div>
 
@@ -142,7 +142,7 @@
         <div v-else>
           <div 
             v-if="viewMode === 'grid'"
-            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-fr w-full"
           >
             <MemberCard
               v-for="member in usersStore.paginatedMembers"
@@ -181,7 +181,7 @@
               class="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
             >
               <span class="material-symbols-outlined">chevron_left</span>
-              Anterior
+              Previous
             </button>
 
             <!-- Page Numbers -->
@@ -207,14 +207,14 @@
               :disabled="usersStore.pagination.currentPage === usersStore.pagination.totalPages"
               class="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              Próximo
+              Next
               <span class="material-symbols-outlined">chevron_right</span>
             </button>
           </div>
 
           <!-- Page Size Selector -->
           <div class="flex items-center gap-3 text-white/60 text-sm">
-            <span>Itens por página:</span>
+            <span>Items per page:</span>
             <select
               :value="usersStore.pagination.pageSize"
               @change="handlePageSizeChange"
@@ -230,15 +230,15 @@
     </div>
 
     <!-- Ban Confirmation Modal -->
-    <Modal v-model="showBanModal" title="Confirmar Banimento">
+    <Modal v-model="showBanModal" title="Confirm Ban">
       <div class="space-y-4">
         <div class="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg p-4">
           <div class="flex items-start gap-3">
             <span class="material-symbols-outlined text-red-500 text-2xl">warning</span>
             <div>
-              <p class="text-slate-900 dark:text-white font-medium mb-1">Ação Irreversível</p>
+              <p class="text-slate-900 dark:text-white font-medium mb-1">Irreversible Action</p>
               <p class="text-slate-600 dark:text-white/60 text-sm">
-                Tem certeza que deseja banir este usuário? Esta ação impedirá completamente o acesso à plataforma.
+                Are you sure you want to ban this user? This action will completely prevent access to the platform.
               </p>
             </div>
           </div>
@@ -250,7 +250,7 @@
               <span class="material-symbols-outlined text-primary text-2xl">person</span>
             </div>
             <div>
-              <p class="text-slate-900 dark:text-white font-medium">{{ userToBan.nome || 'Usuário' }}</p>
+              <p class="text-slate-900 dark:text-white font-medium">{{ userToBan.nome || 'User' }}</p>
               <p class="text-slate-600 dark:text-white/60 text-sm">{{ userToBan.email || userToBan.area_atuacao }}</p>
             </div>
           </div>
@@ -258,13 +258,13 @@
 
         <div>
           <label class="block text-slate-700 dark:text-white text-sm font-medium mb-2">
-            Motivo do banimento (opcional)
+            Ban reason (optional)
           </label>
           <textarea
             v-model="banReason"
             rows="3"
             class="w-full px-4 py-3 bg-white dark:bg-surface-lighter border border-slate-200 dark:border-white/10 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-white/40 focus:border-secondary focus:ring-1 focus:ring-secondary focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] focus:outline-none resize-none transition-all"
-            placeholder="Descreva o motivo do banimento..."
+            placeholder="Describe the ban reason..."
           ></textarea>
         </div>
 
@@ -273,14 +273,14 @@
             @click="showBanModal = false"
             class="px-6 py-2.5 rounded-lg text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
           >
-            Cancelar
+            Cancel
           </button>
           <button
             @click="confirmBan"
             class="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors flex items-center gap-2"
           >
             <span class="material-symbols-outlined text-lg">block</span>
-            Banir Usuário
+            Ban User
           </button>
         </div>
       </div>
@@ -372,11 +372,11 @@ function handleViewProfile(userId: string) {
 }
 
 function handleSuspend(_userId: string) {
-  toast.info('Funcionalidade de suspensão será implementada em breve')
+  toast.info('Suspension functionality will be implemented soon')
 }
 
 function handleUnsuspend(_userId: string) {
-  toast.info('Funcionalidade será implementada em breve')
+  toast.info('Functionality will be implemented soon')
 }
 
 function handleBan(userId: string) {
@@ -393,14 +393,14 @@ async function confirmBan() {
 
   try {
     await usersStore.banUser(userToBan.value.id, banReason.value || undefined)
-    toast.success('Usuário banido com sucesso')
+    toast.success('User banned successfully')
     await usersStore.fetchMembersPaginated(usersStore.pagination.currentPage, usersStore.pagination.pageSize)
     await usersStore.fetchUserStats()
     showBanModal.value = false
     userToBan.value = null
     banReason.value = ''
   } catch (error: any) {
-    toast.error(error.message || 'Erro ao banir usuário')
+    toast.error(error.message || 'Error banning user')
     console.error('Error banning user:', error)
   }
 }
@@ -408,11 +408,11 @@ async function confirmBan() {
 async function handleUnban(userId: string) {
   try {
     await usersStore.unbanUser(userId)
-    toast.success('Usuário desbanido com sucesso')
+    toast.success('User unbanned successfully')
     await usersStore.fetchMembersPaginated(usersStore.pagination.currentPage, usersStore.pagination.pageSize)
     await usersStore.fetchUserStats()
   } catch (error: any) {
-    toast.error(error.message || 'Erro ao desbanir usuário')
+    toast.error(error.message || 'Error unbanning user')
     console.error('Error unbanning user:', error)
   }
 }

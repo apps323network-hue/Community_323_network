@@ -107,7 +107,7 @@
             <!-- YouTube Video Section -->
             <div class="space-y-6">
               <!-- Source Toggle -->
-              <div class="flex p-1 bg-slate-100 dark:bg-black/40 rounded-xl w-fit">
+              <div class="flex p-1 bg-slate-100 dark:bg-black/40 rounded-xl w-fit gap-1">
                 <button 
                   type="button"
                   @click.prevent="videoSource = 'link'"
@@ -128,6 +128,24 @@
                 >
                   Fazer Upload
                 </button>
+                <button 
+                  type="button"
+                  @click.prevent="videoSource = 'none'; formData.youtube_video_id = ''"
+                  :class="[
+                    'px-4 py-2 rounded-lg text-xs font-black uppercase transition-all',
+                    videoSource === 'none' ? 'bg-white dark:bg-surface-dark text-secondary shadow-md' : 'text-slate-500'
+                  ]"
+                >
+                  Sem Vídeo
+                </button>
+              </div>
+              
+              <!-- Info quando sem vídeo -->
+              <div v-if="videoSource === 'none'" class="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                <p class="text-sm text-amber-400 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-sm">info</span>
+                  Esta aula será criada sem vídeo. O conteúdo estará disponível apenas na descrição e materiais.
+                </p>
               </div>
 
               <!-- Option 1: Paste Link -->
@@ -156,7 +174,7 @@
               </div>
 
               <!-- Option 2: Direct Upload -->
-              <div v-else class="space-y-4">
+              <div v-else-if="videoSource === 'upload'" class="space-y-4">
                 <div 
                   @dragover.prevent="isDragging = true"
                   @dragleave.prevent="isDragging = false"
@@ -498,7 +516,7 @@ const modulesStore = useModulesStore()
 const { t } = useLocale()
 const { locale: currentLocale } = useLocale()
 const fetchingMetadata = ref(false)
-const videoSource = ref<'link' | 'upload'>('link')
+const videoSource = ref<'link' | 'upload' | 'none'>('link')
 const isDragging = ref(false)
 const uploadState = ref<{
   isUploading: boolean
@@ -566,6 +584,7 @@ watch(() => uploadState.value, (newVal, oldVal) => {
 }, { deep: true })
 
 function resetForm() {
+  videoSource.value = 'link'
   formData.value = {
     title_pt: '',
     title_en: '',
@@ -730,6 +749,13 @@ function handleSubmit() {
     delete dataToSave.duration_seconds
     delete dataToSave.youtube_thumbnail_url
     delete dataToSave.is_preview
+  }
+  
+  // Se não houver vídeo, garantir que youtube_video_id seja null
+  if (props.mode === 'lesson' && (!dataToSave.youtube_video_id || dataToSave.youtube_video_id.trim() === '')) {
+    dataToSave.youtube_video_id = null
+    dataToSave.youtube_thumbnail_url = null
+    dataToSave.duration_seconds = null
   }
   
   emit('save', dataToSave)

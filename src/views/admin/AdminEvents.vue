@@ -21,7 +21,7 @@
           class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-black font-bold rounded-lg hover:shadow-lg hover:shadow-primary/30 transition-all"
         >
           <span class="material-symbols-outlined">add</span>
-          <span class="hidden sm:inline">{{ t('admin.events.newEvent') }}</span>
+          <span class="hidden sm:inline">New Event</span>
         </button>
       </div>
 
@@ -344,7 +344,7 @@ async function handleCreateEventSubmit(data: { formData: any; dateTime: any; ima
 }
 
 onMounted(async () => {
-  // Verificar se é admin
+  // Check if admin
   if (!isAdmin.value) {
     router.push('/')
     return

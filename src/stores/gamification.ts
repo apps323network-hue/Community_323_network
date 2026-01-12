@@ -60,9 +60,27 @@ export const useGamificationStore = defineStore('gamification', () => {
     }
 
     // Award points to user
+    // 
+    // FUNCIONALIDADE DESATIVADA:
+    // O ganho de pontos ao completar desafios foi desativado temporariamente.
+    // Quando origin = 'challenge', o trigger prevent_challenge_points_trigger no banco de dados
+    // impede que os pontos sejam atribuídos.
+    //
+    // Para reativar:
+    // 1. Remova o trigger no banco: DROP TRIGGER prevent_challenge_points_trigger ON public.user_points;
+    // 2. Arquivo da migração: supabase/migrations/047_disable_challenge_points_award.sql
+    //
     async function awardPoints(points: number, origin: PointsOrigin, originId?: string, description?: string, unique: boolean = false, uniquePerId: boolean = false) {
         if (!userId.value) return
         try {
+            // DESATIVADO: Quando origin = 'challenge', o trigger no banco de dados impede a inserção
+            // Para reativar: Remova o trigger prevent_challenge_points_trigger no banco de dados
+            if (origin === 'challenge') {
+                // O trigger prevent_challenge_points_trigger no banco de dados impedirá a inserção
+                // Não há necessidade de retornar aqui, pois o trigger cuidará disso
+                console.log('[DESATIVADO] Tentativa de atribuir pontos de desafio bloqueada pelo trigger do banco de dados')
+            }
+
             if (unique) {
                 // Check if already awarded for this origin
                 const { data: existingPoints, error: fetchErr } = await supabase

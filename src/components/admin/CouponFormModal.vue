@@ -1,7 +1,7 @@
 <template>
   <Modal
     v-model="isOpen"
-    :title="coupon ? 'Editar Cupom' : 'Criar Novo Cupom'"
+    :title="coupon ? 'Edit Coupon' : 'Create New Coupon'"
     size="lg"
   >
     <form @submit.prevent="handleSubmit" class="space-y-6">
@@ -24,12 +24,12 @@
       <!-- Description -->
       <div>
         <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
-          Descrição
+          Description
         </label>
         <textarea
           v-model="formData.description"
           rows="2"
-          placeholder="Ex: Desconto de Natal para todos os conteúdos"
+          placeholder="Ex: Christmas discount for all content"
           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none resize-none"
         ></textarea>
       </div>
@@ -38,20 +38,20 @@
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
-            Tipo de Desconto *
+            Discount Type *
           </label>
           <select
             v-model="formData.discount_type"
             class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none"
             required
           >
-            <option value="percentage">Percentual (%)</option>
-            <option value="fixed">Valor Fixo ($)</option>
+            <option value="percentage">Percentage (%)</option>
+            <option value="fixed">Fixed Amount ($)</option>
           </select>
         </div>
         <div>
           <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
-            Valor *
+            Value *
           </label>
           <input
             v-model.number="formData.discount_value"
@@ -59,7 +59,7 @@
             step="0.01"
             min="0.01"
             :max="formData.discount_type === 'percentage' ? 100 : undefined"
-            placeholder="Ex: 20 ou 50.00"
+            placeholder="Ex: 20 or 50.00"
             class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none"
             required
           />
@@ -85,7 +85,7 @@
       <!-- Specific Programs -->
       <div v-if="formData.scope_type === 'specific_programs'" class="space-y-3">
         <label class="block text-sm font-medium text-slate-700 dark:text-gray-300">
-          Selecionar Programas
+          Select Programs
         </label>
         
         <!-- Search bar -->
@@ -94,7 +94,7 @@
           <input
             v-model="searchProgram"
             type="text"
-            placeholder="Buscar programas..."
+            placeholder="Search programs..."
             class="w-full pl-11 pr-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none transition-all"
           />
         </div>
@@ -137,7 +137,7 @@
               <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center mx-auto">
                 <span class="material-icons text-3xl">search_off</span>
               </div>
-              <p class="text-xs font-bold uppercase tracking-widest">Nenhum programa encontrado</p>
+              <p class="text-xs font-bold uppercase tracking-widest">No programs found</p>
             </div>
           </div>
         </div>
@@ -147,7 +147,7 @@
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-              {{ formData.applicable_programs.length }} {{ formData.applicable_programs.length === 1 ? 'programa selecionado' : 'programas selecionados' }}
+              {{ formData.applicable_programs.length }} {{ formData.applicable_programs.length === 1 ? 'program selected' : 'programs selected' }}
             </p>
           </div>
           <button 
@@ -157,7 +157,7 @@
             class="group flex items-center gap-1.5 text-[10px] font-black text-red-500 uppercase tracking-widest hover:text-red-600 transition-colors"
           >
             <span class="material-icons text-xs group-hover:rotate-90 transition-transform">close</span>
-            Limpar tudo
+            Clear all
           </button>
         </div>
       </div>
@@ -182,13 +182,13 @@
       <!-- Max Uses -->
       <div>
         <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
-          Limite Total de Usos
+          Total Usage Limit
         </label>
         <input
           v-model.number="formData.max_uses"
           type="number"
           min="1"
-          placeholder="Deixe vazio para ilimitado"
+          placeholder="Leave empty for unlimited"
           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none"
         />
       </div>
@@ -197,7 +197,7 @@
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
-            Válido de
+            Valid from
           </label>
           <input
             v-model="formData.valid_from"
@@ -207,14 +207,14 @@
         </div>
         <div>
           <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
-            Válido até
+            Valid until
           </label>
           <input
             v-model="formData.valid_until"
             type="datetime-local"
             class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none"
           />
-          <p class="text-xs text-slate-500 mt-1">Deixe vazio para sem expiração</p>
+          <p class="text-xs text-slate-500 mt-1">Leave empty for no expiration</p>
         </div>
       </div>
 
@@ -229,7 +229,7 @@
           <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer dark:bg-white/10 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary dark:peer-checked:bg-secondary"></div>
         </label>
         <span class="text-sm text-slate-700 dark:text-gray-300 font-medium">
-          Cupom Ativo
+          Coupon Active
         </span>
       </div>
 
@@ -240,14 +240,14 @@
           @click="handleCancel"
           class="flex-1 px-4 py-2.5 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 rounded-xl text-slate-700 dark:text-white font-bold transition-all"
         >
-          Cancelar
+          Cancel
         </button>
         <button
           type="submit"
           :disabled="submitting"
           class="flex-1 px-4 py-2.5 bg-gradient-to-r from-primary to-secondary text-black font-bold rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
         >
-          {{ submitting ? 'Salvando...' : coupon ? 'Atualizar Cupom' : 'Criar Cupom' }}
+          {{ submitting ? 'Saving...' : coupon ? 'Update Coupon' : 'Create Coupon' }}
         </button>
       </div>
     </form>
@@ -352,27 +352,27 @@ watch(isOpen, (newVal) => {
 async function handleSubmit() {
   // Validation
   if (!formData.value.code.trim()) {
-    toast.error('Código do cupom é obrigatório')
+    toast.error('Coupon code is required')
     return
   }
 
   if (formData.value.discount_value <= 0) {
-    toast.error('Valor do desconto deve ser maior que zero')
+    toast.error('Discount value must be greater than zero')
     return
   }
 
   if (formData.value.discount_type === 'percentage' && formData.value.discount_value > 100) {
-    toast.error('Desconto percentual não pode ser maior que 100%')
+    toast.error('Percentage discount cannot be greater than 100%')
     return
   }
 
   if (formData.value.scope_type === 'specific_programs' && formData.value.applicable_programs.length === 0) {
-    toast.error('Selecione pelo menos um programa')
+    toast.error('Select at least one program')
     return
   }
 
   if (formData.value.scope_type === 'category' && !formData.value.applicable_category) {
-    toast.error('Selecione uma categoria')
+    toast.error('Select a category')
     return
   }
 
@@ -420,9 +420,9 @@ async function handleSubmit() {
     console.error('Error saving coupon:', error)
     
     if (error.code === '23505') {
-      toast.error('Este código de cupom já existe')
+      toast.error('This coupon code already exists')
     } else {
-      toast.error('Erro ao salvar cupom')
+      toast.error('Error saving coupon')
     }
   } finally {
     submitting.value = false

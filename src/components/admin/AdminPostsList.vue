@@ -10,7 +10,7 @@
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Buscar por conteúdo ou autor..."
+          placeholder="Search by content or author..."
           class="w-full pl-10 pr-4 py-2.5 border border-slate-200 dark:border-white/10 rounded-lg bg-white dark:bg-[#0a040f] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] transition-all text-sm sm:text-base"
         />
       </div>
@@ -20,10 +20,10 @@
         v-model="statusFilter"
         class="px-4 py-2.5 border border-slate-200 dark:border-white/10 rounded-lg bg-white dark:bg-[#0a040f] text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] transition-all text-sm sm:text-base"
       >
-        <option value="">Todos os Status</option>
-        <option value="approved">Aprovados</option>
-        <option value="pending">Pendentes</option>
-        <option value="removed">Removidos</option>
+        <option value="">All Status</option>
+        <option value="approved">Approved</option>
+        <option value="pending">Pending</option>
+        <option value="removed">Removed</option>
       </select>
     </div>
 
@@ -44,9 +44,9 @@
     <!-- Empty State -->
     <div v-else-if="!loading && filteredPosts.length === 0" class="text-center py-12">
       <span class="material-symbols-outlined text-slate-400 dark:text-white/40 text-6xl mb-4">article</span>
-      <p class="text-slate-600 dark:text-white/60 text-lg">Nenhum post encontrado</p>
+      <p class="text-slate-600 dark:text-white/60 text-lg">No posts found</p>
       <p v-if="searchQuery || statusFilter" class="text-slate-500 dark:text-white/40 text-sm mt-2">
-        Tente ajustar os filtros de busca
+        Try adjusting the search filters
       </p>
     </div>
 
@@ -63,13 +63,13 @@
             <div class="flex items-start gap-3 mb-2">
               <Avatar
                 :src="post.author?.avatar_url"
-                :name="post.author?.nome || 'Usuário'"
+                :name="post.author?.nome || 'User'"
                 size="sm"
               />
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 mb-1">
                   <h4 class="text-slate-900 dark:text-white font-semibold text-sm sm:text-base truncate">
-                    {{ post.author?.nome || 'Usuário' }}
+                    {{ post.author?.nome || 'User' }}
                   </h4>
                   <PostStatusBadge :status="post.status || 'pending'" />
                 </div>
@@ -99,7 +99,7 @@
             <button
               v-if="post.status === 'pending'"
               class="p-2 text-green-400 hover:bg-green-500/20 rounded-lg transition-all"
-              title="Aprovar"
+              title="Approve"
               @click="$emit('approve', post.id)"
             >
               <span class="material-symbols-outlined text-base sm:text-lg">check_circle</span>
@@ -107,14 +107,14 @@
             <button
               v-if="post.status !== 'removed'"
               class="p-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-all"
-              title="Remover"
+              title="Remove"
               @click="$emit('remove', post.id)"
             >
               <span class="material-symbols-outlined text-base sm:text-lg">delete</span>
             </button>
             <button
               class="p-2 text-slate-600 dark:text-white/60 hover:bg-slate-50 dark:hover:bg-white/10 rounded-lg transition-all"
-              title="Ver Detalhes"
+              title="View Details"
               @click="$emit('view-details', post.id)"
             >
               <span class="material-symbols-outlined text-base sm:text-lg">visibility</span>
@@ -172,7 +172,7 @@ const filteredPosts = computed(() => {
 function formattedDate(dateString?: string) {
   if (!dateString) return ''
   const date = new Date(dateString)
-  return date.toLocaleDateString('pt-BR', {
+  return date.toLocaleDateString('en-US', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -184,9 +184,9 @@ function formattedDate(dateString?: string) {
 function postTypeLabel(tipo: string) {
   const labels: Record<string, string> = {
     networking: 'Networking',
-    ofereco_servico: 'Ofereço Serviço',
-    procuro_ajuda: 'Procuro Ajuda',
-    oportunidade: 'Oportunidade',
+    ofereco_servico: 'Offering Service',
+    procuro_ajuda: 'Seeking Help',
+    oportunidade: 'Opportunity',
   }
   return labels[tipo] || tipo
 }

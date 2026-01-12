@@ -9,7 +9,7 @@
 
   <div v-else-if="!loading && events.length === 0" class="text-center py-12">
     <span class="material-symbols-outlined text-white/40 text-6xl mb-4">event_busy</span>
-    <p class="text-white/60 text-lg">Nenhum evento encontrado</p>
+    <p class="text-white/60 text-lg">No events found</p>
   </div>
 
   <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

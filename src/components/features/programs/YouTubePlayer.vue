@@ -34,7 +34,7 @@
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 
 const props = defineProps<{
-  videoId: string
+  videoId: string | null
   title?: string
   autoplay?: boolean
 }>()
@@ -76,6 +76,12 @@ function loadYouTubeAPI() {
 }
 
 async function initPlayer() {
+  if (!props.videoId) {
+    error.value = 'Nenhum vídeo disponível'
+    loading.value = false
+    return
+  }
+
   loading.value = true
   error.value = ''
 
@@ -197,6 +203,16 @@ defineExpose({
 
 // Watch for videoId changes
 watch(() => props.videoId, (newVideoId, oldVideoId) => {
+  if (!newVideoId) {
+    if (player.value) {
+      player.value.destroy()
+      player.value = null
+    }
+    error.value = 'Nenhum vídeo disponível'
+    loading.value = false
+    return
+  }
+  
   if (newVideoId !== oldVideoId && player.value) {
     loading.value = true
     player.value.loadVideoById(newVideoId)
@@ -204,7 +220,12 @@ watch(() => props.videoId, (newVideoId, oldVideoId) => {
 })
 
 onMounted(() => {
-  initPlayer()
+  if (props.videoId) {
+    initPlayer()
+  } else {
+    error.value = 'Nenhum vídeo disponível'
+    loading.value = false
+  }
 })
 
 onBeforeUnmount(() => {

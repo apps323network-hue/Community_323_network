@@ -15,7 +15,7 @@
               {{ isEditMode ? t('programs.admin.editProgram') : t('programs.admin.createProgram') }}
             </h1>
             <p class="text-slate-600 dark:text-gray-400 mt-1" v-if="isEditMode && form.title_pt">
-              Editando: {{ form.title_pt }}
+              Editing: {{ form.title_pt }}
             </p>
           </div>
         </div>
@@ -26,7 +26,7 @@
           class="px-8 py-2.5 bg-primary dark:bg-secondary text-white font-bold rounded-lg hover:opacity-90 transition shadow-lg flex items-center gap-2"
         >
           <span v-if="saving" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-          {{ saving ? 'Salvando...' : (isEditMode ? 'Atualizar Programa' : 'Criar Programa') }}
+          {{ saving ? 'Saving...' : (isEditMode ? 'Update Program' : 'Create Program') }}
         </button>
       </div>
 
@@ -450,9 +450,9 @@ const imageInput = ref<HTMLInputElement | null>(null)
 const professors = ref<any[]>([])
 
 const tabs = [
-  { id: 'basic', label: 'Informações Básicas' },
-  { id: 'settings', label: 'Inscrição e Detalhes' },
-  { id: 'content', label: 'Conteúdo & Grade' },
+  { id: 'basic', label: 'Basic Information' },
+  { id: 'settings', label: 'Enrollment & Details' },
+  { id: 'content', label: 'Content & Curriculum' },
 ]
 
 // Initialize with default values for Create mode

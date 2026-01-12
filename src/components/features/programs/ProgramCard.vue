@@ -46,6 +46,7 @@
     >
       <div class="flex gap-2 mb-2">
         <button 
+          v-if="hasVideos"
           class="size-8 rounded-full bg-white text-black flex items-center justify-center hover:bg-secondary transition-colors"
           @click.stop="$emit('play')"
         >
@@ -170,5 +171,9 @@ const hoverShadow = computed(() => {
   return props.aspectRatio === 'poster' 
     ? 'hover:shadow-[0_0_20px_rgba(255,0,153,0.3)]'
     : 'hover:shadow-[0_0_20px_rgba(0,240,255,0.3)]'
+})
+
+const hasVideos = computed(() => {
+  return props.program.has_videos === true
 })
 </script>

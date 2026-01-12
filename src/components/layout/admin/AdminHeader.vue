@@ -13,7 +13,7 @@
           </RouterLink>
           <div class="hidden md:block h-6 w-px bg-slate-200 dark:bg-white/10"></div>
           <div class="hidden md:block">
-            <p class="text-sm text-slate-600 dark:text-white/60">Dashboard de Administração</p>
+            <p class="text-sm text-slate-600 dark:text-white/60">Administration Dashboard</p>
           </div>
         </div>
 

@@ -66,8 +66,11 @@
                   : 'bg-white/10 text-white'
               ]"
             >
-              <span class="material-symbols-outlined text-lg">
+              <span v-if="lesson.youtube_video_id" class="material-symbols-outlined text-lg">
                 {{ currentLessonId === lesson.id ? 'play_arrow' : 'play_circle' }}
+              </span>
+              <span v-else class="material-symbols-outlined text-lg">
+                {{ currentLessonId === lesson.id ? 'description' : 'article' }}
               </span>
             </div>
 
@@ -96,11 +99,16 @@
             </div>
 
             <!-- Thumbnail -->
-            <img
-              :src="lesson.youtube_thumbnail_url || `https://img.youtube.com/vi/${lesson.youtube_video_id}/default.jpg`"
-              :alt="getLessonTitle(lesson)"
-              class="w-16 h-12 object-cover rounded flex-shrink-0 opacity-80"
-            />
+            <div v-if="lesson.youtube_video_id" class="w-16 h-12 rounded flex-shrink-0 overflow-hidden">
+              <img
+                :src="lesson.youtube_thumbnail_url || `https://img.youtube.com/vi/${lesson.youtube_video_id}/default.jpg`"
+                :alt="getLessonTitle(lesson)"
+                class="w-full h-full object-cover opacity-80"
+              />
+            </div>
+            <div v-else class="w-16 h-12 rounded flex-shrink-0 bg-slate-700/50 flex items-center justify-center">
+              <span class="material-symbols-outlined text-slate-400 text-xl">description</span>
+            </div>
           </div>
         </div>
       </div>

@@ -825,7 +825,7 @@ const handleCheckout = async () => {
         await programsStore.fetchProgramById(program.value.id)
         
         // Redirecionar para o player
-        router.push(`/programas/${program.value.id}/player`)
+        router.push(`/programs/${program.value.id}/assistir`)
         return
       } catch (err: any) {
         console.error('Localhost enrollment error:', err)
