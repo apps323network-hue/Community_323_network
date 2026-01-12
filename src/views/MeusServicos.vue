@@ -306,6 +306,31 @@
           />
         </div>
 
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
+              Termos e Condições (PT)
+            </label>
+            <textarea
+              v-model="newService.terms_content_pt"
+              rows="4"
+              class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+              placeholder="Defina as condições para este serviço em português..."
+            ></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
+              Terms & Conditions (EN)
+            </label>
+            <textarea
+              v-model="newService.terms_content_en"
+              rows="4"
+              class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+              placeholder="Define the terms for this service in English..."
+            ></textarea>
+          </div>
+        </div>
+
         <div class="flex justify-end gap-3 pt-4">
           <button
             type="button"
@@ -328,7 +353,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSupabase } from '@/composables/useSupabase'
 import AppLayout from '@/components/layout/AppLayout.vue'
@@ -360,7 +385,9 @@ const newService = ref({
   descricao: '',
   categoria: '',
   preco: null as number | null,
-  beneficio_membro: ''
+  beneficio_membro: '',
+  terms_content_pt: '',
+  terms_content_en: ''
 })
 
 async function fetchHiredServices() {
@@ -522,7 +549,9 @@ function handleEditService(service: any) {
     descricao: service.descricao_pt,
     categoria: service.categoria,
     preco: service.preco ? service.preco / 100 : null,
-    beneficio_membro: service.beneficio_membro_pt
+    beneficio_membro: service.beneficio_membro_pt,
+    terms_content_pt: service.terms_content_pt || '',
+    terms_content_en: service.terms_content_en || ''
   }
   showEditModal.value = true
 }
@@ -544,6 +573,8 @@ async function submitEditService() {
         preco: newService.value.preco ? Math.round(newService.value.preco * 100) : null,
         beneficio_membro_pt: newService.value.beneficio_membro || null,
         beneficio_membro_en: newService.value.beneficio_membro || null,
+        terms_content_pt: newService.value.terms_content_pt || null,
+        terms_content_en: newService.value.terms_content_en || null,
         status: 'pending', 
         rejection_reason: null
       })
@@ -562,7 +593,7 @@ async function submitEditService() {
   }
 }
 
-function handleRequestService(service: any) {
+function handleRequestService(_service: any) {
   // Lógica de "ver como usuário" se necessário, ou redirecionar
   router.push('/servicos')
 }

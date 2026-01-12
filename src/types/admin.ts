@@ -137,6 +137,8 @@ export interface AdminService {
   external_url?: string;
   sso_enabled?: boolean;
   sso_callback_path?: string;
+  terms_content_pt?: string;
+  terms_content_en?: string;
 }
 
 export interface ServiceStats {

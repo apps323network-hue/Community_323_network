@@ -324,6 +324,27 @@
             ></textarea>
           </div>
 
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Termos e Condições (PT)</label>
+              <textarea
+                v-model="formData.terms_content_pt"
+                rows="6"
+                class="w-full rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-lighter p-3 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                placeholder="Termos específicos para este serviço em português..."
+              ></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Terms & Conditions (EN)</label>
+              <textarea
+                v-model="formData.terms_content_en"
+                rows="6"
+                class="w-full rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-lighter p-3 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                placeholder="Specific terms for this service in English..."
+              ></textarea>
+            </div>
+          </div>
+
           <div class="flex gap-4">
             <label class="flex items-center gap-2 cursor-pointer">
               <input
@@ -472,6 +493,8 @@ const formData = ref<Partial<AdminService>>({
   rejection_reason: '',
   preco: undefined,
   moeda: 'USD',
+  terms_content_pt: '',
+  terms_content_en: '',
 })
 
 function formatPrice(cents: number, currency: string = 'USD'): string {
@@ -499,6 +522,8 @@ function editService(service: AdminService) {
     rejection_reason: service.rejection_reason || '',
     preco: service.preco ? service.preco / 100 : undefined,
     moeda: service.moeda || 'USD',
+    terms_content_pt: service.terms_content_pt || '',
+    terms_content_en: service.terms_content_en || '',
   }
   showEditModal.value = true
 }
@@ -594,6 +619,8 @@ function closeModal() {
     rejection_reason: '',
     preco: undefined,
     moeda: 'USD',
+    terms_content_pt: '',
+    terms_content_en: '',
   }
 }
 
