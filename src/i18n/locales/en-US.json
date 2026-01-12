@@ -60,7 +60,9 @@
         "minutesAgo": "min ago",
         "hoursAgo": "h ago",
         "daysAgo": "d ago",
-        "secondsShort": "Sec"
+        "secondsShort": "Sec",
+        "next": "Next",
+        "previous": "Previous"
     },
     "navigation": {
         "home": "Feed",
@@ -1134,6 +1136,26 @@
         "submitReview": "Submit Review",
         "reviewSuccess": "Review submitted successfully!",
         "reviewError": "Error submitting review.",
+        "previousLesson": "Previous Lesson",
+        "nextLesson": "Next Lesson",
+        "noDescription": "No description available for this lesson.",
+        "exclusiveContent": "Exclusive Content",
+        "exclusiveContentDesc": "This content is exclusive to enrolled students. If you are already a student, please log in to access.",
+        "textBasedLesson": "This lesson is text-based",
+        "textBasedLessonDesc": "Check the description and materials below to complete this lesson.",
+        "unlockLesson": "Unlock Lesson",
+        "noMaterials": "No Materials",
+        "noMaterialsDesc": "This lesson has no supporting materials.",
+        "programNotFound": "Program not found",
+        "programNotFoundDesc": "You do not have access to this program or it does not exist.",
+        "backAction": "Back to Programs",
+        "courseContent": "Course Content",
+        "moduleLabel": "Module",
+        "lessonLabel": "Lesson",
+        "completed": "completed",
+        "modules": "modules",
+        "lessons": "lessons",
+        "previewLabel": "Preview",
         "noProgramsFound": "No programs found",
         "noProgramsFoundDesc": "There are no programs available at the moment.",
         "noEnrollmentsFound": "You are not enrolled in any programs yet",
@@ -1563,6 +1585,7 @@
                     "enrollmentDate": "Enrollment Date",
                     "status": "Status",
                     "active": "Active",
+                    "progress": "Progress",
                     "noName": "No name"
                 }
             }

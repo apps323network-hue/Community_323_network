@@ -41,6 +41,9 @@
               <th class="px-6 py-4 text-left text-xs font-black text-slate-600 dark:text-gray-400 uppercase tracking-wider">
                 {{ t('professor.manage.studentsTab.table.status') }}
               </th>
+              <th class="px-6 py-4 text-left text-xs font-black text-slate-600 dark:text-gray-400 uppercase tracking-wider">
+                {{ t('professor.manage.studentsTab.table.progress') }}
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-200 dark:divide-white/5">
@@ -70,6 +73,17 @@
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400">
                   {{ t('professor.manage.studentsTab.table.active') }}
                 </span>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="flex-1 h-2 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden min-w-[100px]">
+                    <div 
+                      class="h-full bg-secondary transition-all duration-500"
+                      :style="{ width: `${student.progress_percentage || 0}%` }"
+                    ></div>
+                  </div>
+                  <span class="text-xs font-black text-slate-900 dark:text-white">{{ student.progress_percentage || 0 }}%</span>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -111,6 +125,7 @@ async function fetchStudents() {
       .select(`
         user_id,
         enrolled_at,
+        progress_percentage,
         profile:profiles!program_enrollments_user_id_fkey(
           id,
           nome,

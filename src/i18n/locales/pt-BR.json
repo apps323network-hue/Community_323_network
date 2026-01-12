@@ -60,7 +60,9 @@
         "minutesAgo": "min atrás",
         "hoursAgo": "h atrás",
         "daysAgo": "d atrás",
-        "secondsShort": "Seg"
+        "secondsShort": "Seg",
+        "next": "Próxima",
+        "previous": "Anterior"
     },
     "navigation": {
         "home": "Feed",
@@ -1138,6 +1140,26 @@
         "submitReview": "Enviar Avaliação",
         "reviewSuccess": "Avaliação enviada com sucesso!",
         "reviewError": "Erro ao enviar avaliação.",
+        "previousLesson": "Aula Anterior",
+        "nextLesson": "Próxima Aula",
+        "noDescription": "Nenhuma descrição disponível para esta aula.",
+        "exclusiveContent": "Conteúdo Exclusivo",
+        "exclusiveContentDesc": "Este conteúdo é exclusivo para alunos matriculados. Se você já é aluno, faça login para acessar.",
+        "textBasedLesson": "Esta aula é baseada em texto",
+        "textBasedLessonDesc": "Confira a descrição e os materiais abaixo para completar esta aula.",
+        "unlockLesson": "Desbloquear Aula",
+        "noMaterials": "Nenhum Material",
+        "noMaterialsDesc": "Esta aula não possui arquivos complementares.",
+        "programNotFound": "Programa não encontrado",
+        "programNotFoundDesc": "Você não tem acesso a este programa ou ele não existe.",
+        "backAction": "Voltar aos Programas",
+        "courseContent": "Conteúdo do Curso",
+        "moduleLabel": "Módulo",
+        "lessonLabel": "Aula",
+        "completed": "concluído",
+        "modules": "módulos",
+        "lessons": "aulas",
+        "previewLabel": "Preview",
         "noProgramsFound": "Nenhum programa encontrado",
         "noProgramsFoundDesc": "Não há programas disponíveis no momento.",
         "noEnrollmentsFound": "Você ainda não está matriculado em nenhum programa",
@@ -1567,6 +1589,7 @@
                     "enrollmentDate": "Data de Matrícula",
                     "status": "Status",
                     "active": "Ativo",
+                    "progress": "Progresso",
                     "noName": "Sem nome"
                 }
             }
