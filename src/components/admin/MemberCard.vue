@@ -1,21 +1,21 @@
 <template>
   <div class="relative rounded-[24px] p-6 bg-slate-900/50 backdrop-blur-sm border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(244,37,244,0.2)] group">
-    <div class="flex items-start justify-between gap-4">
+    <div class="flex flex-col sm:flex-row items-start justify-between gap-6">
       <!-- Left Side: Avatar + Info -->
-      <div class="flex items-start gap-4">
+      <div class="flex items-start gap-4 flex-1 min-w-0">
         <!-- Avatar -->
         <div class="relative shrink-0">
           <img 
             v-if="user.avatar_url" 
             :src="user.avatar_url" 
             :alt="user.nome || 'User'"
-            class="w-14 h-14 rounded-full object-cover ring-2 ring-white/10 group-hover:ring-primary/50 transition-all"
+            class="w-16 h-16 rounded-full object-cover ring-2 ring-white/10 group-hover:ring-primary/50 transition-all"
           />
           <div 
             v-else 
-            class="w-14 h-14 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center ring-2 ring-white/10 group-hover:ring-primary/50 transition-all"
+            class="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center ring-2 ring-white/10 group-hover:ring-primary/50 transition-all"
           >
-            <span class="text-white font-black text-xl">{{ initials }}</span>
+            <span class="text-white font-black text-2xl">{{ initials }}</span>
           </div>
           
           <!-- Online indicator -->
@@ -26,41 +26,110 @@
         </div>
 
         <!-- Info -->
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-1 min-w-0 flex-1">
           <!-- Name + Badges -->
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2">
             <h3 class="text-white font-bold text-lg truncate leading-tight">{{ user.nome || 'Usuário' }}</h3>
 
             <span v-if="user.plano" class="px-2 py-0.5 rounded-lg text-[10px] font-medium" :class="planClass">
               {{ user.plano }}
             </span>
+            
+            <UserStatusBadge :status="user.status" size="sm" />
           </div>
 
           <!-- Email -->
-          <p class="text-white/60 text-sm font-medium">{{ user.email }}</p>
+          <p class="text-white/60 text-sm font-medium truncate">{{ user.email }}</p>
 
-          <!-- Location & Chips -->
-          <div class="flex items-center gap-2 mt-1">
-            <span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/5 text-white/70 border border-white/10">
-              {{ roleLabel }}
-            </span>
-            <div v-if="locationText" class="flex items-center gap-1 text-white/40 text-xs">
-              <span class="material-symbols-outlined text-sm">location_on</span>
-              <span>{{ locationText }}</span>
+          <!-- Role Selector -->
+          <div class="flex flex-wrap items-center gap-3 mt-2">
+            <div class="relative group/role">
+              <select
+                :value="user.role || 'user'"
+                @change="handleRoleChange"
+                class="appearance-none bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 pr-8 text-xs text-white/80 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all cursor-pointer hover:bg-white/10"
+              >
+                <option value="user" class="bg-slate-900 text-white">Membro</option>
+                <option value="professor" class="bg-slate-900 text-white">Professor</option>
+                <option value="partner" class="bg-slate-900 text-white">Parceiro</option>
+                <option value="admin" class="bg-slate-900 text-white">Admin</option>
+              </select>
+              <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-white/40 text-sm pointer-events-none group-hover/role:text-white/60 transition-colors">
+                expand_more
+              </span>
+            </div>
+
+            <div v-if="locationText" class="flex items-center gap-1 text-white/40 text-xs truncate">
+              <span class="material-symbols-outlined text-sm shrink-0">location_on</span>
+              <span class="truncate">{{ locationText }}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Right Side: Stats -->
-      <div class="flex flex-col items-end gap-2">
-        <div class="flex items-center gap-2 text-white/60 text-sm" title="Total de Posts">
-          <span><strong class="text-white">{{ user.post_count || 0 }}</strong> Posts</span>
-          <span class="material-symbols-outlined text-lg">article</span>
+      <!-- Right Side: Stats & Actions -->
+      <div class="flex flex-col items-end gap-4 shrink-0 w-full sm:w-auto">
+        <!-- Stats -->
+        <div class="flex gap-4 w-full sm:w-auto justify-around sm:justify-end">
+          <div class="flex flex-col items-center" title="Total de Posts">
+            <span class="text-white font-black text-lg">{{ user.post_count || 0 }}</span>
+            <span class="text-white/40 text-[10px] uppercase font-bold tracking-widest">Posts</span>
+          </div>
+          <div class="flex flex-col items-center" title="Conexões">
+            <span class="text-white font-black text-lg">{{ user.connections_count || 0 }}</span>
+            <span class="text-white/40 text-[10px] uppercase font-bold tracking-widest">Conexões</span>
+          </div>
+          <div class="flex flex-col items-center" title="Pontos">
+            <span class="text-primary font-black text-lg">{{ user.pontos || 0 }}</span>
+            <span class="text-white/40 text-[10px] uppercase font-bold tracking-widest">Pontos</span>
+          </div>
         </div>
-        <div class="flex items-center gap-2 text-white/60 text-sm" title="Conexões">
-          <span><strong class="text-white">{{ user.connections_count || 0 }}</strong> Conexões</span>
-          <span class="material-symbols-outlined text-lg">group</span>
+
+        <!-- Admin Actions -->
+        <div class="flex items-center gap-2 pt-2 border-t border-white/5 w-full justify-end">
+          <button
+            @click="$emit('view-profile', user.id)"
+            class="p-2 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all"
+            title="Ver Perfil"
+          >
+            <span class="material-symbols-outlined text-lg">visibility</span>
+          </button>
+          
+          <button
+            v-if="user.status === 'active'"
+            @click="$emit('suspend', user.id)"
+            class="p-2 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-500/60 hover:text-yellow-500 hover:bg-yellow-500/20 transition-all"
+            title="Suspender"
+          >
+            <span class="material-symbols-outlined text-lg">timer</span>
+          </button>
+          
+          <button
+            v-if="user.status === 'suspended'"
+            @click="$emit('unsuspend', user.id)"
+            class="p-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500/60 hover:text-green-500 hover:bg-green-500/20 transition-all"
+            title="Ativar"
+          >
+            <span class="material-symbols-outlined text-lg">play_circle</span>
+          </button>
+
+          <button
+            v-if="user.status !== 'banned'"
+            @click="$emit('ban', user.id)"
+            class="p-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500/60 hover:text-red-500 hover:bg-red-500/20 transition-all"
+            title="Banir"
+          >
+            <span class="material-symbols-outlined text-lg">block</span>
+          </button>
+          
+          <button
+            v-if="user.status === 'banned'"
+            @click="$emit('unban', user.id)"
+            class="p-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500/60 hover:text-green-500 hover:bg-green-500/20 transition-all"
+            title="Remover Banimento"
+          >
+            <span class="material-symbols-outlined text-lg">check_circle</span>
+          </button>
         </div>
       </div>
     </div>
@@ -68,31 +137,44 @@
     <!-- Strikes Warning (if any) -->
     <div v-if="user.strikes && user.strikes > 0" class="mt-4 flex items-center gap-2 p-2 bg-red-500/10 border border-red-500/20 rounded-lg">
       <span class="material-symbols-outlined text-red-500 text-lg">warning</span>
-      <span class="text-red-400 text-xs font-medium">{{ user.strikes }} strike(s)</span>
+      <span class="text-red-400 text-xs font-medium">{{ user.strikes }} strike(s) ativo(s)</span>
     </div>
 
     <!-- Footer Info -->
     <div class="mt-4 flex items-center justify-between text-[10px] text-white/30 border-t border-white/5 pt-2">
-      <span>{{ lastSeenText }}</span>
-      <span>Cadastrado {{ cadastradoText }}</span>
+      <div class="flex items-center gap-1">
+        <span class="material-symbols-outlined text-[12px]">schedule</span>
+        <span>{{ lastSeenText }}</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <span class="material-symbols-outlined text-[12px]">calendar_today</span>
+        <span>Cadastrado {{ cadastradoText }}</span>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { AdminUser } from '@/types/admin'
+import type { AdminUser, UserRole } from '@/types/admin'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import UserStatusBadge from '@/components/ui/UserStatusBadge.vue'
 
 interface Props {
   user: AdminUser
 }
 
-
 const props = defineProps<Props>()
 
-
+const emit = defineEmits<{
+  'view-profile': [userId: string]
+  'suspend': [userId: string]
+  'unsuspend': [userId: string]
+  'ban': [userId: string]
+  'unban': [userId: string]
+  'update-role': [userId: string, role: UserRole]
+}>()
 
 const initials = computed(() => {
   if (!props.user.nome) return 'U'
@@ -105,16 +187,6 @@ const isOnline = computed(() => {
   if (!props.user.last_seen_at) return false
   const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000)
   return new Date(props.user.last_seen_at) > fiveMinutesAgo
-})
-
-const roleLabel = computed(() => {
-  const labels: Record<string, string> = {
-    user: 'Membro',
-    partner: 'Parceiro',
-    admin: 'Admin',
-    professor: 'Professor'
-  }
-  return labels[props.user.role || 'user'] || 'Membro'
 })
 
 const planClass = computed(() => {
@@ -149,5 +221,8 @@ const cadastradoText = computed(() => {
   })
 })
 
-
+function handleRoleChange(event: Event) {
+  const role = (event.target as HTMLSelectElement).value as UserRole
+  emit('update-role', props.user.id, role)
+}
 </script>
