@@ -339,7 +339,7 @@ function openEditModal(lesson: ProgramLesson) {
   selectedModuleForCreate.value = null
   formData.value = {
     module_id: lesson.module_id,
-    youtube_video_id: lesson.youtube_video_id,
+    youtube_video_id: lesson.youtube_video_id || '',
     title_pt: lesson.title_pt,
     title_en: lesson.title_en,
     is_preview: lesson.is_preview

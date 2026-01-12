@@ -4,10 +4,10 @@
       <!-- Header -->
       <div class="mb-6">
         <h1 class="text-slate-900 dark:text-white text-4xl lg:text-5xl font-black mb-3">
-          Gestão de <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-primary animate-gradient">Posts</span>
+          <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-primary animate-gradient">Posts</span> Management
         </h1>
         <p class="text-slate-600 dark:text-white/60 text-lg">
-          Aprove, remova e gerencie posts da comunidade
+          Approve, remove and manage community posts
         </p>
       </div>
 
@@ -89,7 +89,7 @@
       <!-- Create Post Modal -->
       <Modal
         v-model="showCreateModal"
-        title="Criar Novo Post"
+        title="Create New Post"
         size="lg"
       >
         <form @submit.prevent="handleCreatePost" class="space-y-4">
@@ -146,9 +146,9 @@
               <div class="flex flex-col items-center justify-center pt-5 pb-6">
                 <span class="material-symbols-outlined text-4xl text-slate-500 dark:text-white/60 mb-2">cloud_upload</span>
                 <p class="mb-2 text-sm text-slate-600 dark:text-white/60">
-                  <span class="font-semibold">Clique para fazer upload</span> ou arraste e solte
+                  <span class="font-semibold">Click to upload</span> or drag and drop
                 </p>
-                <p class="text-xs text-slate-500 dark:text-white/40">PNG, JPG ou WEBP (máx. 20MB)</p>
+                <p class="text-xs text-slate-500 dark:text-white/40">PNG, JPG or WEBP (max. 20MB)</p>
               </div>
               <input
                 type="file"
@@ -178,14 +178,14 @@
               :disabled="submitting"
               class="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-black font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50"
             >
-              {{ submitting ? 'Criando...' : 'Criar Post' }}
+              {{ submitting ? 'Creating...' : 'Create Post' }}
             </button>
             <button
               type="button"
               @click="showCreateModal = false"
               class="px-4 py-2 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 rounded-lg text-slate-700 dark:text-white font-medium transition-all"
             >
-              Cancelar
+              Cancel
             </button>
           </div>
         </form>
@@ -237,23 +237,23 @@ const uploadingImage = ref(false)
 const tabs = computed(() => [
   {
     id: 'all' as const,
-    label: 'Todos',
+    label: 'All',
   },
   {
     id: 'pending' as const,
-    label: 'Pendentes',
+    label: 'Pending',
     badge: adminStore.postStats.pending > 0 ? adminStore.postStats.pending : undefined,
     badgeClass: 'bg-yellow-500/20 text-yellow-400',
   },
   {
     id: 'hidden' as const,
-    label: 'Ocultos',
+    label: 'Hidden',
     badge: adminStore.postStats.hidden > 0 ? adminStore.postStats.hidden : undefined,
     badgeClass: 'bg-orange-500/20 text-orange-400',
   },
   {
     id: 'removed' as const,
-    label: 'Removidos',
+    label: 'Removed',
     badge: adminStore.postStats.removed > 0 ? adminStore.postStats.removed : undefined,
     badgeClass: 'bg-red-500/20 text-red-400',
   },
@@ -327,11 +327,11 @@ async function handleModalRemove(postId: string, reason: string) {
     await adminStore.fetchPendingPosts()
     await adminStore.fetchAllPosts()
     await adminStore.fetchPostStats()
-    toast.success('Post removido')
+    toast.success('Post removed')
     showModerationModal.value = false
     selectedPost.value = null
   } catch (err: any) {
-    toast.error(err.message || 'Erro ao remover post')
+    toast.error(err.message || 'Error removing post')
     console.error('Error removing post:', err)
   }
 }
@@ -419,7 +419,7 @@ async function uploadImage(): Promise<string | null> {
     return publicUrl
   } catch (err: any) {
     console.error('Error uploading image:', err)
-    toast.error('Erro ao fazer upload da imagem. Tente novamente.')
+    toast.error('Error uploading image. Please try again.')
     return null
   } finally {
     uploadingImage.value = false
@@ -483,15 +483,15 @@ async function handleCreatePost() {
 }
 
 onMounted(async () => {
-  // Verificar se é admin
+  // Check if admin
   const isAdmin = await adminStore.checkIsAdmin()
   if (!isAdmin) {
     router.push('/')
     return
   }
 
-  // Carregar dados iniciais baseado na aba padrão
-  await adminStore.fetchAllPosts() // Aba padrão é "Todos"
+  // Load initial data based on default tab
+  await adminStore.fetchAllPosts() // Default tab is "All"
   await adminStore.fetchPendingPosts()
   await adminStore.fetchPostStats()
 })

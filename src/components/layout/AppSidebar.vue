@@ -78,7 +78,15 @@
           </span>
           {{ t('navigation.myNetwork') }}
         </RouterLink>
+        <!-- ============================================
+             FUNCIONALIDADE DESATIVADA: DESAFIOS
+             ============================================
+             Esta funcionalidade foi temporariamente desativada.
+             Para reativar: altere v-if="false" para v-if="true" ou remova a diretiva v-if
+             Localização: AppSidebar.vue linha ~82
+             ============================================ -->
         <RouterLink
+          v-if="false"
           to="/desafios"
           class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all"
           :class="$route.path === '/desafios' 
@@ -93,7 +101,15 @@
           </span>
           {{ t('navigation.challenges') }}
         </RouterLink>
+        <!-- ============================================
+             FUNCIONALIDADE DESATIVADA: RANKING
+             ============================================
+             Esta funcionalidade foi temporariamente desativada.
+             Para reativar: altere v-if="false" para v-if="true" ou remova a diretiva v-if
+             Localização: AppSidebar.vue linha ~99
+             ============================================ -->
         <RouterLink
+          v-if="false"
           to="/ranking"
           class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all"
           :class="$route.path === '/ranking' 

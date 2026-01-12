@@ -1,7 +1,7 @@
 <template>
   <Modal
     v-model="isOpen"
-    :title="`Criar Novo Evento - Etapa ${currentStep} de 2`"
+    :title="`Create New Event - Step ${currentStep} of 2`"
     size="lg"
   >
     <!-- Progress Indicator -->
@@ -213,7 +213,7 @@ function handleImageRemove() {
 }
 
 function nextStep() {
-  // Validar campos da etapa 1
+  // Validate step 1 fields
   if (!formData.value.titulo_pt || !formData.value.titulo_en || !formData.value.tipo || !formData.value.program_id) {
     emit('validation-error', 'Por favor, preencha todos os campos obrigatórios')
     return false
@@ -230,11 +230,11 @@ function handleSubmit() {
   if (currentStep.value === 1) {
     const success = nextStep()
     if (!success) {
-      // Validação falhou, não avança
+      // Validation failed, don't proceed
       return
     }
   } else {
-    // Validar campos da etapa 2
+    // Validate step 2 fields
     if (!dateTime.value.day || !dateTime.value.month || !dateTime.value.year || 
         !dateTime.value.hour || !dateTime.value.minute) {
       emit('validation-error', 'Por favor, preencha todos os campos de data e hora')

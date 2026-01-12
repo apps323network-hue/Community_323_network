@@ -1,5 +1,5 @@
 <template>
-  <Modal v-model="isOpen" title="Aprovar/Rejeitar Evento" size="lg">
+  <Modal v-model="isOpen" title="Approve/Reject Event" size="lg">
     <div class="space-y-6">
       <!-- Event Info -->
       <div class="bg-surface-card rounded-lg p-4 border border-white/5 space-y-3">
@@ -26,7 +26,7 @@
 
       <!-- Action Selection -->
       <div>
-        <label class="block text-white/80 text-sm font-semibold mb-3">Ação</label>
+        <label class="block text-white/80 text-sm font-semibold mb-3">Action</label>
         <div class="flex gap-3">
           <button
             :class="[
@@ -38,7 +38,7 @@
             @click="action = 'approve'"
           >
             <span class="material-symbols-outlined">check_circle</span>
-            Aprovar
+            Approve
           </button>
           <button
             :class="[
@@ -50,7 +50,7 @@
             @click="action = 'reject'"
           >
             <span class="material-symbols-outlined">cancel</span>
-            Rejeitar
+            Reject
           </button>
         </div>
       </div>
@@ -58,13 +58,13 @@
       <!-- Reason (required for rejection) -->
       <div v-if="action === 'reject'">
         <label class="block text-white/80 text-sm font-semibold mb-2">
-          Motivo da Rejeição <span class="text-red-400">*</span>
+          Rejection Reason <span class="text-red-400">*</span>
         </label>
         <textarea
           v-model="reason"
           rows="4"
           class="w-full px-3 py-2 border border-white/10 rounded-lg bg-surface-card text-white placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
-          placeholder="Descreva o motivo da rejeição..."
+          placeholder="Describe the reason for rejection..."
         ></textarea>
       </div>
 
@@ -76,14 +76,14 @@
 
     <template #footer>
       <div class="flex gap-3">
-        <Button variant="outline" @click="handleCancel">Cancelar</Button>
+        <Button variant="outline" @click="handleCancel">Cancel</Button>
         <Button
           variant="primary"
           :disabled="!canSubmit || processing"
           @click="handleSubmit"
         >
           <span v-if="processing" class="animate-spin">⏳</span>
-          <span v-else>{{ action === 'approve' ? 'Aprovar' : 'Rejeitar' }}</span>
+          <span v-else>{{ action === 'approve' ? 'Approve' : 'Reject' }}</span>
         </Button>
       </div>
     </template>
@@ -129,7 +129,7 @@ const canSubmit = computed(() => {
 const formattedDate = computed(() => {
   if (!props.event?.data_hora) return ''
   const date = new Date(props.event.data_hora)
-  return date.toLocaleDateString('pt-BR', {
+  return date.toLocaleDateString('en-US', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
@@ -162,7 +162,7 @@ async function handleSubmit() {
   if (!props.event) return
 
   if (action.value === 'reject' && !reason.value.trim()) {
-    error.value = 'Por favor, informe o motivo da rejeição'
+    error.value = 'Please provide a reason for rejection'
     return
   }
 
@@ -177,7 +177,7 @@ async function handleSubmit() {
     }
     isOpen.value = false
   } catch (err: any) {
-    error.value = err.message || 'Erro ao processar ação. Tente novamente.'
+    error.value = err.message || 'Error processing action. Please try again.'
   } finally {
     processing.value = false
   }

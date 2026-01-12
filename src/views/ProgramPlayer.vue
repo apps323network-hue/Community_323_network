@@ -36,9 +36,9 @@
       <!-- Video Player Area -->
       <div class="flex-1 flex flex-col min-w-0">
         <!-- Player -->
-        <div class="relative bg-black aspect-video w-full shadow-2xl overflow-hidden group/player">
+        <div v-if="currentLesson?.youtube_video_id" class="relative bg-black aspect-video w-full shadow-2xl overflow-hidden group/player">
           <YouTubePlayer
-            v-if="currentLesson && (isAuthenticated || (program?.localhost_only && isLocalhost()))"
+            v-if="isAuthenticated || (program?.localhost_only && isLocalhost())"
             :videoId="currentLesson.youtube_video_id"
             :title="getLessonTitle(currentLesson)"
             @ended="handleVideoEnded"
@@ -55,6 +55,19 @@
                 cta="Começar Agora"
               />
             </div>
+          </div>
+        </div>
+        
+        <!-- No Video State -->
+        <div v-else class="relative bg-gradient-to-br from-slate-900 via-black to-slate-900 aspect-video w-full shadow-2xl overflow-hidden flex items-center justify-center">
+          <div class="text-center max-w-md px-6">
+            <div class="bg-secondary/10 p-8 rounded-full w-fit mx-auto mb-6">
+              <span class="material-symbols-outlined text-6xl text-secondary">description</span>
+            </div>
+            <h3 class="text-2xl font-black text-white mb-2">{{ getLessonTitle(currentLesson) }}</h3>
+            <p class="text-gray-400 text-sm">
+              Esta aula não possui vídeo. Conteúdo disponível na descrição e materiais abaixo.
+            </p>
           </div>
         </div>
 

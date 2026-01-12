@@ -5,10 +5,10 @@
       <div class="flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
           <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
-            {{ t('programs.admin.programList') }}
+            Program List
           </h1>
           <p class="text-slate-600 dark:text-gray-400 mt-1">
-            Gerencie todos os conteúdos, mentorias e workshops da plataforma
+            Manage all content, mentorships and workshops on the platform
           </p>
         </div>
         <RouterLink
@@ -16,7 +16,7 @@
           class="flex items-center gap-2 px-6 py-3 bg-primary dark:bg-secondary text-white rounded-xl font-bold shadow-lg hover:shadow-primary/25 dark:hover:shadow-secondary/25 transition-all hover:-translate-y-0.5"
         >
           <span class="material-icons">add</span>
-          {{ t('programs.admin.createProgram') }}
+          Create Program
         </RouterLink>
       </div>
 
@@ -27,7 +27,7 @@
           <input
             v-model="search"
             type="text"
-            placeholder="Buscar programas..."
+            placeholder="Search programs..."
             class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none"
           />
         </div>
@@ -36,22 +36,22 @@
           v-model="filterStatus"
           class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none"
         >
-          <option value="all">Todos os Status</option>
-          <option value="published">Publicados</option>
-          <option value="draft">Rascunhos</option>
-          <option value="archived">Arquivados</option>
+          <option value="all">{{ t('programs.admin.allStatuses') }}</option>
+          <option value="published">{{ t('programs.admin.published') }}</option>
+          <option value="draft">{{ t('programs.admin.draft') }}</option>
+          <option value="archived">{{ t('programs.admin.archived') }}</option>
         </select>
 
         <select
           v-model="filterCategory"
           class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none"
         >
-          <option value="all">Todas as Categorias</option>
-          <option value="curso">Conteúdo</option>
-          <option value="mentoria">Mentorias</option>
+          <option value="all">All Categories</option>
+          <option value="curso">Content</option>
+          <option value="mentoria">Mentorships</option>
           <option value="workshop">Workshops</option>
-          <option value="evento_premium">Eventos Premium</option>
-          <option value="servico_especializado">Serviços</option>
+          <option value="evento_premium">Premium Events</option>
+          <option value="servico_especializado">Services</option>
         </select>
       </div>
 
@@ -61,12 +61,12 @@
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/5">
-                <th class="p-4 font-semibold text-slate-700 dark:text-gray-300 text-sm">Programa</th>
-                <th class="p-4 font-semibold text-slate-700 dark:text-gray-300 text-sm">Categoria</th>
-                <th class="p-4 font-semibold text-slate-700 dark:text-gray-300 text-sm">Alunos</th>
-                <th class="p-4 font-semibold text-slate-700 dark:text-gray-300 text-sm">Preço</th>
-                <th class="p-4 font-semibold text-slate-700 dark:text-gray-300 text-sm">Status</th>
-                <th class="p-4 font-semibold text-slate-700 dark:text-gray-300 text-sm text-right">Ações</th>
+                <th class="p-4 font-semibold text-slate-700 dark:text-gray-300 text-sm">{{ t('programs.admin.tableProgram') }}</th>
+                <th class="p-4 font-semibold text-slate-700 dark:text-gray-300 text-sm">{{ t('programs.admin.tableCategory') }}</th>
+                <th class="p-4 font-semibold text-slate-700 dark:text-gray-300 text-sm">{{ t('programs.admin.tableStudents') }}</th>
+                <th class="p-4 font-semibold text-slate-700 dark:text-gray-300 text-sm">{{ t('programs.admin.tablePrice') }}</th>
+                <th class="p-4 font-semibold text-slate-700 dark:text-gray-300 text-sm">{{ t('programs.admin.tableStatus') }}</th>
+                <th class="p-4 font-semibold text-slate-700 dark:text-gray-300 text-sm text-right">{{ t('programs.admin.tableActions') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-white/5">
@@ -119,7 +119,7 @@
                   ${{ program.price_usd }}
                 </td>
                 <td class="p-4">
-                   <span 
+                    <span 
                     class="px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 w-fit"
                     :class="{
                       'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800': program.status === 'published',
@@ -128,7 +128,7 @@
                     }"
                   >
                     <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
-                    {{ program.status === 'published' ? 'Publicado' : program.status === 'draft' ? 'Rascunho' : 'Arquivado' }}
+                    {{ program.status === 'published' ? 'Published' : program.status === 'draft' ? 'Draft' : 'Archived' }}
                   </span>
                 </td>
                 <td class="p-4 text-right">
@@ -136,21 +136,21 @@
                     <RouterLink
                       :to="`/admin/programs/${program.id}/matriculas`"
                       class="p-2 text-slate-500 hover:text-primary dark:hover:text-secondary bg-slate-100 dark:bg-white/5 rounded-lg hover:bg-white dark:hover:bg-white/10 transition-all border border-transparent hover:border-slate-200 dark:hover:border-white/10"
-                      title="Matrículas"
+                      :title="t('programs.admin.enrollments')"
                     >
                       <span class="material-icons text-sm">people</span>
                     </RouterLink>
                     <RouterLink
                       :to="`/admin/programs/${program.id}/editar`"
                       class="p-2 text-slate-500 hover:text-blue-500 bg-slate-100 dark:bg-white/5 rounded-lg hover:bg-white dark:hover:bg-white/10 transition-all border border-transparent hover:border-slate-200 dark:hover:border-white/10"
-                      title="Editar"
+                      title="Edit"
                     >
                       <span class="material-icons text-sm">edit</span>
                     </RouterLink>
                       <button
                       @click="deleteProgram(program)"
                       class="p-2 text-slate-500 hover:text-red-500 bg-slate-100 dark:bg-white/5 rounded-lg hover:bg-white dark:hover:bg-white/10 transition-all border border-transparent hover:border-slate-200 dark:hover:border-white/10"
-                      title="Excluir"
+                      :title="t('programs.admin.delete')"
                     >
                       <span class="material-icons text-sm">delete</span>
                     </button>
@@ -160,7 +160,7 @@
               <tr v-if="filteredPrograms.length === 0">
                 <td colspan="6" class="p-12 text-center text-slate-500 dark:text-gray-400">
                   <span class="material-icons text-4xl mb-2 opacity-50">block</span>
-                  <p>Nenhum programa encontrado.</p>
+                  <p>No programs found.</p>
                 </td>
               </tr>
             </tbody>
@@ -177,9 +177,9 @@
             <span class="material-icons text-3xl">delete_forever</span>
           </div>
           
-          <h3 class="text-xl font-black text-slate-900 dark:text-white text-center uppercase tracking-tight mb-2">Excluir Programa?</h3>
+          <h3 class="text-xl font-black text-slate-900 dark:text-white text-center uppercase tracking-tight mb-2">Delete Program?</h3>
           <p class="text-slate-500 dark:text-gray-400 text-center text-sm mb-8 leading-relaxed">
-            Você está prestes a excluir permanentemente o programa <span class="font-bold text-slate-900 dark:text-white">"{{ currentLocale === 'pt-BR' ? programToDelete.title_pt : programToDelete.title_en }}"</span>. Esta ação não pode ser desfeita.
+            You are about to permanently delete the program <span class="font-bold text-slate-900 dark:text-white">"{{ currentLocale === 'pt-BR' ? programToDelete.title_pt : programToDelete.title_en }}"</span>. This action cannot be undone.
           </p>
 
           <div class="flex gap-3">
@@ -187,13 +187,13 @@
               @click="programToDelete = null" 
               class="flex-1 px-4 py-3 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
             >
-              Cancelar
+              {{ t('programs.admin.cancel') }}
             </button>
             <button 
               @click="confirmDelete" 
               class="flex-1 px-4 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-500/20"
             >
-              Excluir Agora
+              {{ t('programs.admin.deleteNow') }}
             </button>
           </div>
         </div>
@@ -208,7 +208,7 @@ import { useLocale } from '@/composables/useLocale'
 import AdminLayout from '@/components/layout/admin/AdminLayout.vue'
 import { useProgramsStore } from '@/stores/programs'
 
-const { t, locale: currentLocale } = useLocale()
+const { locale: currentLocale, t } = useLocale()
 const programsStore = useProgramsStore()
 
 const search = ref('')

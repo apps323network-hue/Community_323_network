@@ -48,7 +48,7 @@
         </div>
         <div class="flex items-center gap-2 text-white/70 text-sm">
           <span class="material-symbols-outlined text-secondary text-base">person</span>
-          <span>{{ event.creator_name || 'Usuário' }}</span>
+          <span>{{ event.creator_name || 'User' }}</span>
         </div>
         <div v-if="event.program_name" class="flex items-center gap-2 text-white/70 text-sm">
           <span class="material-symbols-outlined text-secondary text-base">school</span>
@@ -65,14 +65,14 @@
             @click="$emit('approve')"
           >
             <span class="material-symbols-outlined text-base">check_circle</span>
-            Aprovar
+            Approve
           </button>
           <button
             class="flex items-center justify-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg font-semibold transition-all"
             @click="$emit('reject')"
           >
             <span class="material-symbols-outlined text-base">cancel</span>
-            Rejeitar
+            Reject
           </button>
         </template>
 
@@ -86,7 +86,7 @@
           @click="$emit('toggle-destaque')"
         >
           <span class="material-symbols-outlined text-base">{{ event.destaque ? 'star' : 'star_border' }}</span>
-          {{ event.destaque ? 'Em Destaque' : 'Destaque' }}
+          {{ event.destaque ? 'Featured' : 'Feature' }}
         </button>
 
         <!-- Common Buttons -->
@@ -95,7 +95,7 @@
           @click="$emit('view-details')"
         >
           <span class="material-symbols-outlined text-base">visibility</span>
-          Ver Detalhes
+          View Details
         </button>
 
         <button
@@ -104,7 +104,7 @@
           @click="$emit('delete')"
         >
           <span class="material-symbols-outlined text-base">delete</span>
-          Apagar Evento
+          Delete Event
         </button>
       </div>
     </div>
@@ -133,7 +133,7 @@ defineEmits<{
 const formattedDate = computed(() => {
   if (!props.event.data_hora) return ''
   const date = new Date(props.event.data_hora)
-  return date.toLocaleDateString('pt-BR', {
+  return date.toLocaleDateString('en-US', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
