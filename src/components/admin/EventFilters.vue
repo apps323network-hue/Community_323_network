@@ -34,10 +34,10 @@ defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const filters: Filter[] = [
-  { id: 'all', label: 'Todos' },
-  { id: 'pending', label: 'Pendentes' },
-  { id: 'approved', label: 'Aprovados' },
-  { id: 'rejected', label: 'Rejeitados' },
+  { id: 'all', label: 'All' },
+  { id: 'pending', label: 'Pending' },
+  { id: 'approved', label: 'Approved' },
+  { id: 'rejected', label: 'Rejected' },
 ]
 
 function handleFilterClick(filterId: EventStatus | 'all') {

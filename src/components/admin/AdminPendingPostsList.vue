@@ -14,8 +14,8 @@
 
   <div v-else-if="!loading && posts.length === 0" class="text-center py-12">
     <span class="material-symbols-outlined text-slate-400 dark:text-white/40 text-6xl mb-4">article</span>
-    <p class="text-slate-600 dark:text-white/60 text-lg">Nenhum post pendente</p>
-    <p class="text-slate-500 dark:text-white/40 text-sm mt-2">Todos os posts foram processados</p>
+    <p class="text-slate-600 dark:text-white/60 text-lg">No pending posts</p>
+    <p class="text-slate-500 dark:text-white/40 text-sm mt-2">All posts have been processed</p>
   </div>
 
   <div v-else class="space-y-3 sm:space-y-4">
@@ -29,12 +29,12 @@
         <div class="flex items-start gap-4">
           <Avatar
             :src="post.author?.avatar_url"
-            :name="post.author?.nome || 'Usuário'"
+            :name="post.author?.nome || 'User'"
             size="md"
           />
           <div class="flex-1 min-w-0">
             <h3 class="text-slate-900 dark:text-white text-base sm:text-lg font-bold mb-1">
-              {{ post.author?.nome || 'Usuário' }}
+              {{ post.author?.nome || 'User' }}
             </h3>
             <p v-if="post.author?.area_atuacao" class="text-slate-600 dark:text-white/60 text-xs sm:text-sm mb-2">
               {{ post.author.area_atuacao }}
@@ -65,21 +65,21 @@
             @click="$emit('approve', post.id)"
           >
             <span class="material-symbols-outlined text-base">check_circle</span>
-            <span>Aprovar</span>
+            <span>Approve</span>
           </button>
           <button
             class="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg font-semibold transition-all text-xs sm:text-sm"
             @click="$emit('remove', post.id)"
           >
             <span class="material-symbols-outlined text-base">delete</span>
-            <span>Remover</span>
+            <span>Remove</span>
           </button>
           <button
             class="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-surface-lighter hover:bg-slate-50 dark:hover:bg-surface-highlight text-slate-700 dark:text-white border border-slate-200 dark:border-white/10 rounded-lg font-semibold transition-all text-xs sm:text-sm"
             @click="$emit('view-full', post.id)"
           >
             <span class="material-symbols-outlined text-base">visibility</span>
-            <span>Ver Completo</span>
+            <span>View Full</span>
           </button>
         </div>
       </div>
@@ -107,7 +107,7 @@ defineEmits<{
 function formattedDate(dateString?: string) {
   if (!dateString) return ''
   const date = new Date(dateString)
-  return date.toLocaleDateString('pt-BR', {
+  return date.toLocaleDateString('en-US', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -119,9 +119,9 @@ function formattedDate(dateString?: string) {
 function postTypeLabel(tipo: string) {
   const labels: Record<string, string> = {
     networking: 'Networking',
-    ofereco_servico: 'Ofereço Serviço',
-    procuro_ajuda: 'Procuro Ajuda',
-    oportunidade: 'Oportunidade',
+    ofereco_servico: 'Offering Service',
+    procuro_ajuda: 'Seeking Help',
+    oportunidade: 'Opportunity',
   }
   return labels[tipo] || tipo
 }

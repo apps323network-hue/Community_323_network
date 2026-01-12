@@ -24,6 +24,13 @@
             class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900"
           ></div>
         </div>
+        
+        <!-- Online indicator -->
+        <div 
+          v-if="isOnline" 
+          class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900"
+        ></div>
+      </div>
 
         <!-- Info -->
         <div class="flex flex-col gap-1 min-w-0 flex-1">
@@ -65,7 +72,6 @@
             </div>
           </div>
         </div>
-      </div>
 
       <!-- Right Side: Stats & Actions -->
       <div class="flex flex-col items-end gap-4 shrink-0 w-full sm:w-auto">
@@ -160,6 +166,7 @@ import type { AdminUser, UserRole } from '@/types/admin'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import UserStatusBadge from '@/components/ui/UserStatusBadge.vue'
+import { enUS } from 'date-fns/locale'
 
 interface Props {
   user: AdminUser
@@ -207,17 +214,17 @@ const locationText = computed(() => {
 })
 
 const lastSeenText = computed(() => {
-  if (!props.user.last_seen_at) return 'Nunca visto'
-  return 'Visto ' + formatDistanceToNow(new Date(props.user.last_seen_at), { 
+  if (!props.user.last_seen_at) return 'Never seen'
+  return 'Seen ' + formatDistanceToNow(new Date(props.user.last_seen_at), { 
     addSuffix: true, 
-    locale: ptBR 
+    locale: enUS 
   })
 })
 
 const cadastradoText = computed(() => {
   return formatDistanceToNow(new Date(props.user.created_at), { 
     addSuffix: true, 
-    locale: ptBR 
+    locale: enUS 
   })
 })
 

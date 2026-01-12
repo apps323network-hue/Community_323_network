@@ -69,6 +69,9 @@
               <span class="material-symbols-outlined text-lg">
                 {{ completedLessons.includes(lesson.id) ? 'check_circle' : (currentLessonId === lesson.id ? 'play_arrow' : 'play_circle') }}
               </span>
+              <span v-else class="material-symbols-outlined text-lg">
+                {{ currentLessonId === lesson.id ? 'description' : 'article' }}
+              </span>
             </div>
 
             <!-- Lesson Info -->

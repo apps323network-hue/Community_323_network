@@ -5,10 +5,10 @@
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 class="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
-            {{ t('coupons.title') || 'Gerenciamento de Cupons' }}
+            Coupons Management
           </h1>
           <p class="text-slate-500 dark:text-gray-400 font-medium">
-            Crie e gerencie cupons de desconto para seus programas e serviços.
+            Create and manage discount coupons for your programs and services.
           </p>
         </div>
         <div class="flex items-center gap-3">
@@ -17,14 +17,14 @@
             class="flex items-center justify-center gap-2 px-6 py-3 bg-white dark:bg-white/5 text-slate-700 dark:text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-slate-50 dark:hover:bg-white/10 transition-all border border-slate-200 dark:border-white/10"
           >
             <span class="material-icons text-sm">history</span>
-            Histórico
+            History
           </RouterLink>
           <button
             @click="handleCreateCoupon"
             class="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-black font-black uppercase tracking-widest text-xs rounded-2xl hover:scale-105 transition-all shadow-xl shadow-primary/20"
           >
             <span class="material-icons">add</span>
-            {{ t('coupons.createNew') || 'Novo Cupom' }}
+            New Coupon
           </button>
         </div>
       </div>
@@ -47,40 +47,35 @@
       </div>
 
       <!-- Filters & Search -->
-      <div class="bg-white dark:bg-surface-dark p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-white/5 space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Search -->
-          <div class="relative">
-            <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-            <input
-              v-model="search"
-              type="text"
-              placeholder="Buscar por código ou descrição..."
-              class="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none transition-all"
-            />
-          </div>
-
-          <!-- Status Filter -->
-          <select
-            v-model="statusFilter"
-            class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none appearance-none cursor-pointer"
-          >
-            <option value="all">Todos os Status</option>
-            <option value="active">Atuais/Ativos</option>
-            <option value="inactive">Inativos</option>
-            <option value="expired">Expirados</option>
-          </select>
-
-          <!-- Type Filter -->
-          <select
-            v-model="typeFilter"
-            class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none appearance-none cursor-pointer"
-          >
-            <option value="all">Todos os Tipos</option>
-            <option value="percentage">Percentual (%)</option>
-            <option value="fixed">Valor Fixo ($)</option>
-          </select>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="relative">
+          <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+          <input
+            v-model="search"
+            type="text"
+            placeholder="Search by code or description..."
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none"
+          />
         </div>
+        
+        <select
+          v-model="statusFilter"
+          class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none"
+        >
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="expired">Expired</option>
+        </select>
+
+        <select
+          v-model="typeFilter"
+          class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary outline-none"
+        >
+          <option value="all">All Types</option>
+          <option value="percentage">Percentage (%)</option>
+          <option value="fixed">Fixed Amount ($)</option>
+        </select>
       </div>
 
       <!-- Coupons Table -->
@@ -89,12 +84,12 @@
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5">
-                <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Cupom</th>
-                <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Valor / Tipo</th>
-                <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Usos</th>
-                <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Validade</th>
+                <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Coupon</th>
+                <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Value / Type</th>
+                <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Uses</th>
+                <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Validity</th>
                 <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-                <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Ações</th>
+                <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-white/5">
@@ -108,7 +103,7 @@
                 <td class="p-6">
                   <div class="flex flex-col">
                     <span class="text-sm font-black text-slate-900 dark:text-white font-mono uppercase tracking-tighter">{{ coupon.code }}</span>
-                    <span class="text-xs text-slate-500 dark:text-gray-400 truncate max-w-[200px]">{{ coupon.description || 'Sem descrição' }}</span>
+                    <span class="text-xs text-slate-500 dark:text-gray-400 truncate max-w-[200px]">{{ coupon.description || 'No description' }}</span>
                   </div>
                 </td>
 
@@ -119,7 +114,7 @@
                       {{ coupon.discount_type === 'percentage' ? coupon.discount_value + '%' : '$' + coupon.discount_value }}
                     </span>
                     <span class="text-[10px] font-black uppercase text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">
-                      {{ coupon.discount_type === 'percentage' ? 'Perc' : 'Fixo' }}
+                      {{ coupon.discount_type === 'percentage' ? 'Perc' : 'Fixed' }}
                     </span>
                   </div>
                 </td>
@@ -128,7 +123,7 @@
                 <td class="p-6 text-center">
                   <div class="flex flex-col items-center">
                     <span class="text-sm font-bold text-slate-700 dark:text-white">{{ coupon.current_uses }}</span>
-                    <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">de {{ coupon.max_uses || '∞' }}</span>
+                    <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">of {{ coupon.max_uses || '∞' }}</span>
                   </div>
                 </td>
 
@@ -143,7 +138,7 @@
                       <span class="material-icons text-xs">event_busy</span>
                       <span :class="{'text-red-500': isExpired(coupon.valid_until)}">{{ formatDate(coupon.valid_until) }}</span>
                     </div>
-                    <span v-else class="text-[10px] font-bold text-slate-400 uppercase italic">Sem expiração</span>
+                    <span v-else class="text-[10px] font-bold text-slate-400 uppercase italic">No expiration</span>
                   </div>
                 </td>
 
@@ -164,21 +159,21 @@
                     <button 
                       @click="handleToggleStatus(coupon)"
                       class="p-2 rounded-xl text-slate-400 hover:text-primary hover:bg-primary/10 transition-all"
-                      :title="coupon.is_active ? 'Desativar' : 'Ativar'"
+                      :title="coupon.is_active ? 'Deactivate' : 'Activate'"
                     >
                       <span class="material-icons text-sm">{{ coupon.is_active ? 'visibility_off' : 'visibility' }}</span>
                     </button>
                     <button 
                       @click="handleEditCoupon(coupon)"
                       class="p-2 rounded-xl text-slate-400 hover:text-secondary hover:bg-secondary/10 transition-all"
-                      title="Editar"
+                      title="Edit"
                     >
                       <span class="material-icons text-sm">edit</span>
                     </button>
                     <button 
                       @click="handleDeleteCoupon(coupon)"
                       class="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-all font-bold"
-                      title="Deletar"
+                      title="Delete"
                     >
                       <span class="material-icons text-sm">delete</span>
                     </button>
@@ -191,8 +186,8 @@
                 <td colspan="6" class="p-20 text-center">
                   <div class="flex flex-col items-center justify-center opacity-30 grayscale">
                     <span class="material-icons text-6xl mb-4">local_offer</span>
-                    <p class="text-xl font-bold text-slate-500 dark:text-white uppercase tracking-tighter">Nenhum cupom encontrado</p>
-                    <p class="text-sm text-slate-500 dark:text-gray-400 mt-2">Tente ajustar seus filtros ou crie um novo cupom.</p>
+                    <p class="text-xl font-bold text-slate-500 dark:text-white uppercase tracking-tighter">No coupons found</p>
+                    <p class="text-sm text-slate-500 dark:text-gray-400 mt-2">Try adjusting your filters or create a new coupon.</p>
                   </div>
                 </td>
               </tr>
@@ -202,7 +197,7 @@
                 <td colspan="6" class="p-20 text-center">
                    <div class="flex flex-col items-center justify-center gap-4 animate-pulse">
                     <div class="w-12 h-12 border-4 border-slate-200 dark:border-white/10 border-t-primary rounded-full animate-spin"></div>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Buscando cupons na rede...</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Searching for coupons...</p>
                   </div>
                 </td>
               </tr>
@@ -224,13 +219,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useLocale } from '@/composables/useLocale'
 import AdminLayout from '@/components/layout/admin/AdminLayout.vue'
 import CouponFormModal from '@/components/admin/CouponFormModal.vue'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'vue-sonner'
-
-const { t } = useLocale()
 
 const coupons = ref<any[]>([])
 const loading = ref(true)
@@ -250,7 +242,7 @@ const totals = ref({
 
 const stats = computed(() => [
   { 
-    label: 'Total de Cupons', 
+    label: 'Total Coupons', 
     value: totals.value.total, 
     icon: 'local_offer', 
     bgClass: 'bg-primary/20 text-primary',
@@ -258,7 +250,7 @@ const stats = computed(() => [
     suffix: ''
   },
   { 
-    label: 'Ativos Agora', 
+    label: 'Active Now', 
     value: totals.value.active, 
     icon: 'bolt', 
     bgClass: 'bg-secondary/20 text-secondary',
@@ -266,7 +258,7 @@ const stats = computed(() => [
     suffix: ''
   },
   { 
-    label: 'Usos Totais', 
+    label: 'Total Uses', 
     value: totals.value.uses, 
     icon: 'shopping_cart', 
     bgClass: 'bg-blue-500/20 text-blue-500',
@@ -274,7 +266,7 @@ const stats = computed(() => [
     suffix: ''
   },
   { 
-    label: 'Economia Gerada', 
+    label: 'Total Savings', 
     value: totals.value.savings.toFixed(2), 
     icon: 'savings', 
     bgClass: 'bg-green-500/20 text-green-500',
@@ -319,7 +311,7 @@ async function fetchCoupons() {
     calculateStats()
   } catch (error: any) {
     console.error('Error fetching coupons:', error)
-    toast.error('Erro ao carregar cupons')
+    toast.error('Error loading coupons')
   } finally {
     loading.value = false
   }
@@ -356,9 +348,9 @@ function getStatusClass(coupon: any) {
 }
 
 function getStatusText(coupon: any) {
-  if (!coupon.is_active) return 'Inativo'
-  if (coupon.valid_until && isExpired(coupon.valid_until)) return 'Expirado'
-  return 'Ativo'
+  if (!coupon.is_active) return 'Inactive'
+  if (coupon.valid_until && isExpired(coupon.valid_until)) return 'Expired'
+  return 'Active'
 }
 
 function handleCreateCoupon() {
@@ -379,15 +371,15 @@ async function handleToggleStatus(coupon: any) {
       .eq('id', coupon.id)
 
     if (error) throw error
-    toast.success(`Cupom ${coupon.is_active ? 'desativado' : 'ativado'} com sucesso`)
+    toast.success(`Coupon ${coupon.is_active ? 'deactivated' : 'activated'} successfully`)
     fetchCoupons()
   } catch (error) {
-    toast.error('Erro ao atualizar status')
+    toast.error('Error updating status')
   }
 }
 
 async function handleDeleteCoupon(coupon: any) {
-  if (!confirm('Tem certeza que deseja excluir este cupom permanentemente?')) return
+  if (!confirm('Are you sure you want to permanently delete this coupon?')) return
 
   try {
     const { error } = await supabase
@@ -396,10 +388,10 @@ async function handleDeleteCoupon(coupon: any) {
       .eq('id', coupon.id)
 
     if (error) throw error
-    toast.success('Cupom excluído com sucesso')
+    toast.success('Coupon deleted successfully')
     fetchCoupons()
   } catch (error) {
-    toast.error('Erro ao excluir cupom')
+    toast.error('Error deleting coupon')
   }
 }
 

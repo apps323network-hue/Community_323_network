@@ -19,7 +19,7 @@ export interface ProgramLesson {
     title_en: string
     description_pt: string | null
     description_en: string | null
-    youtube_video_id: string
+    youtube_video_id: string | null
     youtube_thumbnail_url: string | null
     duration_seconds: number | null
     order_index: number

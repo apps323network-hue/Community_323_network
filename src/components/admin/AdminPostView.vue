@@ -4,13 +4,13 @@
     <div class="flex items-start gap-4 mb-4 pb-4 border-b border-slate-200 dark:border-white/5">
       <Avatar
         :src="post.author?.avatar_url"
-        :name="post.author?.nome || 'Usuário'"
+        :name="post.author?.nome || 'User'"
         size="lg"
       />
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-3 mb-1">
           <h3 class="text-slate-900 dark:text-white text-lg sm:text-xl font-bold">
-            {{ post.author?.nome || 'Usuário' }}
+            {{ post.author?.nome || 'User' }}
           </h3>
           <PostStatusBadge :status="post.status || 'pending'" />
         </div>
@@ -31,7 +31,7 @@
           :to="`/comunidade/${post.user_id}`"
           class="text-primary hover:text-primary/80 text-sm font-semibold mt-2 inline-flex items-center gap-1"
         >
-          Ver perfil do autor
+          View author profile
           <span class="material-symbols-outlined text-base">arrow_forward</span>
         </RouterLink>
       </div>
@@ -65,7 +65,7 @@
       <ImageLightbox
         v-model="showImageLightbox"
         :image-url="post.image_url"
-        :alt="`Imagem do post de ${post.author?.nome || 'Usuário'}`"
+          :alt="`Post image from ${post.author?.nome || 'User'}`"
       />
     </div>
 
@@ -73,33 +73,33 @@
     <div class="flex items-center gap-6 mb-4 pb-4 border-b border-slate-200 dark:border-white/5 text-slate-600 dark:text-white/60 text-sm">
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-base">favorite</span>
-        <span>{{ post.likes_count || 0 }} curtidas</span>
+        <span>{{ post.likes_count || 0 }} likes</span>
       </div>
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-base">comment</span>
-        <span>{{ post.comments_count || 0 }} comentários</span>
+        <span>{{ post.comments_count || 0 }} comments</span>
       </div>
       <div v-if="post.fixado" class="flex items-center gap-2 text-primary">
         <span class="material-symbols-outlined text-base">push_pin</span>
-        <span>Fixado</span>
+        <span>Pinned</span>
       </div>
     </div>
 
     <!-- Moderation Info -->
     <div v-if="post.approved_by || post.moderated_by" class="mb-4 pb-4 border-b border-slate-200 dark:border-white/5">
-      <h4 class="text-slate-700 dark:text-white/80 text-sm font-semibold mb-2">Informações de Moderação</h4>
+      <h4 class="text-slate-700 dark:text-white/80 text-sm font-semibold mb-2">Moderation Information</h4>
       <div class="space-y-2 text-slate-600 dark:text-white/60 text-xs sm:text-sm">
         <div v-if="post.approved_by && post.approved_at" class="flex items-center gap-2">
           <span class="material-symbols-outlined text-base text-green-400">check_circle</span>
-          <span>Aprovado em {{ formattedDate(post.approved_at) }}</span>
+          <span>Approved on {{ formattedDate(post.approved_at) }}</span>
         </div>
         <div v-if="post.moderated_by && post.moderated_at" class="flex items-center gap-2">
           <span class="material-symbols-outlined text-base text-orange-400">gavel</span>
-          <span>Moderado em {{ formattedDate(post.moderated_at) }}</span>
+          <span>Moderated on {{ formattedDate(post.moderated_at) }}</span>
         </div>
         <div v-if="post.rejection_reason" class="flex items-start gap-2">
           <span class="material-symbols-outlined text-base text-red-400">info</span>
-          <span class="flex-1">Motivo: {{ post.rejection_reason }}</span>
+          <span class="flex-1">Reason: {{ post.rejection_reason }}</span>
         </div>
       </div>
     </div>
@@ -107,7 +107,7 @@
     <!-- Comments Preview -->
     <div v-if="post.comments && post.comments.length > 0" class="mb-4">
       <h4 class="text-slate-700 dark:text-white/80 text-sm font-semibold mb-3">
-        Comentários ({{ post.comments.length }})
+        Comments ({{ post.comments.length }})
       </h4>
       <div class="space-y-3 max-h-64 overflow-y-auto">
         <div
@@ -118,12 +118,12 @@
           <div class="flex items-start gap-3">
             <Avatar
               :src="comment.author?.avatar_url"
-              :name="comment.author?.nome || 'Usuário'"
+              :name="comment.author?.nome || 'User'"
               size="sm"
             />
             <div class="flex-1 min-w-0">
               <p class="text-slate-900 dark:text-white font-semibold text-sm mb-1">
-                {{ comment.author?.nome || 'Usuário' }}
+                {{ comment.author?.nome || 'User' }}
               </p>
               <div class="text-slate-700 dark:text-white/80 text-sm rich-text-content" v-html="sanitize(comment.conteudo)"></div>
               <p class="text-slate-500 dark:text-white/50 text-xs mt-1">
@@ -133,7 +133,7 @@
           </div>
         </div>
         <p v-if="post.comments.length > 5" class="text-slate-600 dark:text-white/60 text-xs text-center">
-          +{{ post.comments.length - 5 }} comentários adicionais
+          +{{ post.comments.length - 5 }} additional comments
         </p>
       </div>
     </div>
@@ -146,21 +146,21 @@
         @click="$emit('approve', post.id)"
       >
         <span class="material-symbols-outlined text-base">check_circle</span>
-        Aprovar
+        Approve
       </button>
       <button
         class="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg font-semibold transition-all text-sm"
         @click="$emit('remove', post.id)"
       >
         <span class="material-symbols-outlined text-base">delete</span>
-        Remover
+        Remove
       </button>
     </div>
   </div>
 
   <div v-else class="text-center py-12">
     <span class="material-symbols-outlined text-slate-400 dark:text-white/40 text-6xl mb-4">article</span>
-    <p class="text-slate-600 dark:text-white/60 text-lg">Post não encontrado</p>
+    <p class="text-slate-600 dark:text-white/60 text-lg">Post not found</p>
   </div>
 </template>
 
@@ -197,7 +197,7 @@ function sanitize(content: string) {
 function formattedDate(dateString?: string) {
   if (!dateString) return ''
   const date = new Date(dateString)
-  return date.toLocaleDateString('pt-BR', {
+  return date.toLocaleDateString('en-US', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -209,9 +209,9 @@ function formattedDate(dateString?: string) {
 function postTypeLabel(tipo: string) {
   const labels: Record<string, string> = {
     networking: 'Networking',
-    ofereco_servico: 'Ofereço Serviço',
-    procuro_ajuda: 'Procuro Ajuda',
-    oportunidade: 'Oportunidade',
+    ofereco_servico: 'Offering Service',
+    procuro_ajuda: 'Seeking Help',
+    oportunidade: 'Opportunity',
   }
   return labels[tipo] || tipo
 }

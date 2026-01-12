@@ -1,5 +1,5 @@
 <template>
-  <Modal v-model="isOpen" title="Moderar Post" size="lg">
+  <Modal v-model="isOpen" title="Moderate Post" size="lg">
     <div class="space-y-6">
       <!-- Post Preview -->
       <div class="bg-surface-card rounded-lg p-4 border border-white/5">
@@ -8,7 +8,7 @@
             <img :src="post.author.avatar_url" :alt="post.author.nome" class="w-full h-full object-cover" />
           </div>
           <div class="flex-1 min-w-0">
-            <h3 class="text-white font-bold text-sm">{{ post?.author?.nome || 'Usuário' }}</h3>
+            <h3 class="text-white font-bold text-sm">{{ post?.author?.nome || 'User' }}</h3>
             <p class="text-white/60 text-xs">{{ post?.author?.area_atuacao || '' }}</p>
           </div>
         </div>
@@ -35,13 +35,13 @@
         <ImageLightbox
           v-model="showImageLightbox"
           :image-url="post?.image_url"
-          :alt="`Imagem do post de ${post?.author?.nome || 'Usuário'}`"
+          :alt="`Post image from ${post?.author?.nome || 'User'}`"
         />
       </div>
 
       <!-- Action Selection -->
       <div>
-        <label class="block text-white/80 text-sm font-semibold mb-3">Ação</label>
+        <label class="block text-white/80 text-sm font-semibold mb-3">Action</label>
         <div class="grid grid-cols-2 gap-3">
           <button
             :class="[
@@ -53,7 +53,7 @@
             @click="action = 'approve'"
           >
             <span class="material-symbols-outlined text-lg">check_circle</span>
-            Aprovar
+            Approve
           </button>
           <button
             :class="[
@@ -65,7 +65,7 @@
             @click="action = 'remove'"
           >
             <span class="material-symbols-outlined text-lg">delete</span>
-            Remover
+            Remove
           </button>
         </div>
       </div>
@@ -73,13 +73,13 @@
       <!-- Reason (required for remove) -->
       <div v-if="action === 'remove'">
         <label class="block text-white/80 text-sm font-semibold mb-2">
-          Motivo <span class="text-red-400">*</span>
+          Reason <span class="text-red-400">*</span>
         </label>
         <textarea
           v-model="reason"
           rows="3"
           class="w-full px-3 py-2 border border-white/10 rounded-lg bg-surface-card text-white placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all text-sm"
-          placeholder="Por que este post deve ser removido?"
+          placeholder="Why should this post be removed?"
         ></textarea>
       </div>
 
@@ -88,9 +88,9 @@
         <div class="flex items-start gap-2">
           <span class="material-symbols-outlined text-red-400 text-lg">warning</span>
           <div class="flex-1">
-            <p class="text-red-400 text-sm font-semibold">Ação Destrutiva</p>
+            <p class="text-red-400 text-sm font-semibold">Destructive Action</p>
             <p class="text-red-400/80 text-xs mt-1">
-              Remover o post é uma ação permanente e não pode ser desfeita.
+              Removing the post is a permanent action and cannot be undone.
             </p>
           </div>
         </div>
@@ -104,7 +104,7 @@
 
     <template #footer>
       <div class="flex gap-3">
-        <Button variant="outline" @click="handleCancel">Cancelar</Button>
+        <Button variant="outline" @click="handleCancel">Cancel</Button>
         <Button
           variant="primary"
           :disabled="!canSubmit || processing"
@@ -159,11 +159,11 @@ const canSubmit = computed(() => {
 const actionLabel = computed(() => {
   switch (action.value) {
     case 'approve':
-      return 'Aprovar'
+      return 'Approve'
     case 'remove':
-      return 'Remover'
+      return 'Remove'
     default:
-      return 'Confirmar'
+      return 'Confirm'
   }
 })
 
@@ -185,7 +185,7 @@ async function handleSubmit() {
   if (!props.post) return
 
   if (action.value === 'remove' && !reason.value.trim()) {
-    error.value = 'Por favor, informe o motivo'
+    error.value = 'Please provide a reason'
     return
   }
 
@@ -203,7 +203,7 @@ async function handleSubmit() {
     }
     isOpen.value = false
   } catch (err: any) {
-    error.value = err.message || 'Erro ao processar ação. Tente novamente.'
+    error.value = err.message || 'Error processing action. Please try again.'
   } finally {
     processing.value = false
   }

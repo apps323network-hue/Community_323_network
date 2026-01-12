@@ -31,32 +31,6 @@
         </button>
       </div>
 
-      <!-- Show WhatsApp Toggle -->
-      <div class="flex items-center justify-between py-2 p-3 rounded-lg hover:bg-white/5 transition-colors">
-        <div>
-          <p class="text-white font-medium text-sm">{{ t('profile.showWhatsApp') }}</p>
-          <p class="text-text-muted text-xs">{{ t('profile.showWhatsAppDesc') }}</p>
-        </div>
-        <button
-          @click="$emit('toggle-whatsapp')"
-          :class="[
-            'w-12 h-6 rounded-full relative transition-all focus:outline-none',
-            showWhatsapp
-              ? 'bg-secondary/20 border border-secondary shadow-[0_0_8px_rgba(0,240,255,0.3)]'
-              : 'bg-input-bg border border-text-muted/30'
-          ]"
-        >
-          <span
-            :class="[
-              'absolute top-0.5 w-4 h-4 rounded-full transition-transform',
-              showWhatsapp
-                ? 'right-1 bg-secondary shadow-[0_0_5px_rgba(0,240,255,0.8)]'
-                : 'left-1 bg-text-muted'
-            ]"
-          ></span>
-        </button>
-      </div>
-
       <!-- Show Email Toggle -->
       <div class="flex items-center justify-between py-2 p-3 rounded-lg hover:bg-white/5 transition-colors">
         <div>
@@ -119,9 +93,9 @@ defineProps<{
 }>()
 
 defineEmits<{
-  (e: 'toggle-public'): void
   (e: 'toggle-whatsapp'): void
   (e: 'toggle-email'): void
+  (e: 'toggle-public'): void
   (e: 'manage-subscription'): void
 }>()
 </script>

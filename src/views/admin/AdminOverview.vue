@@ -7,7 +7,7 @@
           <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-primary animate-gradient">Overview</span>
         </h1>
         <p class="text-slate-600 dark:text-white/60 text-lg">
-          Visão geral do dashboard de administração
+          Administration dashboard overview
         </p>
       </div>
 
@@ -16,51 +16,51 @@
         <!-- Total Membros -->
         <div class="bg-white dark:bg-surface-card rounded-xl p-6 border border-slate-200 dark:border-white/5 hover:border-secondary/50 transition-all group shadow-lg dark:shadow-xl">
           <div class="flex items-center justify-between mb-4">
-            <span class="text-slate-600 dark:text-white/70 text-sm font-medium">Total de Membros</span>
+            <span class="text-slate-600 dark:text-white/70 text-sm font-medium">Total Members</span>
             <div class="p-2 bg-slate-100 dark:bg-white/5 rounded-lg">
               <span class="material-symbols-outlined text-slate-500 dark:text-white/50 text-xl">people</span>
             </div>
           </div>
           <div class="text-3xl font-black text-slate-900 dark:text-white mb-1">{{ userStats.total }}</div>
-          <div class="text-xs text-slate-500 dark:text-white/40">Membros cadastrados</div>
+          <div class="text-xs text-slate-500 dark:text-white/40">Registered members</div>
         </div>
 
         <!-- Pendentes -->
         <div class="bg-white dark:bg-surface-card rounded-xl p-6 border border-slate-200 dark:border-white/5 hover:border-secondary/50 transition-all group shadow-lg dark:shadow-xl">
           <div class="flex items-center justify-between mb-4">
-            <span class="text-slate-600 dark:text-white/70 text-sm font-medium">Pendentes</span>
+            <span class="text-slate-600 dark:text-white/70 text-sm font-medium">Pending</span>
             <div class="p-2 bg-slate-100 dark:bg-white/5 rounded-lg">
               <span class="material-symbols-outlined text-slate-500 dark:text-white/50 text-xl">schedule</span>
             </div>
           </div>
           <div class="text-3xl font-black text-slate-900 dark:text-white mb-1">{{ userStats.pending }}</div>
-          <div v-if="userStats.pending > 0" class="text-xs text-yellow-600 dark:text-yellow-400/70 font-medium">Requer atenção</div>
-          <div v-else class="text-xs text-slate-500 dark:text-white/40">Nenhum pendente</div>
+          <div v-if="userStats.pending > 0" class="text-xs text-yellow-600 dark:text-yellow-400/70 font-medium">Requires attention</div>
+          <div v-else class="text-xs text-slate-500 dark:text-white/40">None pending</div>
         </div>
 
         <!-- Posts Pendentes -->
         <div class="bg-white dark:bg-surface-card rounded-xl p-6 border border-slate-200 dark:border-white/5 hover:border-secondary/50 transition-all group shadow-lg dark:shadow-xl">
           <div class="flex items-center justify-between mb-4">
-            <span class="text-slate-600 dark:text-white/70 text-sm font-medium">Posts Pendentes</span>
+            <span class="text-slate-600 dark:text-white/70 text-sm font-medium">Pending Posts</span>
             <div class="p-2 bg-slate-100 dark:bg-white/5 rounded-lg">
               <span class="material-symbols-outlined text-slate-500 dark:text-white/50 text-xl">article</span>
             </div>
           </div>
           <div class="text-3xl font-black text-slate-900 dark:text-white mb-1">{{ postStats.pending }}</div>
-          <div v-if="postStats.pending > 0" class="text-xs text-yellow-600 dark:text-yellow-400/70 font-medium">Aguardando moderação</div>
-          <div v-else class="text-xs text-slate-500 dark:text-white/40">Nenhum pendente</div>
+          <div v-if="postStats.pending > 0" class="text-xs text-yellow-600 dark:text-yellow-400/70 font-medium">Awaiting moderation</div>
+          <div v-else class="text-xs text-slate-500 dark:text-white/40">None pending</div>
         </div>
 
         <!-- Total Posts -->
         <div class="bg-white dark:bg-surface-card rounded-xl p-6 border border-slate-200 dark:border-white/5 hover:border-secondary/50 transition-all group shadow-lg dark:shadow-xl">
           <div class="flex items-center justify-between mb-4">
-            <span class="text-slate-600 dark:text-white/70 text-sm font-medium">Total de Posts</span>
+            <span class="text-slate-600 dark:text-white/70 text-sm font-medium">Total Posts</span>
             <div class="p-2 bg-slate-100 dark:bg-white/5 rounded-lg">
               <span class="material-symbols-outlined text-slate-500 dark:text-white/50 text-xl">description</span>
             </div>
           </div>
           <div class="text-3xl font-black text-slate-900 dark:text-white mb-1">{{ postStats.total }}</div>
-          <div class="text-xs text-slate-500 dark:text-white/40">Posts publicados</div>
+          <div class="text-xs text-slate-500 dark:text-white/40">Published posts</div>
         </div>
       </div>
 
@@ -68,7 +68,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Ações Rápidas -->
         <div class="bg-white dark:bg-surface-card rounded-xl p-6 border border-slate-200 dark:border-white/5 shadow-lg dark:shadow-xl">
-          <h2 class="text-slate-900 dark:text-white text-xl font-bold mb-4">Ações Rápidas</h2>
+          <h2 class="text-slate-900 dark:text-white text-xl font-bold mb-4">Quick Actions</h2>
           <div class="space-y-3">
             <RouterLink
               to="/admin/membros"
@@ -78,8 +78,8 @@
                 <span class="material-symbols-outlined text-primary text-xl">people</span>
               </div>
               <div class="flex-1">
-                <p class="text-slate-900 dark:text-white font-medium">Gerenciar Membros</p>
-                <p class="text-slate-600 dark:text-white/50 text-sm">{{ userStats.pending }} pendentes</p>
+                <p class="text-slate-900 dark:text-white font-medium">Manage Members</p>
+                <p class="text-slate-600 dark:text-white/50 text-sm">{{ userStats.pending }} pending</p>
               </div>
               <span class="material-symbols-outlined text-slate-400 dark:text-white/40 group-hover:text-slate-900 dark:group-hover:text-white">chevron_right</span>
             </RouterLink>
@@ -92,8 +92,8 @@
                 <span class="material-symbols-outlined text-primary text-xl">article</span>
               </div>
               <div class="flex-1">
-                <p class="text-slate-900 dark:text-white font-medium">Moderar Posts</p>
-                <p class="text-slate-600 dark:text-white/50 text-sm">{{ postStats.pending }} pendentes</p>
+                <p class="text-slate-900 dark:text-white font-medium">Moderate Posts</p>
+                <p class="text-slate-600 dark:text-white/50 text-sm">{{ postStats.pending }} pending</p>
               </div>
               <span class="material-symbols-outlined text-slate-400 dark:text-white/40 group-hover:text-slate-900 dark:group-hover:text-white">chevron_right</span>
             </RouterLink>
@@ -106,8 +106,8 @@
                 <span class="material-symbols-outlined text-primary text-xl">event</span>
               </div>
               <div class="flex-1">
-                <p class="text-slate-900 dark:text-white font-medium">Gerenciar Eventos</p>
-                <p class="text-slate-600 dark:text-white/50 text-sm">Ver todos os eventos</p>
+                <p class="text-slate-900 dark:text-white font-medium">Manage Events</p>
+                <p class="text-slate-600 dark:text-white/50 text-sm">View all events</p>
               </div>
               <span class="material-symbols-outlined text-slate-400 dark:text-white/40 group-hover:text-slate-900 dark:group-hover:text-white">chevron_right</span>
             </RouterLink>
@@ -116,33 +116,33 @@
 
         <!-- Estatísticas Detalhadas -->
         <div class="bg-white dark:bg-surface-card rounded-xl p-6 border border-slate-200 dark:border-white/5 shadow-lg dark:shadow-xl">
-          <h2 class="text-slate-900 dark:text-white text-xl font-bold mb-4">Estatísticas Detalhadas</h2>
+          <h2 class="text-slate-900 dark:text-white text-xl font-bold mb-4">Detailed Statistics</h2>
           <div class="space-y-4">
             <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/5 rounded-lg">
               <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-slate-500 dark:text-white/50">check_circle</span>
-                <span class="text-slate-600 dark:text-white/70 text-sm">Membros Ativos</span>
+                <span class="text-slate-600 dark:text-white/70 text-sm">Active Members</span>
               </div>
               <span class="text-slate-900 dark:text-white font-bold">{{ userStats.active }}</span>
             </div>
             <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/5 rounded-lg">
               <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-slate-500 dark:text-white/50">new_releases</span>
-                <span class="text-slate-600 dark:text-white/70 text-sm">Novos Hoje</span>
+                <span class="text-slate-600 dark:text-white/70 text-sm">New Today</span>
               </div>
               <span class="text-slate-900 dark:text-white font-bold">{{ userStats.newToday }}</span>
             </div>
             <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/5 rounded-lg">
               <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-slate-500 dark:text-white/50">block</span>
-                <span class="text-slate-600 dark:text-white/70 text-sm">Suspensos</span>
+                <span class="text-slate-600 dark:text-white/70 text-sm">Suspended</span>
               </div>
               <span class="text-slate-900 dark:text-white font-bold">{{ userStats.suspended }}</span>
             </div>
             <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/5 rounded-lg">
               <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-slate-500 dark:text-white/50">cancel</span>
-                <span class="text-slate-600 dark:text-white/70 text-sm">Banidos</span>
+                <span class="text-slate-600 dark:text-white/70 text-sm">Banned</span>
               </div>
               <span class="text-slate-900 dark:text-white font-bold">{{ userStats.banned }}</span>
             </div>

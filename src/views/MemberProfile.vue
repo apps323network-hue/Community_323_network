@@ -140,8 +140,15 @@
               :readonly="true"
             />
 
-            <!-- Achievements Section -->
-            <div class="bg-surface-dark border border-white/5 rounded-2xl p-8 shadow-xl">
+            <!-- ============================================
+                 FUNCIONALIDADE DESATIVADA: CONQUISTAS E DESAFIOS
+                 ============================================
+                 Esta funcionalidade foi temporariamente desativada.
+                 Para reativar: altere v-if="false" para v-if="true" ou remova a diretiva v-if
+                 Localização: MemberProfile.vue linha ~139
+                 Nota: Esta seção exibe as conquistas completadas pelo membro visualizado
+                 ============================================ -->
+            <div v-if="false" class="bg-surface-dark border border-white/5 rounded-2xl p-8 shadow-xl">
               <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
                 <span class="material-symbols-outlined text-secondary">stars</span>
                 Conquistas e Desafios

@@ -56,7 +56,14 @@
         </span>
         <span class="text-white font-medium">{{ connections }}</span>
       </div>
-      <div class="flex items-center justify-between text-sm group/stat cursor-default">
+      <!-- ============================================
+           FUNCIONALIDADE DESATIVADA: PONTOS
+           ============================================
+           Esta funcionalidade foi temporariamente desativada.
+           Para reativar: altere v-if="false" para v-if="true" ou remova a diretiva v-if
+           Localização: ProfileCard.vue linha ~59
+           ============================================ -->
+      <div v-if="false" class="flex items-center justify-between text-sm group/stat cursor-default">
         <span class="text-text-muted flex items-center gap-2 group-hover/stat:text-secondary transition-colors">
           <span class="material-symbols-outlined text-[18px]">stars</span>
           Pontos

@@ -92,6 +92,19 @@
             <GuestBlocker :show="true" variant="inline" :title="t('programs.exclusiveContent')" :message="t('programs.exclusiveContentDesc')" :cta="t('programs.unlockLesson')" />
           </div>
         </div>
+        
+        <!-- No Video State -->
+        <div v-else class="relative bg-gradient-to-br from-slate-900 via-black to-slate-900 aspect-video w-full shadow-2xl overflow-hidden flex items-center justify-center">
+          <div class="text-center max-w-md px-6">
+            <div class="bg-secondary/10 p-8 rounded-full w-fit mx-auto mb-6">
+              <span class="material-symbols-outlined text-6xl text-secondary">description</span>
+            </div>
+            <h3 class="text-2xl font-black text-white mb-2">{{ getLessonTitle(currentLesson) }}</h3>
+            <p class="text-gray-400 text-sm">
+              Esta aula não possui vídeo. Conteúdo disponível na descrição e materiais abaixo.
+            </p>
+          </div>
+        </div>
 
         <!-- Lesson Header & Quick Navigation -->
         <div class="p-6 md:p-8 bg-slate-50/50 dark:bg-surface-dark/50 border-b border-slate-200 dark:border-white/5 relative overflow-hidden">

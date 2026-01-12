@@ -4,10 +4,10 @@
       <!-- Header -->
       <div class="mb-6">
         <h1 class="text-slate-900 dark:text-white text-4xl lg:text-5xl font-black mb-3">
-          Gestão de <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-primary animate-gradient">Serviços</span>
+          <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-primary animate-gradient">Services</span> Management
         </h1>
         <p class="text-slate-600 dark:text-white/60 text-lg">
-          Crie, edite e gerencie serviços da comunidade
+          Create, edit and manage community services
         </p>
       </div>
 
@@ -21,40 +21,40 @@
             </div>
           </div>
           <div class="text-4xl font-black text-slate-900 dark:text-white mb-1">{{ serviceStats.total }}</div>
-          <div class="text-xs text-slate-500 dark:text-white/40">Serviços cadastrados</div>
+          <div class="text-xs text-slate-500 dark:text-white/40">Registered services</div>
         </div>
 
         <div class="bg-white dark:bg-surface-card rounded-xl p-6 border border-slate-200 dark:border-white/5 hover:border-secondary/50 transition-all shadow-lg dark:shadow-xl">
           <div class="flex items-center justify-between mb-4">
-            <span class="text-slate-600 dark:text-white/70 text-sm font-medium">Ativos</span>
+            <span class="text-slate-600 dark:text-white/70 text-sm font-medium">Active</span>
             <div class="p-2 bg-slate-100 dark:bg-white/5 rounded-lg">
               <span class="material-symbols-outlined text-slate-500 dark:text-white/50 text-xl">check_circle</span>
             </div>
           </div>
           <div class="text-4xl font-black text-slate-900 dark:text-white mb-1">{{ serviceStats.active }}</div>
-          <div class="text-xs text-slate-500 dark:text-white/40">Serviços ativos</div>
+          <div class="text-xs text-slate-500 dark:text-white/40">Active services</div>
         </div>
 
         <div class="bg-white dark:bg-surface-card rounded-xl p-6 border border-slate-200 dark:border-white/5 hover:border-secondary/50 transition-all shadow-lg dark:shadow-xl">
           <div class="flex items-center justify-between mb-4">
-            <span class="text-slate-600 dark:text-white/70 text-sm font-medium">Inativos</span>
+            <span class="text-slate-600 dark:text-white/70 text-sm font-medium">Inactive</span>
             <div class="p-2 bg-slate-100 dark:bg-white/5 rounded-lg">
               <span class="material-symbols-outlined text-slate-500 dark:text-white/50 text-xl">cancel</span>
             </div>
           </div>
           <div class="text-4xl font-black text-slate-900 dark:text-white mb-1">{{ serviceStats.inactive }}</div>
-          <div class="text-xs text-slate-500 dark:text-white/40">Serviços inativos</div>
+          <div class="text-xs text-slate-500 dark:text-white/40">Inactive services</div>
         </div>
 
         <div class="bg-white dark:bg-surface-card rounded-xl p-6 border border-slate-200 dark:border-white/5 hover:border-secondary/50 transition-all shadow-lg dark:shadow-xl">
           <div class="flex items-center justify-between mb-4">
-            <span class="text-slate-600 dark:text-white/70 text-sm font-medium">Em Destaque</span>
+            <span class="text-slate-600 dark:text-white/70 text-sm font-medium">Featured</span>
             <div class="p-2 bg-slate-100 dark:bg-white/5 rounded-lg">
               <span class="material-symbols-outlined text-slate-500 dark:text-white/50 text-xl">star</span>
             </div>
           </div>
           <div class="text-4xl font-black text-slate-900 dark:text-white mb-1">{{ serviceStats.featured }}</div>
-          <div class="text-xs text-slate-500 dark:text-white/40">Serviços em destaque</div>
+          <div class="text-xs text-slate-500 dark:text-white/40">Featured services</div>
         </div>
       </div>
 
@@ -78,7 +78,7 @@
           class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-black font-bold rounded-lg hover:shadow-lg hover:shadow-primary/30 transition-all"
         >
           <span class="material-symbols-outlined">add</span>
-          <span class="hidden sm:inline">Novo Serviço</span>
+          <span class="hidden sm:inline">New Service</span>
         </button>
       </div>
 
@@ -89,7 +89,7 @@
 
       <div v-else-if="displayedServices.length === 0" class="flex flex-col items-center justify-center py-12 bg-slate-50 dark:bg-surface-dark/50 rounded-xl border border-slate-200 dark:border-white/10">
         <span class="material-symbols-outlined text-slate-400 dark:text-gray-500 text-6xl mb-4">business_center</span>
-        <p class="text-slate-500 dark:text-gray-400 font-medium">Nenhum serviço encontrado</p>
+        <p class="text-slate-500 dark:text-gray-400 font-medium">No services found</p>
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -106,7 +106,7 @@
                   v-if="service.destaque"
                   class="px-2 py-0.5 rounded-full text-xs font-bold bg-yellow-500/20 text-yellow-400"
                 >
-                  Destaque
+                  Featured
                 </span>
                 <span
                   v-if="service.status === 'pending'"
@@ -143,7 +143,7 @@
           </div>
 
           <div v-if="service.beneficio_membro_pt" class="mb-4 p-3 rounded-lg bg-secondary/10 border border-secondary/20">
-            <p class="text-xs font-bold text-secondary uppercase mb-1">Benefício Membro:</p>
+            <p class="text-xs font-bold text-secondary uppercase mb-1">Member Benefit:</p>
             <p class="text-sm text-slate-700 dark:text-gray-300">{{ service.beneficio_membro_pt }}</p>
           </div>
 
@@ -183,7 +183,7 @@
       <!-- Create/Edit Modal -->
       <Modal
         v-model="showModal"
-        :title="showEditModal ? 'Editar Serviço' : 'Criar Novo Serviço'"
+        :title="showEditModal ? 'Edit Service' : 'Create New Service'"
         size="lg"
       >
         <form @submit.prevent="handleSubmit" class="space-y-4">
@@ -199,7 +199,7 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Nome (EN) *</label>
+              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Name (EN) *</label>
               <input
                 v-model="formData.nome_en"
                 type="text"
@@ -221,7 +221,7 @@
               ></textarea>
             </div>
             <div>
-              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Descrição (EN)</label>
+              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Description (EN)</label>
               <textarea
                 v-model="formData.descricao_en"
                 rows="4"
@@ -233,26 +233,26 @@
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Categoria</label>
+              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Category</label>
               <select
                 v-model="formData.categoria"
                 class="w-full rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-lighter p-3 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
               >
-                <option value="">Selecione...</option>
-                <option value="legal">Legal & Burocracia</option>
+                <option value="">Select...</option>
+                <option value="legal">Legal & Bureaucracy</option>
                 <option value="marketing">Marketing & Brand</option>
-                <option value="finance">Finanças</option>
-                <option value="mentoring">Mentoria</option>
+                <option value="finance">Finance</option>
+                <option value="mentoring">Mentoring</option>
               </select>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Parceiro</label>
+              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Partner</label>
               <input
                 v-model="formData.parceiro_id"
                 type="text"
                 class="w-full rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-lighter p-3 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-                placeholder="ID do parceiro (opcional)"
+                placeholder="Partner ID (optional)"
               />
             </div>
           </div>
@@ -268,7 +268,7 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Benefício Membro (EN)</label>
+              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Member Benefit (EN)</label>
               <input
                 v-model="formData.beneficio_membro_en"
                 type="text"
@@ -280,7 +280,7 @@
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Preço (em centavos)</label>
+              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Price (in cents)</label>
               <input
                 v-model.number="formData.preco"
                 type="number"
@@ -291,7 +291,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Moeda</label>
+              <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Currency</label>
               <select
                 v-model="formData.moeda"
                 class="w-full rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-lighter p-3 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
@@ -352,7 +352,7 @@
                 type="checkbox"
                 class="w-4 h-4 rounded border-slate-300 dark:border-white/10 bg-white dark:bg-surface-lighter text-primary focus:ring-primary"
               />
-              <span class="text-sm text-slate-900 dark:text-white">Em destaque</span>
+              <span class="text-sm text-slate-900 dark:text-white">Featured</span>
             </label>
 
             <label class="flex items-center gap-2 cursor-pointer">
@@ -361,7 +361,7 @@
                 type="checkbox"
                 class="w-4 h-4 rounded border-slate-300 dark:border-white/10 bg-white dark:bg-surface-lighter text-primary focus:ring-primary"
               />
-              <span class="text-sm text-slate-900 dark:text-white">Ativo</span>
+              <span class="text-sm text-slate-900 dark:text-white">Active</span>
             </label>
           </div>
 
@@ -371,14 +371,14 @@
               :disabled="submitting"
               class="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-black font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50"
             >
-              {{ submitting ? 'Salvando...' : (showEditModal ? 'Salvar Alterações' : 'Criar Serviço') }}
+              {{ submitting ? 'Saving...' : (showEditModal ? 'Save Changes' : 'Create Service') }}
             </button>
             <button
               type="button"
               @click="closeModal"
               class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white font-medium transition-all"
             >
-              Cancelar
+              Cancel
             </button>
           </div>
         </form>
@@ -538,16 +538,16 @@ async function handleSubmit() {
     }
 
     if (editingService.value) {
-      await adminStore.updateService(editingService.value.id, dataToSave)
-      toast.success('Serviço atualizado com sucesso!')
+      await adminStore.updateService(editingService.value.id, formData.value)
+      toast.success('Service updated successfully!')
     } else {
-      await adminStore.createService(dataToSave)
-      toast.success('Serviço criado com sucesso!')
+      await adminStore.createService(formData.value)
+      toast.success('Service created successfully!')
     }
 
     closeModal()
   } catch (error: any) {
-    toast.error(error.message || 'Erro ao salvar serviço')
+    toast.error(error.message || 'Error saving service')
     console.error('Error saving service:', error)
   } finally {
     submitting.value = false
@@ -587,15 +587,15 @@ async function confirmReject() {
 }
 
 async function deleteService(serviceId: string) {
-  if (!confirm('Tem certeza que deseja deletar este serviço?')) {
+  if (!confirm('Are you sure you want to delete this service?')) {
     return
   }
 
   try {
     await adminStore.deleteService(serviceId)
-    toast.success('Serviço deletado com sucesso!')
+    toast.success('Service deleted successfully!')
   } catch (error: any) {
-    toast.error(error.message || 'Erro ao deletar serviço')
+    toast.error(error.message || 'Error deleting service')
     console.error('Error deleting service:', error)
   }
 }

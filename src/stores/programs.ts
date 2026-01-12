@@ -57,7 +57,44 @@ export const useProgramsStore = defineStore('programs', {
 
                 if (error) throw error
 
-                this.programs = data || []
+                // Check which programs have videos
+                const programIds = (data || []).map((p: any) => p.id)
+                
+                if (programIds.length > 0) {
+                    // Buscar todas as aulas dos programas
+                    const { data: lessonsData, error: lessonsError } = await supabase
+                        .from('program_lessons')
+                        .select('program_id, youtube_video_id')
+                        .in('program_id', programIds)
+                    
+                    if (lessonsError) {
+                        console.warn('Error checking videos:', lessonsError)
+                    }
+                    
+                    // Filtrar programas que têm pelo menos uma aula com vídeo válido (não null e não vazio)
+                    const programsWithVideos = new Set(
+                        (lessonsData || [])
+                            .filter((lesson: any) => 
+                                lesson.youtube_video_id !== null && 
+                                lesson.youtube_video_id !== '' &&
+                                lesson.youtube_video_id.trim() !== ''
+                            )
+                            .map((lesson: any) => lesson.program_id)
+                    )
+
+                    // Add has_videos flag to each program
+                    const processedData = (data || []).map((program: any) => ({
+                        ...program,
+                        has_videos: programsWithVideos.has(program.id)
+                    }))
+
+                    this.programs = processedData
+                } else {
+                    this.programs = (data || []).map((program: any) => ({
+                        ...program,
+                        has_videos: false
+                    }))
+                }
             } catch (err: any) {
                 this.error = err.message
                 console.error('Error fetching programs:', err)

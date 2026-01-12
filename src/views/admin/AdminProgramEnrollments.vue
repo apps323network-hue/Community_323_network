@@ -9,7 +9,7 @@
             class="inline-flex items-center text-sm text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white transition-colors mb-2"
           >
             <span class="material-icons text-sm mr-1">arrow_back</span>
-            Voltar para Programas
+            Back to Programs
           </RouterLink>
           <div v-if="program" class="flex items-center gap-3">
              <div class="h-10 w-14 rounded bg-slate-200 dark:bg-white/10 overflow-hidden flex-shrink-0">
@@ -20,9 +20,9 @@
              </div>
              <div>
                 <h1 class="text-2xl font-bold text-slate-900 dark:text-white">
-                  Matrículas: {{ currentLocale === 'pt-BR' ? program.title_pt : program.title_en }}
+                  Enrollments: {{ currentLocale === 'pt-BR' ? program.title_pt : program.title_en }}
                 </h1>
-                <p class="text-slate-500 text-sm">Gerencie os alunos inscritos e acompanhe o progresso</p>
+                <p class="text-slate-500 text-sm">Manage enrolled students and track progress</p>
              </div>
           </div>
           <div v-else-if="loading" class="h-12 w-96 bg-slate-200 dark:bg-white/10 animate-pulse rounded-lg"></div>
@@ -31,15 +31,15 @@
         <div v-if="enrollments.length > 0 || !loading" class="flex items-center gap-4 bg-white dark:bg-surface-dark p-3 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
            <div class="text-center px-4 border-r border-slate-100 dark:border-white/5">
               <div class="text-2xl font-black text-primary dark:text-secondary">{{ enrollments.length }}</div>
-              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Total</div>
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ t('programs.admin.total') }}</div>
            </div>
            <div class="text-center px-4 border-r border-slate-100 dark:border-white/5">
               <div class="text-2xl font-black text-green-500">{{ activeCount }}</div>
-              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Ativos</div>
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ t('programs.admin.active') }}</div>
            </div>
            <div class="text-center px-4">
               <div class="text-2xl font-black text-blue-500">{{ completedCount }}</div>
-              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Concluídos</div>
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ t('programs.admin.completed') }}</div>
            </div>
         </div>
       </div>
@@ -51,7 +51,7 @@
           <input
             v-model="search"
             type="text"
-            placeholder="Buscar aluno por nome..."
+            placeholder="Search student by name..."
             class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all"
           />
         </div>
@@ -60,11 +60,11 @@
           v-model="filterStatus"
           class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary transition-all"
         >
-          <option value="all">Todos os Status</option>
-          <option value="active">Ativos</option>
-          <option value="pending">Pendentes</option>
-          <option value="completed">Concluídos</option>
-          <option value="cancelled">Cancelados</option>
+          <option value="all">All Statuses</option>
+          <option value="active">Active</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
         </select>
       </div>
 
@@ -74,12 +74,12 @@
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-slate-50/50 dark:bg-white/5 border-b border-slate-200 dark:border-white/5">
-                <th class="p-4 font-bold text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider">Aluno</th>
-                <th class="p-4 font-bold text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider">Data Inscrição</th>
-                <th class="p-4 font-bold text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider">Progresso</th>
-                <th class="p-4 font-bold text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider">Pagamento</th>
-                <th class="p-4 font-bold text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider">Status</th>
-                <th class="p-4 font-bold text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider text-right">Ações</th>
+                <th class="p-4 font-bold text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider">{{ t('programs.admin.tableStudent') }}</th>
+                <th class="p-4 font-bold text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider">{{ t('programs.admin.tableEnrollmentDate') }}</th>
+                <th class="p-4 font-bold text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider">{{ t('programs.admin.tableProgress') }}</th>
+                <th class="p-4 font-bold text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider">{{ t('programs.admin.tablePayment') }}</th>
+                <th class="p-4 font-bold text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider">{{ t('programs.admin.tableStatus') }}</th>
+                <th class="p-4 font-bold text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider text-right">{{ t('programs.admin.tableActions') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-white/5">
@@ -91,7 +91,7 @@
                         {{ enrollment.user?.nome?.substring(0, 2).toUpperCase() || 'U' }}
                     </div>
                     <div>
-                      <div class="font-bold text-slate-900 dark:text-white capitalize">{{ enrollment.user?.nome || 'Usuário' }}</div>
+                      <div class="font-bold text-slate-900 dark:text-white capitalize">{{ enrollment.user?.nome || 'User' }}</div>
                       <div class="text-[10px] text-slate-500 font-mono">{{ enrollment.id.split('-')[0] }}</div>
                     </div>
                   </div>
@@ -124,7 +124,7 @@
                       'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400': enrollment.payment_status === 'failed'
                     }"
                   >
-                    {{ enrollment.payment_status === 'paid' ? 'Pago' : enrollment.payment_status === 'pending' ? 'Pendente' : 'Falhou' }}
+                    {{ enrollment.payment_status === 'paid' ? 'Paid' : enrollment.payment_status === 'pending' ? 'Pending' : 'Failed' }}
                   </span>
                   <div v-if="enrollment.payment_amount" class="text-[10px] text-slate-400 mt-1">
                     {{ enrollment.payment_currency || 'USD' }} {{ enrollment.payment_amount }}
@@ -148,14 +148,14 @@
                      <button
                       @click="openStatusModal(enrollment)"
                       class="p-2 text-slate-400 hover:text-primary dark:hover:text-secondary rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-                      title="Alterar Status"
+                      title="Change Status"
                     >
                       <span class="material-icons text-sm">settings</span>
                     </button>
                     <RouterLink
                       :to="`/admin/users/${enrollment.user_id}/history`"
                       class="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-                      title="Ver Histórico"
+                      :title="t('programs.admin.viewHistory')"
                     >
                       <span class="material-icons text-sm">history</span>
                     </RouterLink>
@@ -166,8 +166,8 @@
                 <td colspan="6" class="p-16 text-center text-slate-500 dark:text-gray-400">
                   <div class="flex flex-col items-center gap-2">
                     <span class="material-icons text-4xl opacity-20">group_off</span>
-                    <p class="font-bold">Nenhuma matrícula encontrada.</p>
-                    <p class="text-xs opacity-60">Tente ajustar seus filtros de busca.</p>
+                    <p class="font-bold">No enrollments found.</p>
+                    <p class="text-xs opacity-60">Try adjusting your search filters.</p>
                   </div>
                 </td>
               </tr>
@@ -181,7 +181,7 @@
           <div class="bg-white dark:bg-surface-dark w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden transform transition-all">
              <div class="p-6">
                 <div class="flex items-center justify-between mb-6">
-                   <h3 class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Alterar Status</h3>
+                   <h3 class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">{{ t('programs.admin.changeStatusTitle') }}</h3>
                    <button @click="selectedEnrollment = null" class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
                       <span class="material-icons">close</span>
                    </button>
@@ -194,29 +194,29 @@
                    </div>
                    <div>
                       <div class="font-bold text-slate-900 dark:text-white">{{ selectedEnrollment.user?.nome }}</div>
-                      <div class="text-xs text-slate-500">Programa: {{ currentLocale === 'pt-BR' ? program?.title_pt : program?.title_en }}</div>
+                      <div class="text-xs text-slate-500">Program: {{ currentLocale === 'pt-BR' ? program?.title_pt : program?.title_en }}</div>
                    </div>
                 </div>
 
                 <div class="space-y-4">
                    <div>
-                      <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Novo Status</label>
+                      <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">New Status</label>
                       <select v-model="newStatus" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary transition-all">
-                         <option value="pending">Pendente</option>
-                         <option value="active">Ativo</option>
-                         <option value="completed">Concluído</option>
-                         <option value="cancelled">Cancelado</option>
+                         <option value="pending">Pending</option>
+                         <option value="active">Active</option>
+                         <option value="completed">Completed</option>
+                         <option value="cancelled">Cancelled</option>
                       </select>
                    </div>
                 </div>
 
                 <div class="mt-8 flex gap-3">
                    <button @click="selectedEnrollment = null" class="flex-1 px-4 py-3 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
-                      Cancelar
+                      {{ t('programs.admin.cancel') }}
                    </button>
                    <button @click="updateStatus" :disabled="updating" class="flex-1 px-4 py-3 bg-primary dark:bg-secondary text-white font-bold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
                       <span v-if="updating" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                      {{ updating ? 'Salvando...' : 'Confirmar' }}
+                      {{ updating ? t('programs.admin.saving') : t('programs.admin.confirm') }}
                    </button>
                 </div>
              </div>
@@ -237,7 +237,7 @@ import { toast } from 'vue-sonner'
 import type { Program, ProgramEnrollment, EnrollmentStatus } from '@/types/programs'
 
 const route = useRoute()
-const { locale: currentLocale } = useLocale()
+const { locale: currentLocale, t } = useLocale()
 const programsStore = useProgramsStore()
 
 const program = ref<Program | null>(null)
@@ -265,10 +265,10 @@ const completedCount = computed(() => enrollments.value.filter(e => e.status ===
 
 const formatStatus = (status: string) => {
   const map: Record<string, string> = {
-    active: 'Ativo',
-    completed: 'Concluído',
-    pending: 'Pendente',
-    cancelled: 'Cancelado'
+    active: t('programs.admin.active'),
+    completed: t('programs.admin.completed'),
+    pending: t('programs.admin.pending'),
+    cancelled: t('programs.admin.cancelled')
   }
   return map[status] || status
 }
@@ -284,7 +284,7 @@ const updateStatus = async () => {
   updating.value = true
   try {
     await programsStore.updateEnrollmentStatus(selectedEnrollment.value.id, newStatus.value)
-    toast.success('Status da matrícula atualizado com sucesso!')
+    toast.success('Enrollment status updated successfully!')
     
     // Refresh list locally
     const idx = enrollments.value.findIndex(e => e.id === selectedEnrollment.value?.id)
@@ -295,7 +295,7 @@ const updateStatus = async () => {
     selectedEnrollment.value = null
   } catch (error: any) {
     console.error('Error updating status:', error)
-    toast.error('Ocorreu um erro ao atualizar o status: ' + (error.message || 'Erro desconhecido'))
+    toast.error('An error occurred while updating the status: ' + (error.message || 'Unknown error'))
   } finally {
     updating.value = false
   }
@@ -315,7 +315,7 @@ onMounted(async () => {
     enrollments.value = e
   } catch (error) {
     console.error('Error loading data:', error)
-    toast.error('Erro ao carregar os dados das matrículas.')
+    toast.error(t('programs.admin.errorLoadingEnrollments'))
   } finally {
     loading.value = false
   }

@@ -89,13 +89,19 @@
             v-model:state="editableProfile.estado"
             v-model:nationality="editableProfile.nacionalidade"
             v-model:email="editableProfile.email"
-            v-model:whatsapp="editableProfile.whatsapp"
             v-model:bio="editableProfile.bio"
             :readonly="isPreviewMode"
           />
 
-          <!-- Achievements Section -->
-          <div class="bg-surface-dark border border-input-border rounded-2xl p-6">
+          <!-- ============================================
+               FUNCIONALIDADE DESATIVADA: CONQUISTAS E DESAFIOS
+               ============================================
+               Esta funcionalidade foi temporariamente desativada.
+               Para reativar: altere v-if="false" para v-if="true" ou remova a diretiva v-if
+               Localização: Profile.vue linha ~96
+               Nota: Esta seção exibe as conquistas completadas pelo usuário
+               ============================================ -->
+          <div v-if="false" class="bg-surface-dark border border-input-border rounded-2xl p-6">
             <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
               <span class="material-symbols-outlined text-secondary">stars</span>
               {{ t('profile.achievementsTitle') }}
@@ -139,11 +145,9 @@
           <ProfileSettings
             v-if="!isPreviewMode"
             :isPublic="editableProfile.is_public"
-            :showWhatsapp="editableProfile.show_whatsapp"
             :showEmail="editableProfile.show_email"
             :isPremium="editableProfile.plano === 'Premium'"
             @toggle-public="editableProfile.is_public = !editableProfile.is_public"
-            @toggle-whatsapp="editableProfile.show_whatsapp = !editableProfile.show_whatsapp"
             @toggle-email="editableProfile.show_email = !editableProfile.show_email"
             @manage-subscription="handleManageSubscription"
           />
@@ -304,7 +308,6 @@ const editableProfile = reactive<any>({
   goals: [],
   is_public: true,
   job_notifications: false,
-  show_whatsapp: false,
   show_email: false,
   nacionalidade: '',
   estado: '',
@@ -325,27 +328,53 @@ function showStatus(msg: string, type: 'success' | 'error' = 'success') {
 // Initialize editable state from store
 function initEditableState() {
   if (userStore.profile) {
-    const data = {
-      ...userStore.profile,
-      tags: userStore.profile.tags || [],
-      goals: userStore.profile.goals || [],
-      // Ensure booleans are initialized
-      is_public: userStore.profile.is_public ?? true,
-      job_notifications: userStore.profile.job_notifications ?? false,
-      show_whatsapp: userStore.profile.show_whatsapp ?? false,
-      show_email: userStore.profile.show_email ?? false,
-      nacionalidade: userStore.profile.nacionalidade || '',
-      estado: userStore.profile.estado || '',
-      email: userStore.profile.email || '',
-      whatsapp: userStore.profile.whatsapp || ''
+    try {
+      const data = {
+        ...userStore.profile,
+        tags: userStore.profile.tags || [],
+        goals: userStore.profile.goals || [],
+        // Ensure booleans are initialized
+        is_public: userStore.profile.is_public ?? true,
+        job_notifications: userStore.profile.job_notifications ?? false,
+        show_email: userStore.profile.show_email ?? false,
+        nacionalidade: userStore.profile.nacionalidade || '',
+        estado: userStore.profile.estado || '',
+        email: userStore.profile.email || '',
+        // Ensure linkedin and instagram are strings, not objects or invalid formats
+        linkedin: typeof userStore.profile.linkedin === 'string' ? userStore.profile.linkedin : (userStore.profile.linkedin || ''),
+        instagram: typeof userStore.profile.instagram === 'string' ? userStore.profile.instagram : (userStore.profile.instagram || '')
+      }
+      
+      // Update editable profile
+      Object.assign(editableProfile, data)
+      
+      // Save stringified version for easy comparison
+      originalData.value = JSON.stringify(editableProfile)
+      hasChanges.value = false
+    } catch (error) {
+      console.error('Error initializing editable state:', error)
+      // Fallback: try to initialize with safe defaults
+      Object.assign(editableProfile, {
+        nome: userStore.profile.nome || '',
+        area_atuacao: userStore.profile.area_atuacao || '',
+        bio: userStore.profile.bio || '',
+        cidade: userStore.profile.cidade || '',
+        pais: userStore.profile.pais || 'USA',
+        linkedin: '',
+        instagram: '',
+        tags: [],
+        goals: [],
+        is_public: true,
+        job_notifications: false,
+        show_email: false,
+        nacionalidade: '',
+        estado: '',
+        email: '',
+        avatar_url: userStore.profile.avatar_url || ''
+      })
+      originalData.value = JSON.stringify(editableProfile)
+      hasChanges.value = false
     }
-    
-    // Update editable profile
-    Object.assign(editableProfile, data)
-    
-    // Save stringified version for easy comparison
-    originalData.value = JSON.stringify(editableProfile)
-    hasChanges.value = false
   }
 }
 
