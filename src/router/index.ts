@@ -391,22 +391,23 @@ const router = createRouter({
 })
 
 // Guard de autenticação
-router.beforeEach(async (to, _from, next) => {  // Detectar se é uma URL de recuperação de senha
-  // O Supabase adiciona type=recovery no hash quando é reset password
-  if (to.path === '/' || to.path === '') {
-    const hashParams = new URLSearchParams(window.location.hash.substring(1))
-    const type = hashParams.get('type')
-    const accessToken = hashParams.get('access_token')
+router.beforeEach(async (to, _from, next) => {    // O Supabase adiciona type=recovery no hash quando é reset password
+    if (to.path === '/' || to.path === '') {
+      const hash = window.location.hash
+      const hashParams = new URLSearchParams(hash.substring(1))
+      const type = hashParams.get('type')
+      const accessToken = hashParams.get('access_token')
 
-    if (type === 'recovery' && accessToken) {
-      // Redirecionar para página de reset password mantendo o hash
-      next({
-        path: '/reset-password',
-        replace: true
-      })
-      return
+      if (type === 'recovery' && accessToken) {
+        // Redirecionar para página de reset password PRESERVANDO o hash
+        next({
+          path: '/reset-password',
+          hash: hash, // Crucial: mantém o token para a próxima página
+          replace: true
+        })
+        return
+      }
     }
-  }
   const authStore = useAuthStore()
 
   // Aguardar inicialização do Firebase/Supabase se necessário
