@@ -216,8 +216,8 @@
             </Button>
           </div>
             
-          <!-- Google Login -->
-          <div>
+          <!-- Google Login (Localhost only) -->
+          <div v-if="isLocalhost">
             <div class="relative">
               <div class="absolute inset-0 flex items-center">
                 <div class="w-full border-t border-slate-200 dark:border-slate-800"></div>
@@ -370,8 +370,8 @@
             </Button>
           </div>
 
-          <!-- Google Register -->
-          <div>
+          <!-- Google Register (Localhost only) -->
+          <div v-if="isLocalhost">
             <div class="relative">
               <div class="absolute inset-0 flex items-center">
                 <div class="w-full border-t border-slate-200 dark:border-slate-800"></div>
@@ -506,6 +506,7 @@ import LanguageSwitcher from '@/components/ui/LanguageSwitcher.vue'
 import { toast } from 'vue-sonner'
 import { useI18n } from 'vue-i18n'
 import { useTermsAcceptance } from '@/composables/useTermsAcceptance'
+import { isLocalhost } from '@/utils/localhost'
 
 const { t } = useI18n()
 
