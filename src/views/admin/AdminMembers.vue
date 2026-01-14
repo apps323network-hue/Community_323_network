@@ -149,6 +149,7 @@
               @ban="handleBan"
               @unban="handleUnban"
               @update-role="handleUpdateRole"
+              @approve="handleApprove"
             />
           </div>
 
@@ -164,6 +165,7 @@
               @ban="handleBan"
               @unban="handleUnban"
               @update-role="handleUpdateRole"
+              @approve="handleApprove"
             />
           </div>
         </div>
@@ -288,6 +290,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { supabase } from '@/lib/supabase'
 import { useAdminUsersStore } from '@/stores/admin/users'
 import { useAdminBaseStore } from '@/stores/admin/base'
 import AdminLayout from '@/components/layout/admin/AdminLayout.vue'
@@ -375,6 +378,27 @@ function handleSuspend(_userId: string) {
 
 function handleUnsuspend(_userId: string) {
   toast.info('Functionality will be implemented soon')
+}
+
+async function handleApprove(userId: string) {
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ status: 'active' })
+      .eq('id', userId)
+    
+    if (error) throw error
+    
+    toast.success('Member approved successfully!')
+    await usersStore.fetchMembersPaginated(
+      usersStore.pagination.currentPage,
+      usersStore.pagination.pageSize
+    )
+    await usersStore.fetchUserStats()
+  } catch (error: any) {
+    toast.error(error.message || 'Failed to approve member')
+    console.error('Error approving member:', error)
+  }
 }
 
 function handleBan(userId: string) {

@@ -146,7 +146,17 @@
           >
             <span class="material-symbols-outlined text-lg">play_circle</span>
           </button>
-
+          
+          <!-- Approve Button (for pending members) -->
+          <button
+            v-if="user?.status === 'pending'"
+            @click="$emit('approve', user.id)"
+            class="p-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500/60 hover:text-green-500 hover:bg-green-500/20 transition-all"
+            title="Approve Member"
+          >
+            <span class="material-symbols-outlined text-lg">check_circle</span>
+          </button>
+          
           <button
             v-if="user?.status !== 'banned' && user"
             @click="$emit('ban', user.id)"
@@ -210,6 +220,7 @@ const emit = defineEmits<{
   'ban': [userId: string]
   'unban': [userId: string]
   'update-role': [userId: string, role: UserRole]
+  'approve': [userId: string]
 }>()
 
 const initials = computed(() => {
