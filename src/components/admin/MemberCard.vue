@@ -21,16 +21,9 @@
           <!-- Online indicator -->
           <div 
             v-if="isOnline" 
-            class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900"
+            class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900 shadow-[0_0_10px_rgba(34,197,94,0.5)]"
           ></div>
         </div>
-        
-        <!-- Online indicator -->
-        <div 
-          v-if="isOnline" 
-          class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900"
-        ></div>
-      </div>
 
         <!-- Info -->
         <div class="flex flex-col gap-1 min-w-0 flex-1">
@@ -72,6 +65,7 @@
             </div>
           </div>
         </div>
+      </div>
 
       <!-- Right Side: Stats & Actions -->
       <div class="flex flex-col items-end gap-4 shrink-0 w-full sm:w-auto">
