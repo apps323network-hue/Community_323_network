@@ -56,17 +56,29 @@
           </div>
 
           <!-- New Today -->
-          <div class="relative rounded-[24px] p-6 bg-slate-900/50 backdrop-blur-sm border border-white/10 hover:border-secondary/50 transition-all group">
+          <button
+            @click="filterByToday"
+            class="relative rounded-[24px] p-6 bg-slate-900/50 backdrop-blur-sm border border-white/10 hover:border-secondary/50 transition-all group cursor-pointer"
+            :class="{ 'border-secondary shadow-[0_0_30px_rgba(0,243,255,0.3)] scale-105': currentFilters.dateRange === 'today' }"
+          >
             <div class="flex items-center gap-4">
-              <div class="p-3 rounded-xl bg-secondary/10 border border-secondary/20">
+              <div class="p-3 rounded-xl bg-secondary/10 border border-secondary/20 group-hover:scale-110 transition-transform">
                 <span class="material-symbols-outlined text-secondary text-2xl">person_add</span>
               </div>
-              <div>
+              <div class="text-left">
                 <p class="text-white/50 text-xs font-medium mb-1">New Today</p>
                 <p class="text-white text-2xl font-black">{{ usersStore.userStats.newToday }}</p>
+                <p class="text-secondary text-[10px] font-bold uppercase tracking-wider mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  Click to filter
+                </p>
               </div>
             </div>
-          </div>
+            <!-- Active indicator -->
+            <div 
+              v-if="currentFilters.dateRange === 'today'"
+              class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full animate-pulse"
+            ></div>
+          </button>
 
           <!-- Engagement Rate -->
           <div class="relative rounded-[24px] p-6 bg-slate-900/50 backdrop-blur-sm border border-white/10 hover:border-purple-500/50 transition-all group">
@@ -87,10 +99,18 @@
 
         <!-- Results Info -->
         <div class="flex items-center justify-between mb-6">
-          <p class="text-white/60 text-sm">
-            Showing <span class="text-white font-bold">{{ usersStore.paginatedMembers.length }}</span> of 
-            <span class="text-white font-bold">{{ usersStore.pagination.totalItems }}</span> members
-          </p>
+          <div>
+            <p class="text-white/60 text-sm">
+              Showing <span class="text-white font-bold">{{ usersStore.paginatedMembers.length }}</span> of 
+              <span class="text-white font-bold">{{ usersStore.pagination.totalItems }}</span> members
+            </p>
+            <p v-if="currentFilters.dateRange && currentFilters.dateRange !== 'all'" class="text-secondary text-xs font-bold mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">filter_alt</span>
+              <span v-if="currentFilters.dateRange === 'today'">Registered today</span>
+              <span v-else-if="currentFilters.dateRange === 'week'">Registered this week</span>
+              <span v-else-if="currentFilters.dateRange === 'month'">Registered this month</span>
+            </p>
+          </div>
 
           <!-- View Toggle -->
           <div class="flex items-center gap-2">
@@ -356,6 +376,18 @@ async function handleClearFilters() {
   usersStore.clearFilters()
   await usersStore.fetchMembersPaginated(1, usersStore.pagination.pageSize)
 }
+
+async function filterByToday() {
+  // Toggle filter: if already filtering by today, clear it; otherwise set it
+  if (currentFilters.value.dateRange === 'today') {
+    currentFilters.value = { ...currentFilters.value, dateRange: undefined }
+  } else {
+    currentFilters.value = { ...currentFilters.value, dateRange: 'today' }
+  }
+  usersStore.setFilters(currentFilters.value)
+  await usersStore.fetchMembersPaginated(1, usersStore.pagination.pageSize)
+}
+
 
 async function handlePageChange(page: number) {
   await usersStore.fetchMembersPaginated(page, usersStore.pagination.pageSize)

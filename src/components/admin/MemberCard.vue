@@ -2,32 +2,32 @@
   <div v-if="loading" class="relative rounded-[24px] p-6 bg-slate-900/50 backdrop-blur-sm border border-white/10 animate-pulse group">
     <div class="flex flex-col sm:flex-row items-start justify-between gap-6">
       <div class="flex items-start gap-4 flex-1">
-        <div class="w-16 h-16 rounded-full bg-white/5 shrink-0"></div>
+        <div class="w-16 h-16 rounded-full bg-slate-800 shrink-0"></div>
         <div class="flex flex-col gap-2 flex-1">
-          <div class="h-6 bg-white/10 rounded-lg w-1/3"></div>
-          <div class="h-4 bg-white/5 rounded-lg w-1/2"></div>
+          <div class="h-6 bg-slate-800 rounded-lg w-1/3"></div>
+          <div class="h-4 bg-slate-800/50 rounded-lg w-1/2"></div>
           <div class="flex gap-2 mt-2">
-            <div class="h-8 bg-white/5 rounded-lg w-24"></div>
-            <div class="h-4 bg-white/5 rounded-lg w-32 mt-2"></div>
+            <div class="h-8 bg-slate-800/50 rounded-lg w-24"></div>
+            <div class="h-4 bg-slate-800/30 rounded-lg w-32 mt-2"></div>
           </div>
         </div>
       </div>
       <div class="flex flex-col items-end gap-4 shrink-0 w-full sm:w-auto">
         <div class="flex gap-4">
-          <div class="w-12 h-10 bg-white/5 rounded-lg"></div>
-          <div class="w-12 h-10 bg-white/5 rounded-lg"></div>
-          <div class="w-12 h-10 bg-white/5 rounded-lg"></div>
+          <div class="w-12 h-10 bg-slate-800 rounded-lg"></div>
+          <div class="w-12 h-10 bg-slate-800 rounded-lg"></div>
+          <div class="w-12 h-10 bg-slate-800 rounded-lg"></div>
         </div>
         <div class="flex gap-2 pt-2 border-t border-white/5 w-full justify-end">
-          <div class="w-10 h-10 bg-white/5 rounded-lg"></div>
-          <div class="w-10 h-10 bg-white/5 rounded-lg"></div>
-          <div class="w-10 h-10 bg-white/5 rounded-lg"></div>
+          <div class="w-10 h-10 bg-slate-800/50 rounded-lg"></div>
+          <div class="w-10 h-10 bg-slate-800/50 rounded-lg"></div>
+          <div class="w-10 h-10 bg-slate-800/50 rounded-lg"></div>
         </div>
       </div>
     </div>
     <div class="mt-8 flex items-center justify-between border-t border-white/5 pt-2">
-      <div class="w-24 h-3 bg-white/5 rounded"></div>
-      <div class="w-32 h-3 bg-white/5 rounded"></div>
+      <div class="w-24 h-3 bg-slate-800/30 rounded"></div>
+      <div class="w-32 h-3 bg-slate-800/30 rounded"></div>
     </div>
   </div>
 
