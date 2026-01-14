@@ -12,6 +12,27 @@
       <p class="text-slate-500 dark:text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 max-w-md mx-auto px-2 font-medium">
         Conectando a comunidade brasileira através de negócios, cultura e inovação. Junte-se à revolução neon.
       </p>
+
+      <!-- Legal Links -->
+      <div class="flex flex-wrap justify-center items-center gap-3 sm:gap-6 mb-4 sm:mb-5">
+        <RouterLink 
+          :to="{ name: 'Terms' }" 
+          class="relative px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-primary transition-all duration-300 group overflow-hidden rounded-lg hover:bg-primary/5 border border-transparent hover:border-primary/20"
+        >
+          <span class="relative z-10">{{ t('auth.terms') }}</span>
+          <div class="absolute inset-0 bg-primary/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+        </RouterLink>
+        
+        <span class="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+        
+        <RouterLink 
+          :to="{ name: 'PrivacyPolicy' }" 
+          class="relative px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-secondary transition-all duration-300 group overflow-hidden rounded-lg hover:bg-secondary/5 border border-transparent hover:border-secondary/20"
+        >
+          <span class="relative z-10">{{ t('auth.privacyPolicy') }}</span>
+          <div class="absolute inset-0 bg-secondary/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+        </RouterLink>
+      </div>
       
       <div class="flex justify-center space-x-4 sm:space-x-6 mb-3 sm:mb-4">
         <a href="#" class="text-gray-500 hover:text-secondary transition-colors transform hover:-translate-y-1">
@@ -33,6 +54,8 @@
 </template>
 
 <script setup lang="ts">
-// Footer component
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 </script>
 
