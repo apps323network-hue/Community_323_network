@@ -10,11 +10,11 @@
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div class="space-y-2">
             <h1 class="text-4xl md:text-6xl font-black tracking-tighter uppercase">
-              <span class="text-slate-900 dark:text-white">Gerenciar</span>
-              <span class="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary animate-gradient-x">Termos de Uso</span>
+              <span class="text-slate-900 dark:text-white">Manage</span>
+              <span class="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary animate-gradient-x">Terms & Policies</span>
             </h1>
             <p class="text-slate-500 dark:text-slate-400 text-lg font-medium max-w-2xl">
-              Central de controle para documentos legais e políticas de privacidade da plataforma.
+              Control center for legal documents and platform privacy policies.
             </p>
           </div>
           
@@ -26,7 +26,7 @@
             <div class="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-gradient-x"></div>
             <span class="relative flex items-center gap-2 uppercase tracking-widest text-sm">
               <span class="material-symbols-outlined font-bold">add_circle</span>
-              Novo Documento
+              New Document
             </span>
           </Button>
         </header>
@@ -61,7 +61,7 @@
                       class="px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-500 text-[9px] font-black uppercase tracking-tighter flex items-center gap-1.5 shrink-0"
                     >
                       <span class="w-1 h-1 rounded-full bg-green-500 animate-pulse"></span>
-                      Ativo
+                      Active
                     </div>
                   </div>
                   
@@ -72,7 +72,7 @@
                     </span>
                     <span class="flex items-center gap-1.5">
                       <span class="material-symbols-outlined text-sm">tag</span>
-                      VERSÃO {{ term.version }}
+                      VERSION {{ term.version }}
                     </span>
                     <span class="flex items-center gap-1.5">
                       <span class="material-symbols-outlined text-sm">history</span>
@@ -89,7 +89,7 @@
                   class="h-12 px-5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white text-xs font-bold uppercase tracking-wider hover:bg-primary/10 hover:border-primary/30 transition-all flex items-center gap-2"
                 >
                   <span class="material-symbols-outlined text-sm">edit</span>
-                  Editar
+                  Edit
                 </button>
                 
                 <button
@@ -99,13 +99,13 @@
                   class="h-12 px-5 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 text-xs font-bold uppercase tracking-wider hover:bg-green-500 hover:text-white transition-all disabled:opacity-50 flex items-center gap-2"
                 >
                   <span class="material-symbols-outlined text-sm">{{ activating === term.id ? 'sync' : 'check_circle' }}</span>
-                  <span class="hidden sm:inline">Ativar</span>
+                  <span class="hidden sm:inline">Activate</span>
                 </button>
 
                 <button
                   @click="viewAcceptanceHistory(term.id)"
                   class="h-12 w-12 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 hover:text-secondary transition-all flex items-center justify-center group/btn shrink-0"
-                  title="Histórico de Aceites"
+                  title="Acceptance History"
                 >
                   <span class="material-symbols-outlined group-hover/btn:scale-110 transition-transform">history_edu</span>
                 </button>
@@ -113,7 +113,7 @@
                 <button
                   @click="previewTerm(term)"
                   class="h-12 w-12 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-all flex items-center justify-center group/btn shrink-0"
-                  title="Visualizar"
+                  title="Preview"
                 >
                   <span class="material-symbols-outlined group-hover/btn:scale-110 transition-transform">visibility</span>
                 </button>
@@ -121,7 +121,7 @@
                 <router-link
                   :to="{ path: '/admin/termos-aceitos', query: { term_id: term.id } }"
                   class="h-12 w-12 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 hover:text-secondary transition-all flex items-center justify-center group/btn shrink-0"
-                  title="Histórico de Aceites"
+                  title="Acceptance Logs"
                 >
                   <span class="material-symbols-outlined group-hover/btn:scale-110 transition-transform">history</span>
                 </router-link>
@@ -138,9 +138,9 @@
           <template #header>
             <div class="flex flex-col gap-1">
               <h2 class="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
-                {{ editingTerm ? 'Editar' : 'Criar Novo' }} <span class="text-primary font-black">Documento</span>
+                {{ editingTerm ? 'Edit' : 'Create New' }} <span class="text-primary font-black">Document</span>
               </h2>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Configure os detalhes e o conteúdo legal.</p>
+              <p class="text-sm text-slate-500 dark:text-slate-400">Configure legal details and content.</p>
             </div>
           </template>
 
@@ -148,7 +148,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Title Field -->
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest pl-1">Título do Documento</label>
+                <label class="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest pl-1">Document Title</label>
                 <div class="relative group">
                   <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">title</span>
@@ -164,7 +164,7 @@
 
               <!-- Term Type Field -->
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest pl-1">Tipo de Documento</label>
+                <label class="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest pl-1">Document Type</label>
                 <div class="relative group">
                   <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">category</span>
@@ -187,17 +187,17 @@
             <div v-if="editingTerm" class="flex items-center gap-4 p-5 rounded-2xl bg-primary/5 border border-primary/20">
               <span class="material-symbols-outlined text-primary text-3xl">info</span>
               <div>
-                <p class="text-sm font-bold text-slate-900 dark:text-white">Atenção: Editando a Versão {{ termForm.version }}</p>
-                <p class="text-xs text-slate-500 dark:text-slate-400">Alterações no conteúdo serão salvas diretamente neste documento ativo. Para uma nova versão, crie um novo documento.</p>
+                <p class="text-sm font-bold text-slate-900 dark:text-white">Warning: Editing Version {{ termForm.version }}</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Content changes will be saved directly to this active document. For a new version, create a new document.</p>
               </div>
             </div>
 
             <!-- Advanced Legal Editor Area -->
             <div class="space-y-4">
-              <label class="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest pl-1">Conteúdo Legal Avançado</label>
+              <label class="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest pl-1">Advanced Legal Content</label>
               <AdvancedLegalEditor
                 v-model="termForm.content"
-                placeholder="Redija aqui o documento legal completo (suporta tabelas, alinhamento e código fonte)..."
+                placeholder="Draft the complete legal document here (supports tables, alignment, and source code)..."
               />
             </div>
           </div>
@@ -208,7 +208,7 @@
                 @click="cancelEdit"
                 class="px-8 py-4 rounded-2xl border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
               >
-                Cancelar
+                Cancel
               </button>
               <button
                 @click="saveTerm"
@@ -218,7 +218,7 @@
                 <div class="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-gradient-x"></div>
                 <span class="relative flex items-center gap-2 uppercase tracking-widest text-xs">
                   <span class="material-symbols-outlined text-sm font-bold">{{ saving ? 'sync' : 'save_as' }}</span>
-                  {{ editingTerm ? 'Salvar Alterações' : 'Publicar Documento' }}
+                  {{ editingTerm ? 'Save Changes' : 'Publish Document' }}
                 </span>
               </button>
             </div>
@@ -290,7 +290,7 @@ const sanitizedPreviewContent = computed(() => {
 
 function formatDate(dateString: string) {
   const date = new Date(dateString)
-  return date.toLocaleString('pt-BR', {
+  return date.toLocaleString('en-US', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',

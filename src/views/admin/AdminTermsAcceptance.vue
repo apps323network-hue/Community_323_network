@@ -10,11 +10,11 @@
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div class="space-y-2">
             <h1 class="text-4xl md:text-6xl font-black tracking-tighter uppercase">
-              <span class="text-slate-900 dark:text-white">Log de</span>
-              <span class="block text-transparent bg-clip-text bg-gradient-to-r from-secondary via-primary to-secondary animate-gradient-x">Aceites Legais</span>
+              <span class="text-slate-900 dark:text-white">Acceptance</span>
+              <span class="block text-transparent bg-clip-text bg-gradient-to-r from-secondary via-primary to-secondary animate-gradient-x">Logs</span>
             </h1>
             <p class="text-slate-500 dark:text-slate-400 text-lg font-medium max-w-2xl">
-              Rastreamento de conformidade e auditoria de aceitação de termos em tempo real.
+              Compliance tracking and legal acceptance audit in real-time.
             </p>
           </div>
           
@@ -25,7 +25,7 @@
                 class="h-14 px-6 rounded-2xl border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 transition-all flex items-center gap-2"
               >
                 <span class="material-symbols-outlined" :class="{ 'animate-spin': loading }">refresh</span>
-                Sincronizar
+                Synchronize
               </Button>
           </div>
         </header>
@@ -33,28 +33,28 @@
         <!-- Stats Section -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard 
-            title="Total de Aceites" 
+            title="Total Acceptances" 
             :value="stats.total" 
             icon="description" 
             color="slate" 
             :loading="initialLoading"
           />
           <StatCard 
-            title="Termos de Uso" 
+            title="Terms of Service" 
             :value="stats.terms_of_service" 
             icon="gavel" 
             color="primary" 
             :loading="initialLoading"
           />
           <StatCard 
-            title="Privacidade" 
+            title="Privacy Policy" 
             :value="stats.privacy_policy" 
             icon="privacy_tip" 
             color="secondary" 
             :loading="initialLoading"
           />
           <StatCard 
-            title="Hoje" 
+            title="Today" 
             :value="stats.today" 
             icon="today" 
             color="green" 
@@ -68,26 +68,26 @@
           <div class="p-1 rounded-[2rem] bg-gradient-to-r from-slate-200 dark:from-white/10 to-transparent">
             <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[1.9rem] p-4 flex flex-wrap items-end gap-6 border border-white/20 dark:border-white/5">
               <div class="flex-1 min-w-[200px] space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Tipo de Documento</label>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Document Type</label>
                 <select v-model="filters.term_type" class="w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-bold uppercase tracking-widest focus:ring-2 focus:ring-primary/50 transition-all outline-none">
-                  <option value="">Todos os Tipos</option>
-                  <option value="terms_of_service">Termos de Uso</option>
-                  <option value="privacy_policy">Política de Privacidade</option>
+                  <option value="">All Types</option>
+                  <option value="terms_of_service">Terms of Service</option>
+                  <option value="privacy_policy">Privacy Policy</option>
                 </select>
               </div>
 
               <div class="flex-1 min-w-[200px] space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Data Inicial</label>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Start Date</label>
                 <input type="date" v-model="filters.start_date" class="w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-bold focus:ring-2 focus:ring-primary/50 transition-all outline-none" />
               </div>
 
               <div class="flex-1 min-w-[200px] space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Data Final</label>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">End Date</label>
                 <input type="date" v-model="filters.end_date" class="w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-bold focus:ring-2 focus:ring-primary/50 transition-all outline-none" />
               </div>
               
               <button @click="clearFilters" class="h-12 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-colors">
-                Limpar
+                Clear
               </button>
             </div>
           </div>
@@ -98,11 +98,11 @@
               <table class="w-full text-left border-collapse">
                 <thead>
                   <tr class="border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
-                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Usuário</th>
-                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Documento</th>
-                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Data do Aceite</th>
-                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Conexão (IP/UA)</th>
-                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Ações</th>
+                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">User</th>
+                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Document</th>
+                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Accepted At</th>
+                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Connection (IP/UA)</th>
+                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-white/5">
@@ -125,16 +125,18 @@
                           </div>
                           <div class="min-w-0">
                             <div class="text-sm font-black text-slate-900 dark:text-white truncate uppercase tracking-tight">{{ acceptance.user_name }}</div>
-                            <div class="text-[10px] font-bold text-slate-400 lowercase truncate">{{ acceptance.user_email }}</div>
+                            <div class="text-[10px] font-bold text-slate-400 truncate">{{ acceptance.user_email }}</div>
                           </div>
                         </div>
                       </td>
                       <td class="px-8 py-6">
-                        <div class="flex flex-col">
-                          <span class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest mb-1">{{ acceptance.term?.title }}</span>
-                          <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest w-fit" :class="acceptance.term_type === 'terms_of_service' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'">
-                            v{{ acceptance.term?.version }}
-                          </span>
+                        <div class="flex flex-col gap-3">
+                          <div v-for="item in acceptance.items" :key="item.id" class="flex flex-col">
+                            <span class="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest mb-1">{{ item.term?.title }}</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest w-fit" :class="item.term_type === 'terms_of_service' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'">
+                              v{{ item.term?.version }}
+                            </span>
+                          </div>
                         </div>
                       </td>
                       <td class="px-8 py-6 text-center">
@@ -147,15 +149,25 @@
                         </div>
                       </td>
                       <td class="px-8 py-6 text-right">
-                        <button 
-                          @click="handleDownloadPDF(acceptance.id)"
-                          :disabled="downloadingPDF === acceptance.id"
-                          class="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-primary hover:bg-white dark:hover:bg-surface-lighter transition-all group/btn flex items-center justify-center"
-                          title="Baixar PDF de Aceite"
-                        >
-                          <span v-if="downloadingPDF === acceptance.id" class="material-symbols-outlined animate-spin">sync</span>
-                          <span v-else class="material-symbols-outlined group-hover/btn:scale-110 transition-transform">picture_as_pdf</span>
-                        </button>
+                        <div class="flex items-center justify-end gap-2">
+                          <button 
+                            v-for="item in acceptance.items"
+                            :key="item.id"
+                            @click="handleDownloadPDF(item.id)"
+                            :disabled="downloadingPDF === item.id"
+                            class="h-10 px-3 rounded-xl transition-all group/btn flex items-center justify-center gap-2 shrink-0 border"
+                            :class="item.term_type === 'terms_of_service' 
+                              ? 'bg-primary/5 border-primary/20 text-primary hover:bg-primary hover:text-black hover:border-primary' 
+                              : 'bg-secondary/5 border-secondary/20 text-secondary hover:bg-secondary hover:text-black hover:border-secondary'"
+                            :title="'Download PDF: ' + item.term?.title"
+                          >
+                            <span v-if="downloadingPDF === item.id" class="material-symbols-outlined animate-spin text-sm">sync</span>
+                            <div v-else class="flex items-center gap-1.5">
+                              <span class="material-symbols-outlined text-[16px]">{{ item.term_type === 'terms_of_service' ? 'gavel' : 'shield' }}</span>
+                              <span class="material-symbols-outlined group-hover/btn:scale-110 transition-transform text-[16px]">picture_as_pdf</span>
+                            </div>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   </template>
@@ -164,8 +176,8 @@
                     <td colspan="5" class="px-8 py-20 text-center">
                       <div class="flex flex-col items-center gap-4">
                         <span class="material-symbols-outlined text-6xl text-slate-200 dark:text-white/10">history_edu</span>
-                        <p class="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">Nenhum registro de aceite encontrado</p>
-                        <button @click="clearFilters" class="text-primary font-black uppercase tracking-widest text-[10px] hover:underline">Limpar Filtros</button>
+                        <p class="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">No acceptance logs found</p>
+                        <button @click="clearFilters" class="text-primary font-black uppercase tracking-widest text-[10px] hover:underline">Clear Filters</button>
                       </div>
                     </td>
                   </tr>
@@ -176,14 +188,14 @@
             <!-- Enhanced Pagination -->
             <div v-if="acceptances.length > 0" class="p-6 border-t border-slate-200 dark:border-white/10 bg-slate-50/30 dark:bg-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
               <div class="flex items-center gap-4">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Exibir</span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Show</span>
                 <select v-model="itemsPerPage" class="h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase outline-none focus:ring-2 focus:ring-primary/50">
-                  <option :value="5">5 itens</option>
-                  <option :value="10">10 itens</option>
-                  <option :value="25">25 itens</option>
-                  <option :value="50">50 itens</option>
+                  <option :value="5">5 items</option>
+                  <option :value="10">10 items</option>
+                  <option :value="25">25 items</option>
+                  <option :value="50">50 items</option>
                 </select>
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">de {{ filteredAcceptances.length }} registros</span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">of {{ filteredAcceptances.length }} entries</span>
               </div>
 
               <div class="flex items-center gap-2">
@@ -278,7 +290,30 @@ const currentPage = ref(1)
 const itemsPerPage = ref(10)
 
 const filteredAcceptances = computed(() => {
-  return acceptances.value
+  const groupsMap: Record<string, any> = {}
+  
+  acceptances.value.forEach(acc => {
+    // Group by user_id, truncated time (1 minute precision for safety), and IP
+    const date = new Date(acc.accepted_at)
+    const timeKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}`
+    const key = `${acc.user_id}_${timeKey}_${acc.ip_address}`
+    
+    if (!groupsMap[key]) {
+      groupsMap[key] = {
+        ...acc,
+        items: [acc]
+      }
+    } else {
+      // Append if it's a different term_id to avoid true duplicates
+      if (!groupsMap[key].items.find((i: any) => i.id === acc.id)) {
+        groupsMap[key].items.push(acc)
+      }
+    }
+  })
+  
+  return Object.values(groupsMap).sort((a: any, b: any) => 
+    new Date(b.accepted_at).getTime() - new Date(a.accepted_at).getTime()
+  )
 })
 
 const totalPages = computed(() => Math.ceil(filteredAcceptances.value.length / itemsPerPage.value))
@@ -319,7 +354,7 @@ watch(filters, async () => {
 function formatDate(dateString: string) {
   if (!dateString) return 'N/A'
   const date = new Date(dateString)
-  return date.toLocaleString('pt-BR', {
+  return date.toLocaleString('en-US', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -350,9 +385,9 @@ async function handleDownloadPDF(acceptanceId: string) {
   downloadingPDF.value = acceptanceId
   try {
     await store.downloadAcceptancePDF(acceptanceId)
-    toast.success('Download do PDF iniciado com sucesso')
+    toast.success('PDF download started successfully')
   } catch (error: any) {
-    toast.error(error.message || 'Erro ao baixar PDF')
+    toast.error(error.message || 'Error downloading PDF')
   } finally {
     downloadingPDF.value = null
   }
@@ -365,7 +400,7 @@ async function handleRefresh() {
       applyFilters()
     ])
   } catch (error: any) {
-    toast.error(error.message || 'Erro ao sincronizar dados')
+    toast.error(error.message || 'Error synchronizing data')
   }
 }
 

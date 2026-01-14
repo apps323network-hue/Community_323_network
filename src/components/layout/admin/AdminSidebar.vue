@@ -157,24 +157,24 @@ const menuItems = computed<SidebarItem[]>(() => [
   },
   {
     id: 'community',
-    label: 'Comunidade',
+    label: 'Community',
     icon: 'forum',
     dropdown: [
       {
         path: '/admin/membros',
-        label: 'Membros',
+        label: 'Members',
         badge: adminStore.userStats.pending > 0 ? adminStore.userStats.pending : undefined,
         badgeClass: 'bg-yellow-500/20 text-yellow-500',
       },
       {
         path: '/admin/posts',
-        label: 'Publicações',
+        label: 'Posts',
         badge: adminStore.postStats.pending > 0 ? adminStore.postStats.pending : undefined,
         badgeClass: 'bg-yellow-500/20 text-yellow-500',
       },
       {
         path: '/admin/eventos',
-        label: 'Eventos',
+        label: 'Events',
         badge: adminStore.stats.pending > 0 ? adminStore.stats.pending : undefined,
         badgeClass: 'bg-yellow-500/20 text-yellow-500',
       }
@@ -182,44 +182,44 @@ const menuItems = computed<SidebarItem[]>(() => [
   },
   {
     id: 'education',
-    label: 'Educação',
+    label: 'Education',
     icon: 'school',
     dropdown: [
-      { path: '/admin/programs', label: 'Programas' },
-      { path: '/admin/desafios', label: 'Desafios' },
-      { path: '/admin/servicos', label: 'Serviços' }
+      { path: '/admin/programs', label: 'Programs' },
+      { path: '/admin/desafios', label: 'Challenges' },
+      { path: '/admin/servicos', label: 'Services' }
     ]
   },
   {
     id: 'finance',
-    label: 'Financeiro',
+    label: 'Finance',
     icon: 'payments',
     dropdown: [
-      { path: '/admin/subscriptions', label: 'Assinaturas' },
-      { path: '/admin/cupons', label: 'Cupons' }
+      { path: '/admin/subscriptions', label: 'Subscriptions' },
+      { path: '/admin/cupons', label: 'Coupons' }
     ]
   },
   {
     id: 'legal',
-    label: 'Jurídico',
+    label: 'Legal',
     icon: 'gavel',
     dropdown: [
-      { path: '/admin/termos-gerenciar', label: 'Gestão de Termos' },
-      { path: '/admin/termos-aceitos', label: 'Logs de Aceite' }
+      { path: '/admin/termos-gerenciar', label: 'Terms Management' },
+      { path: '/admin/termos-aceitos', label: 'Acceptance Logs' }
     ]
   },
   {
     id: 'safety',
-    label: 'Moderação',
+    label: 'Moderation',
     icon: 'security',
     dropdown: [
       {
         path: '/admin/reports',
-        label: 'Denúncias',
+        label: 'Reports',
         badge: adminStore.reportStats.pending > 0 ? adminStore.reportStats.pending : undefined,
         badgeClass: 'bg-red-500/20 text-red-500',
       },
-      { path: '/admin/palavras-proibidas', label: 'Filtro de Palavras' }
+      { path: '/admin/palavras-proibidas', label: 'Banned Words' }
     ]
   }
 ])

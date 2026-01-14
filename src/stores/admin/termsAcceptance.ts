@@ -114,9 +114,9 @@ export const useAdminTermsAcceptanceStore = defineStore('admin-terms-acceptance'
         const profile = profilesMap.get(item.user_id)
         return {
           ...item,
-          user_name: profile?.nome || 'N/A',
-          user_email: profile?.email || 'N/A',
-          user_country: profile?.pais || 'N/A',
+          user_name: profile?.nome || 'Unknown User',
+          user_email: profile?.email || '',
+          user_country: profile?.pais || '',
           user_avatar: profile?.avatar_url || null,
         }
       }) as TermAcceptanceWithDetails[]
