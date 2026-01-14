@@ -71,7 +71,6 @@ onMounted(async () => {
       console.log('[CALLBACK] É novo usuário?', isNewUser ? 'Sim' : 'Não')
       
       // Se veio do modo "login" mas é um usuário novo, redirecionar para registro
-      // (Isso não deveria acontecer agora que removemos o botão da aba de login, mas é uma segurança extra)
       if (mode === 'login' && isNewUser) {
         console.warn('[CALLBACK] ⚠️ Tentativa de login com Google de usuário não cadastrado')
         await supabase.auth.signOut()
@@ -112,4 +111,3 @@ onMounted(async () => {
   }
 })
 </script>
-
