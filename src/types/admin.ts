@@ -76,6 +76,7 @@ export interface MemberFilters {
   plans?: string[]
   statuses?: UserStatus[]
   countries?: string[]
+  dateRange?: 'today' | 'week' | 'month' | 'all'
 }
 
 export interface PaginationMeta {
@@ -139,6 +140,7 @@ export interface AdminService {
   sso_callback_path?: string;
   terms_content_pt?: string;
   terms_content_en?: string;
+  image_url?: string;
 }
 
 export interface ServiceStats {

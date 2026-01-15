@@ -40,7 +40,7 @@
   </Card>
 
   <!-- Modal de Criação de Post - Estilo LinkedIn -->
-  <Modal v-model="showPostModal" size="lg" :show-close="false">
+  <Modal v-model="showPostModal" size="lg" :closable="false">
     <template #default>
       <div class="relative">
         <!-- Header -->
@@ -689,13 +689,7 @@ async function handleSubmit() {
     selectedImageFile.value = null
     showPostModal.value = false
 
-    if (newPost.status === 'pending') {
-      const { toast } = await import('vue-sonner')
-      toast.success(t('posts.form.pendingApproval'), {
-        description: t('posts.form.pendingApprovalDesc'),
-        duration: 5000,
-      })
-    }
+
 
     emit('post-created', newPost.id)
   } catch (err: any) {
