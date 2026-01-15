@@ -70,6 +70,32 @@ onMounted(async () => {
       console.log('[CALLBACK] Usuário criado há', secondsSinceCreation.toFixed(1), 'segundos')
       console.log('[CALLBACK] É novo usuário?', isNewUser ? 'Sim' : 'Não')
       
+      // Se é um novo usuário via OAuth, registrar aceite automático dos termos
+      if (isNewUser) {
+        console.log('[CALLBACK] Registrando aceite automático dos termos para novo usuário OAuth...')
+        try {
+          const { useTermsAcceptance } = await import('@/composables/useTermsAcceptance')
+          const { getLatestActiveTerm, recordTermAcceptance } = useTermsAcceptance()
+          
+          // Buscar termos ativos
+          const termsOfService = await getLatestActiveTerm('terms_of_service')
+          const privacyPolicy = await getLatestActiveTerm('privacy_policy')
+          
+          if (termsOfService) {
+            await recordTermAcceptance(termsOfService.id, 'terms_of_service', session.user.id)
+            console.log('[CALLBACK] ✅ Terms of Service registrado')
+          }
+          
+          if (privacyPolicy) {
+            await recordTermAcceptance(privacyPolicy.id, 'privacy_policy', session.user.id)
+            console.log('[CALLBACK] ✅ Privacy Policy registrado')
+          }
+        } catch (termsError) {
+          // Não bloquear o login se falhar - apenas logar
+          console.error('[CALLBACK] ⚠️ Erro ao registrar termos (não crítico):', termsError)
+        }
+      }
+      
       // Se veio do modo "login" mas é um usuário novo, redirecionar para registro
       if (mode === 'login' && isNewUser) {
         console.warn('[CALLBACK] ⚠️ Tentativa de login com Google de usuário não cadastrado')
