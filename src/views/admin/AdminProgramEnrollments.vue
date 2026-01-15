@@ -167,6 +167,16 @@
                   </td>
                   <td class="p-4 text-right">
                     <div class="flex items-center justify-end gap-1">
+                       <!-- Sync with Stripe button -->
+                       <button
+                        v-if="enrollment.payment_id && enrollment.payment_status !== 'paid'"
+                        @click="syncPaymentFromStripe(enrollment)"
+                        :disabled="syncing === enrollment.id"
+                        class="p-2 text-blue-500 hover:text-blue-600 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all disabled:opacity-50"
+                        title="Sync payment status from Stripe"
+                      >
+                        <span class="material-icons text-sm" :class="{ 'animate-spin': syncing === enrollment.id }">{{ syncing === enrollment.id ? 'refresh' : 'sync' }}</span>
+                      </button>
                        <button
                         @click="openStatusModal(enrollment)"
                         class="p-2 text-slate-400 hover:text-primary dark:hover:text-secondary rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
@@ -223,7 +233,7 @@
 
                 <div class="space-y-4">
                    <div>
-                      <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">New Status</label>
+                      <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Enrollment Status</label>
                       <select v-model="newStatus" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary transition-all">
                          <option value="pending">Pending</option>
                          <option value="active">Active</option>
@@ -231,13 +241,32 @@
                          <option value="cancelled">Cancelled</option>
                       </select>
                    </div>
+
+                   <div>
+                      <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2">Payment Status</label>
+                      <select v-model="newPaymentStatus" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-gray-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary transition-all">
+                         <option value="pending">Pending</option>
+                         <option value="paid">Paid</option>
+                         <option value="failed">Failed</option>
+                         <option value="refunded">Refunded</option>
+                      </select>
+                   </div>
+
+                   <!-- Quick action button -->
+                   <button
+                      @click="markAsPaidAndActive"
+                      class="w-full px-4 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                   >
+                      <span class="material-icons text-sm">check_circle</span>
+                      Mark as Paid & Active
+                   </button>
                 </div>
 
-                <div class="mt-8 flex gap-3">
+                <div class="mt-6 flex gap-3">
                    <button @click="selectedEnrollment = null" class="flex-1 px-4 py-3 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
                       {{ t('programs.admin.cancel') }}
                    </button>
-                   <button @click="updateStatus" :disabled="updating" class="flex-1 px-4 py-3 bg-primary dark:bg-secondary text-white font-bold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                   <button @click="updateBothStatuses" :disabled="updating" class="flex-1 px-4 py-3 bg-primary dark:bg-secondary text-white font-bold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
                       <span v-if="updating" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                       {{ updating ? t('programs.admin.saving') : t('programs.admin.confirm') }}
                    </button>
@@ -257,7 +286,8 @@ import { useLocale } from '@/composables/useLocale'
 import AdminLayout from '@/components/layout/admin/AdminLayout.vue'
 import { useProgramsStore } from '@/stores/programs'
 import { toast } from 'vue-sonner'
-import type { Program, ProgramEnrollment, EnrollmentStatus } from '@/types/programs'
+import { supabase } from '@/lib/supabase'
+import type { Program, ProgramEnrollment, EnrollmentStatus, PaymentStatus } from '@/types/programs'
 
 const route = useRoute()
 const { locale: currentLocale, t } = useLocale()
@@ -268,12 +298,14 @@ const enrollments = ref<ProgramEnrollment[]>([])
 const loading = ref(true)
 const initialLoading = ref(true)
 const updating = ref(false)
+const syncing = ref<string | null>(null) // ID of enrollment being synced
 
 const search = ref('')
 const filterStatus = ref('all')
 
 const selectedEnrollment = ref<ProgramEnrollment | null>(null)
 const newStatus = ref<EnrollmentStatus>('active')
+const newPaymentStatus = ref<PaymentStatus>('pending')
 
 const filteredEnrollments = computed(() => {
   return enrollments.value.filter(e => {
@@ -300,28 +332,74 @@ const formatStatus = (status: string) => {
 const openStatusModal = (enrollment: ProgramEnrollment) => {
   selectedEnrollment.value = enrollment
   newStatus.value = enrollment.status
+  newPaymentStatus.value = enrollment.payment_status || 'pending'
 }
 
-const updateStatus = async () => {
+const markAsPaidAndActive = () => {
+  newStatus.value = 'active'
+  newPaymentStatus.value = 'paid'
+}
+
+const updateBothStatuses = async () => {
   if (!selectedEnrollment.value) return
   
   updating.value = true
   try {
-    await programsStore.updateEnrollmentStatus(selectedEnrollment.value.id, newStatus.value)
-    toast.success('Enrollment status updated successfully!')
+    // Update both status and payment_status
+    const { error } = await supabase
+      .from('program_enrollments')
+      .update({
+        status: newStatus.value,
+        payment_status: newPaymentStatus.value,
+        paid_at: newPaymentStatus.value === 'paid' ? new Date().toISOString() : null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', selectedEnrollment.value.id)
+
+    if (error) throw error
+
+    toast.success('Enrollment updated successfully!')
     
-    // Refresh list locally
-    const idx = enrollments.value.findIndex(e => e.id === selectedEnrollment.value?.id)
-    if (idx !== -1) {
-      enrollments.value[idx].status = newStatus.value
-    }
+    // Refresh the list
+    const programId = route.params.id as string
+    const e = await programsStore.fetchProgramEnrollments(programId)
+    enrollments.value = e
     
     selectedEnrollment.value = null
   } catch (error: any) {
-    console.error('Error updating status:', error)
-    toast.error('An error occurred while updating the status: ' + (error.message || 'Unknown error'))
+    console.error('Error updating enrollment:', error)
+    toast.error('An error occurred: ' + (error.message || 'Unknown error'))
   } finally {
     updating.value = false
+  }
+}
+
+const syncPaymentFromStripe = async (enrollment: ProgramEnrollment) => {
+  if (!enrollment.payment_id) return
+
+  syncing.value = enrollment.id
+  
+  try {
+    const { data, error } = await supabase.functions.invoke('check-payment-status', {
+      body: { session_id: enrollment.payment_id }
+    })
+
+    if (error) throw error
+
+    if (data?.status === 'completed') {
+      toast.success('Payment confirmed! Enrollment activated.')
+      // Refresh the list
+      const programId = route.params.id as string
+      const e = await programsStore.fetchProgramEnrollments(programId)
+      enrollments.value = e
+    } else {
+      toast.warning(`Payment is still ${data?.stripe_status || 'pending'} on Stripe.`)
+    }
+  } catch (error: any) {
+    console.error('Error syncing payment:', error)
+    toast.error('Error syncing with Stripe: ' + (error.message || 'Unknown error'))
+  } finally {
+    syncing.value = null
   }
 }
 
