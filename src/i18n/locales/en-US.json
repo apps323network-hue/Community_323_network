@@ -411,11 +411,6 @@
         "selectProgram": "Select a program...",
         "mustEnrollToCreateEvent": "You must be enrolled in a program to create events.",
         "eventLocationPlaceholder": "Ex: Miami, FL",
-        "day": "Day",
-        "month": "Month",
-        "year": "Year",
-        "hour": "Hour",
-        "minute": "Minute",
         "validation": {
             "fillTitle": "Please fill in the event title",
             "selectProgram": "Please select the event program",
@@ -544,12 +539,7 @@
         "mustBeLoggedInToRequest": "You must be logged in to request a service.",
         "requestSuccess": "Request sent successfully! The partner will contact you shortly.",
         "requestError": "Error sending request. Please try again later.",
-        "roleLucas": "Designer in Miami",
-        "testimonialLucas": "\"The assistance in opening my LLC was impeccable. In 2 weeks I was already operating legally in Florida.\"",
-        "roleAmanda": "Businesswoman in NY",
-        "testimonialAmanda": "\"The VIP networking opened doors that would have taken me years to achieve alone. Worth every penny.\"",
-        "roleBeatriz": "Architect in Austin",
-        "testimonialBeatriz": "\"I managed to organize my visa strategy with the mentoring. I felt much more secure to apply.\""
+        "noTestimonials": "We don't have any reviews for this service at the moment."
     },
     "connections": {
         "title": "My Network",
@@ -726,7 +716,6 @@
         "aboutWhat": "What do you want to talk about?",
         "publish": "Publish",
         "whatsOnYourMind": "What's on your mind?",
-        "aboutWhat": "What do you want to share?",
         "createPost": "Create Post",
         "startPost": "Start a post",
         "photo": "Photo",
@@ -734,7 +723,6 @@
         "publishing": "Publishing...",
         "createEvent": "Create Event",
         "post": "Post",
-        "publish": "Publish",
         "addPhoto": "Add Photo",
         "addVideo": "Add Video",
         "like": "Like",
@@ -784,7 +772,9 @@
         "commentDeleted": "Comment deleted",
         "postNotFound": "Post not found",
         "postNotFoundDesc": "The post you are looking for does not exist or has been removed.",
-        "loadPostError": "Error loading post"
+        "loadPostError": "Error loading post",
+        "showMore": "Show more",
+        "showLess": "Show less"
     },
     "notifications": {
         "notifications": "Notifications",

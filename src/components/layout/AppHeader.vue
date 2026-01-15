@@ -324,7 +324,7 @@
                   <!-- Settings Section -->
                   <div class="px-2 py-1">
                     <!-- Theme Toggle -->
-                    <button 
+                    <div 
                       @click="handleThemeClick"
                       class="w-full px-3 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-surface-lighter transition-colors cursor-pointer"
                     >
@@ -335,7 +335,7 @@
                         </div>
                         <AnimatedThemeToggler ref="themeTogglerRef" />
                       </div>
-                    </button>
+                    </div>
 
                     <!-- Language Toggle -->
                     <button 

@@ -413,11 +413,6 @@
         "selectProgram": "Selecione um programa...",
         "mustEnrollToCreateEvent": "Você precisa estar matriculado em um programa para criar eventos.",
         "eventLocationPlaceholder": "Ex: Miami, FL",
-        "day": "Dia",
-        "month": "Mês",
-        "year": "Ano",
-        "hour": "Hora",
-        "minute": "Minuto",
         "validation": {
             "fillTitle": "Por favor, preencha o título do evento",
             "selectProgram": "Por favor, selecione o programa do evento",
@@ -547,12 +542,7 @@
         "mustBeLoggedInToRequest": "Você precisa estar logado para solicitar um serviço.",
         "requestSuccess": "Solicitação enviada com sucesso! O parceiro entrará em contato em breve.",
         "requestError": "Erro ao enviar solicitação. Tente novamente mais tarde.",
-        "roleLucas": "Designer em Miami",
-        "testimonialLucas": "\"A assessoria para abrir minha LLC foi impecável. Em 2 semanas eu já estava operando legalmente na Flórida.\"",
-        "roleAmanda": "Empresária em NY",
-        "testimonialAmanda": "\"O networking VIP abriu portas que eu levaria anos para conseguir sozinho. Vale cada centavo.\"",
-        "roleBeatriz": "Arquiteta em Austin",
-        "testimonialBeatriz": "\"Consegui organizar minha estratégia de visto com a mentoria. Me senti muito mais segura para aplicar.\""
+        "noTestimonials": "Ainda não temos depoimentos para este serviço no momento."
     },
     "connections": {
         "title": "Minha Rede",
@@ -729,7 +719,6 @@
         "aboutWhat": "Sobre o que você quer falar?",
         "publish": "Publicar",
         "whatsOnYourMind": "No que você está pensando?",
-        "aboutWhat": "Sobre o que você quer compartilhar?",
         "createPost": "Criar Post",
         "startPost": "Comece uma publicação",
         "photo": "Foto",
@@ -737,7 +726,6 @@
         "publishing": "Publicando...",
         "createEvent": "Criar Evento",
         "post": "Publicar",
-        "publish": "Publicar",
         "addPhoto": "Adicionar Foto",
         "addVideo": "Adicionar Vídeo",
         "like": "Curtir",
@@ -787,7 +775,9 @@
         "commentDeleted": "Comentário deletado",
         "postNotFound": "Post não encontrado",
         "postNotFoundDesc": "O post que você está procurando não existe ou foi removido.",
-        "loadPostError": "Erro ao carregar post"
+        "loadPostError": "Erro ao carregar post",
+        "showMore": "Mostrar mais",
+        "showLess": "Mostrar menos"
     },
     "notifications": {
         "notifications": "Notificações",
