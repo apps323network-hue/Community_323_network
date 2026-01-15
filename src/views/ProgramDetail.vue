@@ -296,7 +296,7 @@
                   <!-- Price Header -->
                   <div class="text-center space-y-2">
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest">
-                      Melhor Oferta do Dia
+                      {{ t('programs.sidebar.bestOffer') }}
                     </div>
                     <div class="flex justify-center items-baseline gap-1">
                       <span class="text-3xl font-black text-slate-900 dark:text-white leading-none">$</span>
@@ -304,42 +304,35 @@
                         {{ program.price_usd }}
                       </span>
                     </div>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ t('programs.paymentModal.total') }} Único</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ t('programs.paymentModal.total') }} {{ t('programs.sidebar.oneTimePayment') }}</p>
                   </div>
 
                   <!-- Quick Stats -->
                   <div class="grid grid-cols-2 gap-4">
                     <div class="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 text-center">
                        <span class="material-icons text-primary mb-1">people_alt</span>
-                       <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Alunos</p>
+                       <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ t('programs.sidebar.students') }}</p>
                        <p class="text-lg font-black text-slate-900 dark:text-white">{{ program.current_students || 0 }}</p>
                     </div>
                     <div class="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 text-center">
                        <span class="material-icons text-secondary mb-1">verified</span>
-                       <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Vagas</p>
+                       <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ t('programs.sidebar.spots') }}</p>
                        <p class="text-lg font-black text-slate-900 dark:text-white">{{ program.max_students || '∞' }}</p>
                     </div>
                   </div>
 
                   <!-- CTA Button -->
                   <div class="space-y-4">
-                    <!-- Aviso Localhost -->
-                    <div v-if="program.localhost_only && isLocalhost()" class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-center">
-                      <p class="text-xs font-bold text-amber-400 uppercase tracking-widest flex items-center justify-center gap-2">
-                        <span class="material-icons text-sm">bug_report</span>
-                        Modo Debug - Acesso Local
-                      </p>
-                    </div>
+                    <!-- Localhost testing enabled - no restrictions -->
                     
                     <button
                       v-if="!isEnrolled"
                       @click="handleRequestEnroll"
                       :disabled="isSoldOut || submitting"
                       class="w-full group relative py-5 px-6 rounded-2xl font-black text-black overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed shadow-2xl shadow-primary/30"
-                      :class="program.localhost_only && isLocalhost() ? 'bg-amber-500 hover:bg-amber-600' : ''"
                     >
                       <!-- Gradient Background -->
-                      <div v-if="!(program.localhost_only && isLocalhost())" class="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-gradient-x transition-all"></div>
+                      <div class="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-gradient-x transition-all"></div>
                       
                       <!-- Text content -->
                       <span class="relative flex items-center justify-center gap-3 uppercase tracking-widest text-sm">
@@ -348,13 +341,8 @@
                           {{ t('programs.paymentModal.processing') }}
                         </template>
                         <template v-else>
-                          <template v-if="program.localhost_only && isLocalhost()">
-                            🔧 Acessar (Debug)
-                          </template>
-                          <template v-else>
-                            {{ isSoldOut ? t('programs.programFull') : (isAuthenticated ? t('programs.paymentModal.enroll') : t('programs.actions.secureMySpot')) }}
-                            <span class="material-icons font-bold group-hover:translate-x-1 transition-transform">play_arrow</span>
-                          </template>
+                          {{ isSoldOut ? t('programs.programFull') : (isAuthenticated ? t('programs.paymentModal.enroll') : t('programs.actions.secureMySpot')) }}
+                          <span class="material-icons font-bold group-hover:translate-x-1 transition-transform">play_arrow</span>
                         </template>
                       </span>
                     </button>
@@ -382,7 +370,7 @@
                           <span class="material-icons text-sm">history</span>
                        </div>
                        <div>
-                          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Última Atualização</p>
+                          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ t('programs.sidebar.lastUpdate') }}</p>
                           <p class="text-xs font-bold text-slate-700 dark:text-white">{{ new Date(program.updated_at).toLocaleDateString() }}</p>
                        </div>
                     </div>
@@ -391,8 +379,8 @@
                           <span class="material-icons text-sm">language</span>
                        </div>
                        <div>
-                          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Idioma</p>
-                          <p class="text-xs font-bold text-slate-700 dark:text-white">Português (Brasil)</p>
+                          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ t('programs.sidebar.language') }}</p>
+                         <p class="text-xs font-bold text-slate-700 dark:text-white">{{ t('programs.sidebar.languageValue') }}</p>
                        </div>
                     </div>
                   </div>
@@ -407,10 +395,10 @@
                  <div class="w-12 h-12 rounded-2xl bg-white/10 dark:bg-black/10 flex items-center justify-center shrink-0">
                     <span class="material-icons">help_outline</span>
                  </div>
-                  <div>
-                    <h4 class="font-bold text-sm leading-tight">Dúvidas sobre o conteúdo?</h4>
-                    <p class="text-xs opacity-60">Fale com nosso suporte especializado</p>
-                  </div>
+                   <div>
+                     <h4 class="font-bold text-sm leading-tight">{{ t('programs.sidebar.supportTitle') }}</h4>
+                     <p class="text-xs opacity-60">{{ t('programs.sidebar.supportDesc') }}</p>
+                   </div>
               </div>
             </div>
 
@@ -438,7 +426,7 @@
     <Modal
       v-if="program"
       v-model="showCheckoutModal"
-      :title="program.localhost_only && isLocalhost() ? 'Acesso Local (Debug)' : ('Matrícula: ' + title)"
+      :title="'Matrícula: ' + title"
     >
       <div class="flex flex-col gap-6 p-1">
         <!-- Descrição -->
@@ -482,7 +470,7 @@
         </div>
 
         <!-- Coupon Section -->
-        <div v-if="!(program?.localhost_only && isLocalhost())" class="space-y-3">
+        <div class="space-y-3">
           <label class="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-gray-400">{{ t('coupons.code') || 'Cupom de Desconto' }}</label>
           <div class="flex gap-2">
             <input
@@ -540,7 +528,7 @@
         </div>
 
         <!-- Método de Pagamento -->
-        <div v-if="!(program?.localhost_only && isLocalhost())" class="space-y-4">
+        <div class="space-y-4">
           <label class="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-gray-400">Método de Pagamento</label>
           <div class="grid grid-cols-2 gap-4">
             <button
@@ -570,7 +558,7 @@
         <div class="space-y-4 pt-4">
           <button
             @click="handleCheckout"
-            :disabled="!!(submitting || (!paymentMethod && !(program?.localhost_only && isLocalhost())) || (!!(program?.terms_content_pt || program?.terms_content_en) && !acceptedTerms))"
+            :disabled="!!(submitting || !paymentMethod || (!!(program?.terms_content_pt || program?.terms_content_en) && !acceptedTerms))"
             class="w-full rounded-2xl bg-gradient-to-r from-primary to-secondary py-5 text-sm font-black text-black shadow-2xl shadow-primary/30 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed uppercase tracking-widest"
           >
             <template v-if="submitting">
@@ -832,56 +820,8 @@ const handleCheckout = async () => {
       return
     }
 
-    // Verificar se é programa localhost_only e se está em localhost
-    if (program.value.localhost_only && isLocalhost()) {
-      // Criar matrícula diretamente sem pagamento
-      try {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) throw new Error('Usuário não autenticado')
-
-        // Verificar se já está matriculado
-        const { data: existing } = await supabase
-          .from('program_enrollments')
-          .select('id')
-          .eq('program_id', program.value.id)
-          .eq('user_id', user.id)
-          .single()
-
-        if (existing) {
-          toast.info('Você já está matriculado neste programa')
-          // Recarregar dados do programa para atualizar o estado
-          await programsStore.fetchProgramById(program.value.id)
-          showCheckoutModal.value = false
-          return
-        }
-
-        // Criar matrícula localhost
-        const { error: enrollError } = await programsStore.enrollInProgram({
-          program_id: program.value.id,
-          payment_method: 'localhost',
-          accepted_terms: true
-        })
-
-        if (enrollError) throw enrollError
-
-        toast.success('Matrícula realizada com sucesso! (Modo Localhost)')
-        showCheckoutModal.value = false
-        
-        // Recarregar dados do programa
-        await programsStore.fetchProgramById(program.value.id)
-        
-        // Redirecionar para o player
-        router.push(`/programs/${program.value.id}/assistir`)
-        return
-      } catch (err: any) {
-        console.error('Localhost enrollment error:', err)
-        toast.error(err.message || 'Erro ao realizar matrícula local')
-        return
-      }
-    }
-
-    // Fluxo normal de pagamento (apenas se não for localhost)
-    if (!(program.value.localhost_only && isLocalhost()) && !paymentMethod.value) {
+    // Fluxo normal de pagamento sempre (permite testar Stripe em localhost)
+    if (!paymentMethod.value) {
       toast.error('Selecione um método de pagamento')
       return
     }
