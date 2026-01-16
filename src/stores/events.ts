@@ -351,7 +351,7 @@ export const useEventStore = defineStore('events', () => {
         const isApproved = data.status === 'approved'
         const isCreator = currentUserId.value && data.created_by === currentUserId.value
         const isOwnPending = data.status === 'pending' && isCreator
-        
+
         if (!isApproved && !isOwnPending) {
           console.warn('Access denied to event:', eventId, 'Status:', data.status)
           throw new Error('Event not found or not accessible')
@@ -547,9 +547,9 @@ export const useEventStore = defineStore('events', () => {
         .eq('status', 'active')
         .maybeSingle()
 
-        if (!enrollment) {
-          throw new Error(`ENROLLMENT_REQUIRED:${fullEvent.program_id}`)
-        }
+      if (!enrollment) {
+        throw new Error(`ENROLLMENT_REQUIRED:${fullEvent.program_id}`)
+      }
     }
 
     // Optimistic update
@@ -742,30 +742,6 @@ export const useEventStore = defineStore('events', () => {
       // Add to beginning of events array
       events.value = [newEvent, ...events.value]
 
-      // Notificar admins se evento estiver pendente
-      if (newEvent.status === 'pending') {
-        // Buscar nome do criador
-        const { data: creatorProfile } = await supabase
-          .from('profiles')
-          .select('nome')
-          .eq('id', currentUserId.value)
-          .single()
-
-        const creatorName = creatorProfile?.nome || 'Usuário'
-
-        // Chamar notificação de forma assíncrona sem bloquear
-        import('@/lib/emails').then(({ notifyAdminsNewEvent }) => {
-          notifyAdminsNewEvent(
-            newEvent.id,
-            newEvent.titulo_pt,
-            newEvent.data_hora,
-            newEvent.tipo,
-            creatorName
-          ).catch(err => {
-            console.error('Failed to notify admins about new event:', err)
-          })
-        })
-      }
 
       return newEvent
     } catch (err: any) {

@@ -368,11 +368,8 @@ export const usePostStore = defineStore('posts', () => {
         throw new Error('Seu post contém palavras ofensivas. Por favor, revise o conteúdo.')
       }
 
-      // Determinar status baseado na verificação
-      let postStatus: 'pending' | 'approved' = 'approved'
-      if (bannedCheck.found && (bannedCheck.action === 'block' || bannedCheck.action === 'warn')) {
-        postStatus = 'pending'
-      }
+      // Todos os posts são criados como aprovados agora
+      const postStatus: 'approved' = 'approved'
 
       const { data, error: insertError } = await supabase
         .from('posts')
@@ -419,17 +416,8 @@ export const usePostStore = defineStore('posts', () => {
         isLiked: false,
       }
 
-      // Não adicionar à lista imediatamente se for pending (aguardar aprovação)
-      // Ou adicionar mas mostrar badge de "Aguardando aprovação"
-      // Por enquanto, vamos adicionar mas o RLS vai filtrar
-      if (newPost.status === 'pending') {
-        // Adicionar apenas se for o próprio usuário (ele pode ver seu próprio post pending)
-        if (currentUserId.value === data.user_id) {
-          posts.value = [newPost, ...posts.value]
-        }
-      } else {
-        posts.value = [newPost, ...posts.value]
-      }
+      // Adicionar à lista imediatamente pois já está aprovado
+      posts.value = [newPost, ...posts.value]
 
       // Log da ação
       logAdminAction(currentUserId.value, {
@@ -446,21 +434,6 @@ export const usePostStore = defineStore('posts', () => {
       // Award points for creating a post (First time only)
       await gamificationStore.awardPoints(10, 'post', data.id, 'Primeiro post criado!', true)
 
-      // Notificar admins se post estiver pendente
-      if (newPost.status === 'pending') {
-        const authorName = profileData?.nome || 'Usuário'
-        // Chamar notificação de forma assíncrona sem bloquear
-        import('@/lib/emails').then(({ notifyAdminsNewPost }) => {
-          notifyAdminsNewPost(
-            newPost.id,
-            newPost.conteudo,
-            authorName,
-            newPost.tipo
-          ).catch(err => {
-            console.error('Failed to notify admins about new post:', err)
-          })
-        })
-      }
 
       return newPost
     } catch (err: any) {
