@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { supabase } from '@/lib/supabase'
 import { isLocalhost } from '@/utils/localhost'
+import { useUserStore } from './user'
 import type {
     Program,
     ProgramEnrollment,
@@ -31,27 +32,33 @@ export const useProgramsStore = defineStore('programs', {
     }),
 
     getters: {
-        publishedPrograms: (state) => {
+        publishedPrograms: (state: ProgramsState) => {
             const isLocal = isLocalhost()
-            return state.programs.filter((p) => {
+            const userStore = useUserStore()
+            const isAdmin = userStore.profile?.role === 'admin'
+
+            return state.programs.filter((p: Program) => {
                 const isPublished = p.status === 'published'
                 if (!isPublished) return false
-                // Se for localhost_only, só mostrar se estiver em localhost
-                if (p.localhost_only && !isLocal) return false
+                // Se for localhost_only, só mostrar se estiver em localhost OU se for admin
+                if (p.localhost_only && !isLocal && !isAdmin) return false
                 return true
             })
         },
-        featuredPrograms: (state) => {
+        featuredPrograms: (state: ProgramsState) => {
             const isLocal = isLocalhost()
-            return state.programs.filter((p) => {
+            const userStore = useUserStore()
+            const isAdmin = userStore.profile?.role === 'admin'
+
+            return state.programs.filter((p: Program) => {
                 const isFeatured = p.featured && p.status === 'published'
                 if (!isFeatured) return false
-                if (p.localhost_only && !isLocal) return false
+                if (p.localhost_only && !isLocal && !isAdmin) return false
                 return true
             })
         },
-        activeEnrollments: (state) => state.myEnrollments.filter((e) => e.status === 'active'),
-        completedEnrollments: (state) => state.myEnrollments.filter((e) => e.status === 'completed'),
+        activeEnrollments: (state: ProgramsState) => state.myEnrollments.filter((e: ProgramEnrollment) => e.status === 'active'),
+        completedEnrollments: (state: ProgramsState) => state.myEnrollments.filter((e: ProgramEnrollment) => e.status === 'completed'),
     },
 
     actions: {
