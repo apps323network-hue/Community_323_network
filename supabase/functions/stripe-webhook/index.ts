@@ -285,24 +285,38 @@ Deno.serve(async (req) => {
                     const userId = session.metadata.user_id
 
                     if (enrollmentId) {
-                        // Atualizar matrícula como falhou
-                        await supabase
+                        // 🔥 CRITICAL: Check if enrollment is already paid before marking as failed
+                        const { data: existingEnrollment } = await supabase
                             .from('program_enrollments')
-                            .update({
-                                payment_status: 'failed',
-                                status: 'cancelled',
-                                updated_at: new Date().toISOString()
-                            })
+                            .select('payment_status')
                             .eq('id', enrollmentId)
+                            .single()
 
-                        if (userId) {
-                            await supabase.from('notifications').insert({
-                                user_id: userId,
-                                type: 'program_payment_failed',
-                                title: 'Enrollment payment failed',
-                                content: "We couldn't process your enrollment payment. Please try again.",
-                                metadata: { enrollment_id: enrollmentId }
-                            })
+                        // Only mark as failed if payment was NOT already completed
+                        if (existingEnrollment && existingEnrollment.payment_status !== 'paid') {
+                            // Atualizar matrícula como falhou
+                            await supabase
+                                .from('program_enrollments')
+                                .update({
+                                    payment_status: 'failed',
+                                    status: 'cancelled',
+                                    updated_at: new Date().toISOString()
+                                })
+                                .eq('id', enrollmentId)
+
+                            if (userId) {
+                                await supabase.from('notifications').insert({
+                                    user_id: userId,
+                                    type: 'program_payment_failed',
+                                    title: 'Enrollment payment failed',
+                                    content: "We couldn't process your enrollment payment. Please try again.",
+                                    metadata: { enrollment_id: enrollmentId }
+                                })
+                            }
+                            
+                            console.log(`Program enrollment marked as failed: ${enrollmentId}`)
+                        } else {
+                            console.log(`Skipping failed update - enrollment ${enrollmentId} is already paid`)
                         }
                     }
                 }

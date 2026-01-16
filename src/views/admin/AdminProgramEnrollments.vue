@@ -539,8 +539,22 @@ const syncPaymentFromStripe = async (enrollment: ProgramEnrollment) => {
   syncing.value = enrollment.id
   
   try {
+    // Detect if payment_id is from live mode (starts with cs_live_)
+    const isLivePayment = enrollment.payment_id.startsWith('cs_live_')
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    
+    // Force live mode if we're on localhost but checking a live payment
+    const forceLiveMode = isLocalhost && isLivePayment
+    
+    if (forceLiveMode) {
+      console.log('[Admin] Forcing LIVE mode for live payment from localhost')
+    }
+    
     const { data, error } = await supabase.functions.invoke('check-payment-status', {
-      body: { session_id: enrollment.payment_id }
+      body: { 
+        session_id: enrollment.payment_id,
+        force_live_mode: forceLiveMode
+      }
     })
 
     if (error) throw error
