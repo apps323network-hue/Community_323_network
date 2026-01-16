@@ -10,7 +10,7 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'Home',
     component: () => import('@/views/Home.vue'),
-    meta: { publicAccess: true, limitedForGuests: true },
+    meta: { publicAccess: true, limitedForGuests: true, title: 'Home' },
   },
   {
     path: '/posts-salvos',
@@ -132,7 +132,7 @@ const routes: RouteRecordRaw[] = [
     path: '/eventos',
     name: 'Events',
     component: () => import('@/views/Events.vue'),
-    meta: { publicAccess: true },
+    meta: { publicAccess: true, title: 'Events' },
   },
   {
     path: '/eventos/:id',
@@ -156,7 +156,7 @@ const routes: RouteRecordRaw[] = [
     path: '/servicos',
     name: 'Services',
     component: () => import('@/views/Services.vue'),
-    meta: { publicAccess: true },
+    meta: { publicAccess: true, title: 'Services' },
   },
   {
     path: '/servicos/:id',
@@ -242,7 +242,7 @@ const routes: RouteRecordRaw[] = [
     path: '/programs',
     name: 'Programs',
     component: () => import('@/views/Programs.vue'),
-    meta: { publicAccess: true },
+    meta: { publicAccess: true, title: 'Programs' },
   },
   {
     path: '/programs/:id',
@@ -580,6 +580,13 @@ router.beforeEach(async (to, _from, next) => {    // O Supabase adiciona type=re
   }
 
   next()
+})
+
+// Título dinâmico
+router.afterEach((to) => {
+  const DEFAULT_TITLE = '323 Network - Connecting Brazilians in the USA'
+  const routeTitle = to.meta.title as string | undefined
+  document.title = routeTitle ? `${routeTitle} | 323 Network` : DEFAULT_TITLE
 })
 
 export default router

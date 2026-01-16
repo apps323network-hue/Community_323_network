@@ -39,7 +39,7 @@
             </div>
             <h2 class="text-xl font-bold text-slate-900 dark:text-white">{{ tos.title }}</h2>
           </div>
-          <article class="prose prose-slate dark:prose-invert max-w-none prose-sm sm:prose-base" v-html="tosContent"></article>
+          <article class="prose prose-slate dark:prose-invert max-w-none" v-html="tosContent"></article>
         </section>
 
         <!-- Privacy Policy Section -->
@@ -50,7 +50,7 @@
             </div>
             <h2 class="text-xl font-bold text-slate-900 dark:text-white">{{ privacy.title }}</h2>
           </div>
-          <article class="prose prose-slate dark:prose-invert max-w-none prose-sm sm:prose-base" v-html="privacyContent"></article>
+          <article class="prose prose-slate dark:prose-invert max-w-none" v-html="privacyContent"></article>
         </section>
 
         <!-- Loading Skeletons -->
@@ -201,8 +201,42 @@ export default {
 
 <style scoped>
 .prose {
-  font-size: 1rem;
-  line-height: 1.7;
+  @apply text-slate-700/90 dark:text-slate-300/90;
+  font-size: 1.125rem;
+  line-height: 1.85;
+}
+
+.prose :deep(h1), .prose :deep(h2), .prose :deep(h3), .prose :deep(h4) {
+  @apply text-slate-900 dark:text-white font-black mt-8 mb-4 tracking-tight leading-tight;
+}
+
+.prose :deep(h1) { @apply text-4xl lg:text-5xl; }
+.prose :deep(h2) { 
+  @apply text-3xl lg:text-4xl pb-4 border-b-2 border-slate-100 dark:border-white/5 scroll-mt-24; 
+}
+.prose :deep(h3) { @apply text-2xl lg:text-3xl; }
+.prose :deep(h4) { @apply text-xl lg:text-2xl font-bold; }
+
+.prose :deep(p) { @apply mb-5 leading-[1.75]; }
+
+.prose :deep(ul), .prose :deep(ol) { @apply mb-6 ml-6 space-y-2; }
+.prose :deep(ul) { @apply list-disc; }
+.prose :deep(ol) { @apply list-decimal; }
+.prose :deep(li) { @apply pl-2; }
+.prose :deep(li::marker) { @apply text-primary font-bold; }
+
+.prose :deep(strong) { @apply font-black text-slate-900 dark:text-white; }
+
+.prose :deep(blockquote) {
+  @apply border-l-4 border-primary bg-primary/5 dark:bg-primary/10 pl-6 py-6 pr-6 italic my-8 rounded-2xl text-lg text-slate-800 dark:text-slate-100 font-medium;
+}
+
+.prose :deep(hr) { 
+  @apply my-10 border-0 h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-white/10 to-transparent;
+}
+
+.prose :deep(a) {
+  @apply text-primary hover:text-secondary underline underline-offset-8 decoration-2 transition-all font-bold;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
