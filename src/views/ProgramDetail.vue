@@ -424,7 +424,7 @@
       </div>
     </div>
 
-    <!-- Modal de Matrícula / Checkout (Keep Original Logic for now, style can be polished if needed) -->
+    <!-- Modal de Matrícula / Checkout -->
     <Modal
       v-if="program"
       v-model="showCheckoutModal"
@@ -577,6 +577,7 @@
       </div>
     </Modal>
 
+
     <!-- Modal de Termos -->
     <Modal
       v-if="program"
@@ -586,9 +587,10 @@
     >
       <div class="p-2 space-y-4">
         <div class="prose dark:prose-invert max-w-none">
-          <div class="text-sm text-slate-700 dark:text-gray-300 whitespace-pre-line leading-relaxed h-[60vh] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
-            {{ currentLocale === 'pt-BR' ? (program.terms_content_pt || program.terms_content_en) : (program.terms_content_en || program.terms_content_pt) }}
-          </div>
+          <div 
+            class="text-sm text-slate-700 dark:text-gray-300 leading-relaxed h-[60vh] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent custom-legal-content"
+            v-html="sanitizedTerms"
+          ></div>
         </div>
         <div class="flex justify-end pt-4 border-t border-slate-100 dark:border-white/5">
           <button
@@ -608,6 +610,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLocale } from '@/composables/useLocale'
 import { useProgramsStore } from '@/stores/programs'
+import DOMPurify from 'dompurify'
 import { useModulesStore } from '@/stores/modules'
 import { useSupabase } from '@/composables/useSupabase'
 import { usePublicAccess } from '@/composables/usePublicAccess'
@@ -651,6 +654,19 @@ const title = computed(() =>
       : program.value.title_en
     : ''
 )
+
+const sanitizedTerms = computed(() => {
+  const content = currentLocale.value === 'pt-BR' 
+    ? (program.value?.terms_content_pt || program.value?.terms_content_en)
+    : (program.value?.terms_content_en || program.value?.terms_content_pt)
+  
+  if (!content) return ''
+  
+  return DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'a'],
+    ALLOWED_ATTR: ['href', 'target']
+  })
+})
 
 const description = computed(() =>
   program.value
@@ -854,6 +870,8 @@ const handleCheckout = async () => {
   }
 }
 
+
+
 onMounted(async () => {
   // Wait for program data to be loaded before trying to apply coupons
   await programsStore.fetchProgramById(programId.value)
@@ -885,5 +903,37 @@ onMounted(async () => {
 
 .animate-gradient-x {
   animation: gradient-x 3s ease infinite;
+}
+
+.custom-legal-content :deep(h1),
+.custom-legal-content :deep(h2),
+.custom-legal-content :deep(h3) {
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: rgb(var(--primary-rgb));
+}
+
+.custom-legal-content :deep(p) {
+  margin-bottom: 1rem;
+}
+
+.custom-legal-content :deep(ul),
+.custom-legal-content :deep(ol) {
+  margin-bottom: 1rem;
+  margin-left: 1.5rem;
+}
+
+.custom-legal-content :deep(li) {
+  margin-bottom: 0.5rem;
+}
+
+.custom-legal-content :deep(strong) {
+  color: #000;
+}
+
+.dark .custom-legal-content :deep(strong) {
+  color: #fff;
 }
 </style>

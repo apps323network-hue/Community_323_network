@@ -77,25 +77,33 @@
           </div>
           <div>
             <div class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
-              {{ selectedEnrollments.length }} {{ selectedEnrollments.length === 1 ? 'aluno selecionado' : 'alunos selecionados' }}
+              {{ selectedEnrollments.length }} {{ selectedEnrollments.length === 1 ? 'student selected' : 'students selected' }}
             </div>
             <button
               @click="clearSelection"
               class="text-xs font-bold text-slate-500 hover:text-primary transition-colors flex items-center gap-1"
             >
               <span class="material-icons text-xs">close</span>
-              Limpar seleção
+              Clear selection
             </button>
           </div>
         </div>
         <div class="flex items-center gap-2">
+          <button
+            @click="storeSelectedDocuments"
+            :disabled="storingBulk"
+            class="flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span class="material-icons text-sm" :class="{ 'animate-pulse': storingBulk }">cloud_upload</span>
+            {{ storingBulk ? 'Storing...' : 'Store Documents' }}
+          </button>
           <button
             @click="exportSelected"
             :disabled="exportingBulk"
             class="flex items-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-green-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span class="material-icons text-sm" :class="{ 'animate-pulse': exportingBulk }">download</span>
-            {{ exportingBulk ? 'Exportando...' : 'Exportar Selecionados' }}
+            {{ exportingBulk ? 'Exporting...' : 'Export Selected' }}
           </button>
         </div>
       </div>
@@ -215,12 +223,21 @@
                   </td>
                   <td class="p-4 text-right">
                     <div class="flex items-center justify-end gap-1">
+                       <!-- Store enrollment document button -->
+                       <button
+                        @click="storeEnrollmentDocument(enrollment)"
+                        :disabled="storing === enrollment.id"
+                        class="p-2 text-blue-500 hover:text-blue-600 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all disabled:opacity-50"
+                        title="Store enrollment document in bucket"
+                      >
+                        <span class="material-icons text-sm" :class="{ 'animate-pulse': storing === enrollment.id }">{{ storing === enrollment.id ? 'cloud_upload' : 'save' }}</span>
+                      </button>
                        <!-- Export enrollment data button -->
                        <button
                         @click="exportEnrollmentData(enrollment)"
                         :disabled="exporting === enrollment.id"
                         class="p-2 text-green-500 hover:text-green-600 rounded-lg hover:bg-green-50 dark:hover:bg-green-500/10 transition-all disabled:opacity-50"
-                        title="Exportar dados completos da matrícula"
+                        title="Export complete enrollment data"
                       >
                         <span class="material-icons text-sm" :class="{ 'animate-pulse': exporting === enrollment.id }">{{ exporting === enrollment.id ? 'download' : 'description' }}</span>
                       </button>
@@ -269,13 +286,13 @@
         <div v-if="filteredEnrollments.length > 0" class="p-6 border-t border-slate-200 dark:border-white/5 bg-slate-50/30 dark:bg-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
           <div class="flex items-center gap-4">
             <span class="text-sm font-bold text-slate-600 dark:text-slate-400">
-              Mostrando {{ ((currentPage - 1) * itemsPerPage) + 1 }} - {{ Math.min(currentPage * itemsPerPage, filteredEnrollments.length) }} de {{ filteredEnrollments.length }} matrículas
+              Showing {{ ((currentPage - 1) * itemsPerPage) + 1 }} - {{ Math.min(currentPage * itemsPerPage, filteredEnrollments.length) }} of {{ filteredEnrollments.length }} enrollments
             </span>
             <select v-model="itemsPerPage" @change="currentPage = 1" class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-slate-800 text-sm font-bold">
-              <option :value="10">10 por página</option>
-              <option :value="25">25 por página</option>
-              <option :value="50">50 por página</option>
-              <option :value="100">100 por página</option>
+              <option :value="10">10 per page</option>
+              <option :value="25">25 per page</option>
+              <option :value="50">50 per page</option>
+              <option :value="100">100 per page</option>
             </select>
           </div>
 
@@ -403,6 +420,8 @@ const updating = ref(false)
 const syncing = ref<string | null>(null) // ID of enrollment being synced
 const exporting = ref<string | null>(null) // ID of enrollment being exported
 const exportingBulk = ref(false) // Bulk export in progress
+const storing = ref<string | null>(null) // ID of enrollment being stored
+const storingBulk = ref(false) // Bulk store in progress
 
 const search = ref('')
 const filterStatus = ref('all')
@@ -594,30 +613,284 @@ const exportEnrollmentData = async (enrollment: ProgramEnrollment) => {
 
 const exportSelected = async () => {
   if (selectedEnrollments.value.length === 0) {
-    toast.error('Selecione pelo menos um aluno para exportar')
+    toast.error('Please select at least one student to export')
     return
   }
 
   exportingBulk.value = true
   
   try {
-    const { useEnrollmentExport } = await import('@/composables/useEnrollmentExport')
-    const { exportEnrollmentPDF } = useEnrollmentExport()
+    // Get full enrollment data for selected IDs
+    const selectedEnrollmentData = enrollments.value.filter(e => 
+      selectedEnrollments.value.includes(e.id)
+    )
+
+    // Fetch term acceptances for all selected users
+    const exportData: Record<string, any>[] = []
     
-    // Export each selected enrollment
-    for (const enrollmentId of selectedEnrollments.value) {
-      await exportEnrollmentPDF(enrollmentId)
-      // Small delay between exports to avoid overwhelming the system
-      await new Promise(resolve => setTimeout(resolve, 500))
+    for (const enrollment of selectedEnrollmentData) {
+      try {
+        // Buscar dados completos do perfil do usuário (incluindo email)
+        const { data: userProfile, error: profileError } = await supabase
+          .from('profiles')
+          .select('nome, email')
+          .eq('id', enrollment.user_id)
+          .single()
+
+        if (profileError) {
+          console.error('Error fetching user profile:', profileError)
+        }
+
+        // Buscar aceites de termos do usuário
+        const { data: termAcceptances, error: termsError } = await supabase
+          .from('comprehensive_term_acceptance')
+          .select(`
+            *,
+            term:term_id (
+              title,
+              term_type,
+              version
+            )
+          `)
+          .eq('user_id', enrollment.user_id)
+          .order('accepted_at', { ascending: false })
+
+        if (termsError) {
+          console.error('Error fetching term acceptances:', termsError)
+        }
+
+        // Organizar aceites de termos
+        const privacyAcceptance = termAcceptances?.find((a: any) => a.term.term_type === 'privacy_policy')
+        const tosAcceptance = termAcceptances?.find((a: any) => a.term.term_type === 'terms_of_service')
+        
+        // Buscar termos específicos do programa (se houver)
+        const programTerms = termAcceptances?.filter((a: any) => 
+          a.term.term_type !== 'privacy_policy' && a.term.term_type !== 'terms_of_service'
+        ) || []
+
+        const row: Record<string, string> = {
+          'Name': userProfile?.nome || enrollment.user?.nome || 'N/A',
+          'Email': userProfile?.email || 'N/A',
+          'Enrollment Date': enrollment.enrolled_at 
+            ? new Date(enrollment.enrolled_at).toLocaleString('en-US') 
+            : 'N/A',
+          'Payment Amount': enrollment.payment_amount 
+            ? `${enrollment.payment_currency || 'USD'} ${(enrollment.payment_amount / 100).toFixed(2)}`
+            : 'N/A',
+          'Payment ID': enrollment.payment_id || 'N/A',
+          'Payment Method': enrollment.payment_method === 'card' ? 'Credit Card' 
+            : enrollment.payment_method === 'pix' ? 'PIX' 
+            : enrollment.payment_method || 'N/A',
+          'Payment Status': enrollment.payment_status === 'paid' ? 'Paid'
+            : enrollment.payment_status === 'pending' ? 'Pending'
+            : enrollment.payment_status === 'failed' ? 'Failed'
+            : enrollment.payment_status || 'N/A',
+          'Payment Date': enrollment.paid_at
+            ? new Date(enrollment.paid_at).toLocaleString('en-US')
+            : enrollment.payment_status === 'paid' && enrollment.updated_at
+              ? new Date(enrollment.updated_at).toLocaleString('en-US')
+              : 'N/A',
+          'Privacy Policy': privacyAcceptance 
+            ? `Accepted (v${privacyAcceptance.term.version}) on ${new Date(privacyAcceptance.accepted_at).toLocaleString('en-US')}`
+            : 'Not accepted',
+          'Terms of Service': tosAcceptance
+            ? `Accepted (v${tosAcceptance.term.version}) on ${new Date(tosAcceptance.accepted_at).toLocaleString('en-US')}`
+            : 'Not accepted'
+        }
+
+        // Adicionar termos específicos do programa (se houver)
+        if (programTerms.length > 0) {
+          programTerms.forEach((programTerm: any, index: number) => {
+            row[`Program Term ${index + 1}`] = `${programTerm.term.title} (v${programTerm.term.version}) - Accepted on ${new Date(programTerm.accepted_at).toLocaleString('en-US')}`
+          })
+        }
+
+        exportData.push(row)
+      } catch (err) {
+        console.error('Error processing enrollment:', enrollment.id, err)
+      }
     }
+
+    if (exportData.length === 0) {
+      toast.error('No data to export')
+      return
+    }
+
+    // Convert to CSV
+    const headers = Object.keys(exportData[0])
+    const csvContent = [
+      headers.join(','), // Header row
+      ...exportData.map(row => 
+        headers.map(header => {
+          const value = row[header] || ''
+          // Escape commas and quotes in values
+          const escaped = String(value).replace(/"/g, '""')
+          return `"${escaped}"`
+        }).join(',')
+      )
+    ].join('\n')
+
+    // Create and download CSV file
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
     
-    toast.success(`${selectedEnrollments.value.length} matrículas exportadas com sucesso!`)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `matriculas_${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    toast.success(`${exportData.length} enrollment(s) exported successfully!`)
     clearSelection()
   } catch (error: any) {
-    console.error('Error exporting selected enrollments:', error)
-    toast.error('Error exporting data: ' + (error.message || 'Unknown error'))
+    console.error('Error exporting enrollments:', error)
+    toast.error('Error exporting: ' + (error.message || 'Unknown error'))
   } finally {
     exportingBulk.value = false
+  }
+}
+
+const storeEnrollmentDocument = async (enrollment: ProgramEnrollment) => {
+  storing.value = enrollment.id
+  
+  try {
+    // Verificar se o documento já existe e foi enviado
+    const { data: existingDoc, error: checkError } = await supabase
+      .from('legal_documents')
+      .select('id, email_sent, email_sent_at, storage_path, filename')
+      .eq('document_type', 'enrollment_contract')
+      .eq('related_id', enrollment.id)
+      .eq('email_sent', true)
+      .maybeSingle()
+
+    if (checkError) {
+      console.error('Error checking existing document:', checkError)
+    }
+
+    if (existingDoc) {
+      const sentDate = existingDoc.email_sent_at 
+        ? new Date(existingDoc.email_sent_at).toLocaleString('en-US')
+        : 'unknown date'
+      
+      toast.info(`Document already generated and sent on ${sentDate}. File: ${existingDoc.filename}`)
+      storing.value = null
+      return
+    }
+
+    // Se não existe ou não foi enviado, gerar novo documento
+    const { data, error } = await supabase.functions.invoke('generate-legal-pdf', {
+      body: {
+        type: 'enrollment_contract',
+        enrollment_id: enrollment.id,
+        user_id: enrollment.user_id
+      }
+    })
+
+    if (error) throw error
+
+    if (data?.success) {
+      toast.success('Enrollment document stored and sent successfully!')
+    } else {
+      throw new Error('Failed to store document')
+    }
+  } catch (error: any) {
+    console.error('Error storing enrollment document:', error)
+    toast.error('Error storing document: ' + (error.message || 'Unknown error'))
+  } finally {
+    storing.value = null
+  }
+}
+
+const storeSelectedDocuments = async () => {
+  if (selectedEnrollments.value.length === 0) {
+    toast.error('Please select at least one student to store documents')
+    return
+  }
+
+  storingBulk.value = true
+  let successCount = 0
+  let errorCount = 0
+  let skippedCount = 0
+  
+  try {
+    // Get full enrollment data for selected IDs
+    const selectedEnrollmentData = enrollments.value.filter(e => 
+      selectedEnrollments.value.includes(e.id)
+    )
+    
+    // Store document for each selected enrollment
+    for (const enrollment of selectedEnrollmentData) {
+      try {
+        // Verificar se o documento já existe e foi enviado
+        const { data: existingDoc, error: checkError } = await supabase
+          .from('legal_documents')
+          .select('id, email_sent')
+          .eq('document_type', 'enrollment_contract')
+          .eq('related_id', enrollment.id)
+          .eq('email_sent', true)
+          .maybeSingle()
+
+        if (checkError) {
+          console.error('Error checking existing document for enrollment:', enrollment.id, checkError)
+        }
+
+        if (existingDoc) {
+          console.log(`Skipping enrollment ${enrollment.id} - document already exists and was sent`)
+          skippedCount++
+          continue
+        }
+
+        // Se não existe ou não foi enviado, gerar novo documento
+        const { data, error } = await supabase.functions.invoke('generate-legal-pdf', {
+          body: {
+            type: 'enrollment_contract',
+            enrollment_id: enrollment.id,
+            user_id: enrollment.user_id
+          }
+        })
+
+        if (error) throw error
+
+        if (data?.success) {
+          successCount++
+        }
+        
+        // Small delay between operations to avoid overwhelming the system
+        await new Promise(resolve => setTimeout(resolve, 500))
+      } catch (err) {
+        console.error('Error storing document for enrollment:', enrollment.id, err)
+        errorCount++
+      }
+    }
+    
+    // Mensagens de feedback
+    const messages = []
+    if (successCount > 0) {
+      messages.push(`${successCount} document(s) stored and sent`)
+    }
+    if (skippedCount > 0) {
+      messages.push(`${skippedCount} already existed`)
+    }
+    if (errorCount > 0) {
+      messages.push(`${errorCount} failed`)
+    }
+    
+    if (messages.length > 0) {
+      if (errorCount > 0) {
+        toast.warning(messages.join(' | '))
+      } else {
+        toast.success(messages.join(' | '))
+      }
+    }
+    
+    clearSelection()
+  } catch (error: any) {
+    console.error('Error storing selected documents:', error)
+    toast.error('Error storing documents: ' + (error.message || 'Unknown error'))
+  } finally {
+    storingBulk.value = false
   }
 }
 

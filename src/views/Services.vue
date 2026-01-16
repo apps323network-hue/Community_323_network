@@ -228,11 +228,8 @@
               {{ t('services.processing') }}
             </span>
           </template>
-          <template v-else-if="selectedService.preco">
-            {{ t('services.pay') }} {{ formatPrice(selectedService.preco, selectedService.moeda) }}
-          </template>
           <template v-else>
-            {{ t('services.confirmRequest') }}
+            {{ selectedService.preco ? t('services.confirmPayment') : t('services.confirmRequest') }}
           </template>
         </button>
 
@@ -360,9 +357,10 @@
     >
       <div class="p-2 space-y-4">
         <div class="prose dark:prose-invert max-w-none">
-          <div class="text-sm text-slate-700 dark:text-gray-300 whitespace-pre-line leading-relaxed h-[60vh] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
-            {{ currentLocale === 'pt-BR' ? (selectedService.terms_content_pt || selectedService.terms_content_en) : (selectedService.terms_content_en || selectedService.terms_content_pt) }}
-          </div>
+          <div 
+            class="text-sm text-slate-700 dark:text-gray-300 leading-relaxed h-[60vh] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent custom-legal-content"
+            v-html="sanitizedTerms"
+          ></div>
         </div>
         <div class="flex justify-end pt-4 border-t border-slate-100 dark:border-white/5">
           <button
@@ -385,6 +383,7 @@ import { useSupabase } from '@/composables/useSupabase'
 import { useSubscriptionsStore } from '@/stores/subscriptions'
 import { useAuthStore } from '@/stores/auth'
 import { useSSO } from '@/composables/useSSO'
+import DOMPurify from 'dompurify'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import ServiceCard from '@/components/features/services/ServiceCard.vue'
 
@@ -392,6 +391,7 @@ import Modal from '@/components/ui/Modal.vue'
 import FlickeringGrid from '@/components/ui/FlickeringGrid.vue'
 import { toast } from 'vue-sonner'
 import { fetchExchangeRate, calculatePixAmount } from '@/lib/exchange'
+import { isLocalhost } from '@/utils/localhost'
 
 const router = useRouter()
 
@@ -458,6 +458,19 @@ const CARD_FEE_PERCENTAGE = 0.039 // 3.9%
 const CARD_FEE_FIXED = 30 // $0.30 em centavos
 
 
+const sanitizedTerms = computed(() => {
+  const content = currentLocale.value === 'pt-BR' 
+    ? (selectedService.value?.terms_content_pt || selectedService.value?.terms_content_en)
+    : (selectedService.value?.terms_content_en || selectedService.value?.terms_content_pt)
+  
+  if (!content) return ''
+  
+  return DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'a'],
+    ALLOWED_ATTR: ['href', 'target']
+  })
+})
+
 function calculateFee(basePriceCents: number, method: 'card' | 'pix'): number {
   if (method === 'card') {
     // Taxa cartão: 3.9% + $0.30
@@ -505,17 +518,21 @@ async function fetchServices() {
 
     if (fetchError) throw fetchError
     
-    // Filter out user-created "Tradução de Documentos" service in production (only show on localhost)
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    // Filter for production vs localhost
+    const isLocal = isLocalhost()
     
     services.value = (data || []).filter((service: any) => {
-      // Hide user-created translation service in production
-      // Check by name since it's a user-created service
+      // Se for localhost_only, só mostrar se estiver em localhost
+      if (service.localhost_only && !isLocal) {
+        return false
+      }
+
+      // Hide specific user-created translation service in production
       const isTranslationService = 
         service.nome_pt?.toLowerCase().includes('tradução de documentos') ||
         service.nome_en?.toLowerCase().includes('document translation')
       
-      if (isTranslationService && service.is_user_service && !isLocalhost) {
+      if (isTranslationService && service.is_user_service && !isLocal) {
         return false
       }
       return true
@@ -556,24 +573,37 @@ async function handleRequestService(service: any) {
     return
   }
 
-  // Comportamento padrão: abrir modal de solicitação
+  // Abrir modal para serviços com preço
+  if (service.preco) {
+    paymentMethod.value = null
+    acceptedTerms.value = false
+    selectedService.value = service
+    requestMessage.value = ''
+    showRequestModal.value = true
+    return
+  }
+
+  // Comportamento fallback para solicitações manuais (sem preço definido)
   selectedService.value = service
-  paymentMethod.value = null
   requestMessage.value = ''
-  acceptedTerms.value = false
   showRequestModal.value = true
 }
 
 async function handleCheckout() {
-  if (!selectedService.value || !paymentMethod.value) return
+  if (!selectedService.value) return
 
   try {
     submitting.value = true
     
-    const { data: { session } } = await supabase.auth.getSession()
-    
-    if (!session) {
-      toast.error(t('services.mustBeLoggedInToContract'))
+    // Check if user is logged in
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      toast.error(t('services.mustBeLoggedInToRequest'))
+      return
+    }
+
+    if (!paymentMethod.value) {
+      toast.error(t('services.selectPaymentMethod'))
       return
     }
 
@@ -582,7 +612,6 @@ async function handleCheckout() {
         service_id: selectedService.value.id,
         payment_method: paymentMethod.value,
         exchange_rate: exchangeRate.value,
-        mensagem: requestMessage.value,
         accepted_terms: acceptedTerms.value
       }
     })
@@ -592,11 +621,11 @@ async function handleCheckout() {
     if (data?.checkout_url) {
       window.location.href = data.checkout_url
     } else {
-      throw new Error('URL de checkout não retornada')
+      throw new Error('Erro ao gerar link de pagamento')
     }
-  } catch (error: any) {
-    console.error('Erro ao iniciar checkout:', error)
-    toast.error(error.message || t('services.checkoutError'))
+  } catch (err: any) {
+    console.error('Checkout error:', err)
+    toast.error(err.message || 'Erro ao iniciar pagamento')
   } finally {
     submitting.value = false
   }
@@ -793,5 +822,37 @@ function contactSupport() {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.custom-legal-content :deep(h1),
+.custom-legal-content :deep(h2),
+.custom-legal-content :deep(h3) {
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: rgb(var(--primary-rgb));
+}
+
+.custom-legal-content :deep(p) {
+  margin-bottom: 1rem;
+}
+
+.custom-legal-content :deep(ul),
+.custom-legal-content :deep(ol) {
+  margin-bottom: 1rem;
+  margin-left: 1.5rem;
+}
+
+.custom-legal-content :deep(li) {
+  margin-bottom: 0.5rem;
+}
+
+.custom-legal-content :deep(strong) {
+  color: #000;
+}
+
+.dark .custom-legal-content :deep(strong) {
+  color: #fff;
 }
 </style>
