@@ -544,7 +544,7 @@ async function uploadToStorage(
         .from('legal-documents')
         .upload(storagePath, pdfBytes, {
             contentType: 'application/pdf',
-            upsert: false
+            upsert: true
         })
 
     if (uploadError) throw new Error(`Storage upload failed: ${uploadError.message}`)

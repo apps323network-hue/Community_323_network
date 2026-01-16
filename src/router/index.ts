@@ -224,6 +224,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/PaymentCancel.vue'),
     meta: { requiresAuth: true },
   },
+
   {
     path: '/desafios',
     name: 'Challenges',
