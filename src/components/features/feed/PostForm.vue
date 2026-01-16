@@ -868,7 +868,7 @@ async function handleCreateEvent() {
       tipo: eventForm.value.tipo,
       local: eventForm.value.tipo === 'presencial' ? eventForm.value.local : null,
       image_url: eventImageUrl || null,
-      status: 'pending',
+      status: 'approved',
       created_by: authStore.user?.id,
       program_id: eventForm.value.program_id,
     }
@@ -892,24 +892,6 @@ async function handleCreateEvent() {
 
     console.log('✅ Evento criado com sucesso! ID:', data.id)
 
-    // Notificar admins sobre o evento (se estiver pendente)
-    // O post também será notificado quando for criado abaixo
-    if (data.status === 'pending') {
-      const creatorName = userStore.profile?.nome || 'Usuário'
-      
-      // Chamar notificação de forma assíncrona sem bloquear
-      import('@/lib/emails').then(({ notifyAdminsNewEvent }) => {
-        notifyAdminsNewEvent(
-          data.id,
-          data.titulo,
-          data.data_hora,
-          data.tipo,
-          creatorName
-        ).catch(err => {
-          console.error('Failed to notify admins about new event:', err)
-        })
-      })
-    }
 
     console.log('11. Criando post sobre o evento...')
     // Criar post sobre o evento com a imagem do banner
