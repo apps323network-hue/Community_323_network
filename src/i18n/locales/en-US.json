@@ -605,7 +605,15 @@
             "em_andamento": "Your service is being handled. The partner may contact you at any time for updates.",
             "concluido": "Your service has been completed. If you need additional support, please contact us."
         },
-        "whatsappMessage": "Hello! I hired the service \"{name}\" and would like to track the status."
+        "whatsappMessage": "Hello! I hired the service \"{name}\" and would like to track the status.",
+        "americanDream": {
+            "installmentStatus": "{current}/2 Installments Received",
+            "fullPaymentStatus": "Full Payment (2/2)",
+            "partialPaymentStatus": "Installment {current}/2 Paid",
+            "accessPortal": "Access AD Portal",
+            "accumulatedAmount": "Total Paid Accumulated",
+            "installmentProgress": "Installment Status"
+        }
     },
     "myRequests": {
         "title": "My Orders",
@@ -1869,5 +1877,15 @@
         "actionRequired": "Action Required",
         "profileIncompleteMessage": "Your profile is missing some required information. Click to complete it.",
         "profileIncompleteMobile": "Your profile is missing some required information. Tap to complete it."
+    },
+    "share": {
+        "shareButton": "Share",
+        "copyLink": "Copy Link",
+        "moreOptions": "More Options",
+        "linkCopied": "Link copied!",
+        "copyFailed": "Failed to copy link",
+        "shareFailed": "Failed to share",
+        "instagramInstructions": "Link copied!",
+        "instagramInstructionsDesc": "Paste the link in your Instagram bio or direct message"
     }
 }
