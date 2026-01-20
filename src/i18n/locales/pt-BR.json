@@ -608,7 +608,15 @@
             "em_andamento": "Seu serviço está sendo atendido. O parceiro pode entrar em contato a qualquer momento para atualizações.",
             "concluido": "Seu serviço foi concluído. Se precisar de suporte adicional, entre em contato conosco."
         },
-        "whatsappMessage": "Olá! Contratei o serviço \"{name}\" e gostaria de acompanhar o status."
+        "whatsappMessage": "Olá! Contratei o serviço \"{name}\" e gostaria de acompanhar o status.",
+        "americanDream": {
+            "installmentStatus": "{current}/2 Parcelas Recebidas",
+            "fullPaymentStatus": "Pago Integral (2/2)",
+            "partialPaymentStatus": "Parcela {current}/2 Paga",
+            "accessPortal": "Acessar Portal AD",
+            "accumulatedAmount": "Total Pago Acumulado",
+            "installmentProgress": "Status das Parcelas"
+        }
     },
     "myRequests": {
         "title": "Meus Pedidos",

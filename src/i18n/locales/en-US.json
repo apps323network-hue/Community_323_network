@@ -605,7 +605,15 @@
             "em_andamento": "Your service is being handled. The partner may contact you at any time for updates.",
             "concluido": "Your service has been completed. If you need additional support, please contact us."
         },
-        "whatsappMessage": "Hello! I hired the service \"{name}\" and would like to track the status."
+        "whatsappMessage": "Hello! I hired the service \"{name}\" and would like to track the status.",
+        "americanDream": {
+            "installmentStatus": "{current}/2 Installments Received",
+            "fullPaymentStatus": "Full Payment (2/2)",
+            "partialPaymentStatus": "Installment {current}/2 Paid",
+            "accessPortal": "Access AD Portal",
+            "accumulatedAmount": "Total Paid Accumulated",
+            "installmentProgress": "Installment Status"
+        }
     },
     "myRequests": {
         "title": "My Orders",
