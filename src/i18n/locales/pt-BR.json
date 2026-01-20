@@ -1892,6 +1892,30 @@
             "shareFailed": "Erro ao compartilhar",
             "instagramInstructions": "Link copiado! 📋",
             "instagramInstructionsDesc": "Agora abra o Instagram e cole o link onde quiser (Stories, DM, Bio)"
+        },
+        "payment": {
+            "parcelow": {
+                "title": "Parcelar em até 12x",
+                "buttonLabel": "Parcelar (Parcelow)",
+                "confirmModal": {
+                    "title": "Confirmar Pagamento Parcelado",
+                    "priceUSD": "Valor em USD",
+                    "priceBRL": "Valor em BRL",
+                    "info": "Você será redirecionado para escolher o número de parcelas",
+                    "confirm": "Confirmar",
+                    "cancel": "Cancelar"
+                },
+                "errors": {
+                    "cpfRequired": "CPF é obrigatório para pagamento parcelado",
+                    "createFailed": "Erro ao criar checkout"
+                },
+                "cpfValidation": {
+                    "title": "CPF OBRIGATÓRIO",
+                    "description": "O parcelamento via Parcelow exige que seu CPF esteja cadastrado no sistema.",
+                    "button": "CONFIGURAR CPF NO MEU PERFIL",
+                    "toastError": "CPF obrigatório para parcelamento. Por favor, atualize seu perfil."
+                }
+            }
         }
     }
 }
