@@ -1882,6 +1882,16 @@
             "actionRequired": "Ação Necessária",
             "profileIncompleteMessage": "Seu perfil está faltando algumas informações obrigatórias. Clique para completar.",
             "profileIncompleteMobile": "Seu perfil está faltando algumas informações obrigatórias. Toque para completar."
+        },
+        "share": {
+            "shareButton": "Compartilhar",
+            "copyLink": "Copiar Link",
+            "moreOptions": "Mais Opções",
+            "linkCopied": "Link copiado!",
+            "copyFailed": "Erro ao copiar link",
+            "shareFailed": "Erro ao compartilhar",
+            "instagramInstructions": "Link copiado!",
+            "instagramInstructionsDesc": "Cole o link na sua bio do Instagram ou em uma mensagem direta"
         }
     }
 }

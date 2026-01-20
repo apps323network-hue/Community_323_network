@@ -647,10 +647,6 @@ export const useAuthStore = defineStore('auth', () => {
           ? 'http://localhost:8080'
           : 'https://americandream.323network.com'
 
-        console.log('[SSO] Hostname detectado:', window.location.hostname)
-        console.log('[SSO] É localhost?', isLocalhost)
-        console.log('[SSO] Base URL escolhida:', baseUrl)
-
         returnUrl = new URL(decodedReturnTo.startsWith('/') ? decodedReturnTo : `/${decodedReturnTo}`, baseUrl)
       }
 

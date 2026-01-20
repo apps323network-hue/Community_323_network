@@ -1877,5 +1877,15 @@
         "actionRequired": "Action Required",
         "profileIncompleteMessage": "Your profile is missing some required information. Click to complete it.",
         "profileIncompleteMobile": "Your profile is missing some required information. Tap to complete it."
+    },
+    "share": {
+        "shareButton": "Share",
+        "copyLink": "Copy Link",
+        "moreOptions": "More Options",
+        "linkCopied": "Link copied!",
+        "copyFailed": "Failed to copy link",
+        "shareFailed": "Failed to share",
+        "instagramInstructions": "Link copied!",
+        "instagramInstructionsDesc": "Paste the link in your Instagram bio or direct message"
     }
 }

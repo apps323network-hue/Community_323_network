@@ -42,6 +42,21 @@
                 {{ title }}
               </h1>
 
+              <div class="absolute top-6 right-6 z-30">
+                <ShareButton
+                  v-if="program"
+                  :options="{
+                    url: `/programas/${program.id}`,
+                    title: title,
+                    description: description?.substring(0, 160) || '',
+                    imageUrl: program.banner_url,
+                    type: 'program',
+                    id: program.id
+                  }"
+                  variant="icon"
+                />
+              </div>
+
               <div class="flex flex-wrap items-center gap-4 md:gap-6 text-white/90">
                 <div v-if="program.instructor_name" class="flex items-center gap-3">
                   <div class="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary p-0.5 shadow-lg">
@@ -617,7 +632,10 @@ import { usePublicAccess } from '@/composables/usePublicAccess'
 import { useCoupons } from '@/composables/useCoupons'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Modal from '@/components/ui/Modal.vue'
+import ShareButton from '@/components/ui/ShareButton.vue'
 import { toast } from 'vue-sonner'
+import { useDynamicMeta } from '@/composables/useDynamicMeta'
+import { watch } from 'vue'
 import { fetchExchangeRate, calculatePixAmount } from '@/lib/exchange'
 import { isLocalhost } from '@/utils/localhost'
 import type { Coupon } from '@/composables/useCoupons'
@@ -800,6 +818,19 @@ function handleRemoveCoupon() {
   localStorage.removeItem(`applied_coupon_${programId.value}`)
   toast.info('Cupom removido')
 }
+
+// Set dynamic meta tags for social sharing
+watch(() => program.value, (newProgram) => {
+  if (newProgram) {
+    useDynamicMeta({
+      title: `${title.value} - 323 Network`,
+      description: description.value?.substring(0, 160) || '',
+      image: newProgram.banner_url,
+      url: `/programas/${newProgram.id}`,
+      type: 'article'
+    })
+  }
+}, { immediate: true })
 
 function calculateCurrentFee(): number {
   if (!program.value || !paymentMethod.value) return 0
