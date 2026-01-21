@@ -187,13 +187,16 @@
                     </button>
                     <button
                       @click="paymentMethod = 'parcelow'"
-                      class="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all group"
+                      class="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all group relative"
                       :class="paymentMethod === 'parcelow' 
                         ? 'border-primary bg-primary/10 text-slate-900 dark:text-white shadow-lg shadow-primary/10' 
                         : 'border-slate-100 dark:border-white/5 hover:border-primary/30 text-slate-500 dark:text-gray-400'"
                     >
+                      <div class="absolute -top-1 -right-1 group-hover:rotate-12 transition-transform">
+                        <span class="text-[8px] font-bold bg-primary text-black px-1.5 py-0.5 rounded-bl-lg">21x</span>
+                      </div>
                       <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">payments</span>
-                      <span class="text-[10px] font-black uppercase tracking-tight">Parcelar</span>
+                      <span class="text-[10px] font-black uppercase tracking-tight">Parcelow</span>
                     </button>
                   </div>
                   
@@ -269,7 +272,7 @@
                   <span class="relative flex items-center justify-center gap-3 uppercase tracking-widest text-xs">
                     <template v-if="submitting">
                       <span class="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
-                      {{ t('services.processing') }}
+                      {{ paymentMethod === 'parcelow' ? 'Redirecionando para Parcelow...' : t('services.processing') }}
                     </template>
                     <template v-else>
                       {{ t('services.pay') }} Now
@@ -327,45 +330,6 @@
       </div>
     </Modal>
 
-    <!-- Modal de Confirmação Parcelow -->
-    <Modal
-      v-model="showParcelowConfirm"
-      :title="t('payment.parcelow.confirmModal.title')"
-    >
-      <div v-if="parcelowData" class="flex flex-col gap-6 p-1">
-        <p class="text-sm text-slate-600 dark:text-gray-300 leading-relaxed">
-          {{ t('payment.parcelow.confirmModal.info') }}
-        </p>
-
-        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 space-y-3">
-          <div class="flex justify-between items-center text-sm">
-            <span class="text-slate-500 dark:text-gray-400">{{ t('payment.parcelow.confirmModal.priceUSD') }}</span>
-            <span class="text-slate-900 dark:text-white font-bold">{{ formatPrice(parcelowData.total_usd, 'USD') }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-slate-900 dark:text-white font-black uppercase text-xs tracking-widest">{{ t('payment.parcelow.confirmModal.priceBRL') }}</span>
-            <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-              {{ formatPrice(parcelowData.total_brl, 'BRL') }}
-            </span>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-3">
-          <button
-            @click="confirmParcelow"
-            class="w-full rounded-2xl bg-gradient-to-r from-primary to-secondary py-5 text-sm font-black text-black shadow-xl hover:scale-[1.02] transition-all uppercase tracking-widest"
-          >
-            {{ t('payment.parcelow.confirmModal.confirm') }}
-          </button>
-          <button
-            @click="cancelParcelow"
-            class="w-full py-4 text-xs font-bold text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-white transition-colors"
-          >
-            {{ t('payment.parcelow.confirmModal.cancel') }}
-          </button>
-        </div>
-      </div>
-    </Modal>
   </AppLayout>
 </template>
 
@@ -399,11 +363,7 @@ const acceptedTerms = ref(false)
 const showTermsModal = ref(false)
 
 const { 
-  createCheckout: startParcelowCheckout, 
-  confirmAndRedirect: confirmParcelow,
-  cancelCheckout: cancelParcelow,
-  showConfirmationModal: showParcelowConfirm,
-  checkoutData: parcelowData,
+  createCheckout: startParcelowCheckout,
   isCreatingCheckout: parcelowLoading,
   error: parcelowError
 } = useParcelowCheckout()

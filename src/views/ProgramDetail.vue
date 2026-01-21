@@ -144,7 +144,7 @@
                               {{ t('programs.debugAccess') }}
                             </template>
                             <template v-else>
-                              {{ isSoldOut ? t('programs.programFull') : (isAuthenticated ? t('programs.paymentModal.enroll') : t('programs.actions.secureMySpot')) }}
+                              {{ isSoldOut ? t('programs.programFull') : (isAuthenticated ? t('programs.paymentModal.enroll') : t('programs.actions.watch')) }}
                               <span class="material-icons text-sm font-bold group-hover:translate-x-1 transition-transform">play_arrow</span>
                             </template>
                           </template>
@@ -354,7 +354,7 @@
                           {{ t('programs.paymentModal.processing') }}
                         </template>
                         <template v-else>
-                          {{ isSoldOut ? t('programs.programFull') : (isAuthenticated ? t('programs.paymentModal.enroll') : t('programs.actions.secureMySpot')) }}
+                          {{ isSoldOut ? t('programs.programFull') : (isAuthenticated ? t('programs.paymentModal.enroll') : t('programs.actions.watch')) }}
                           <span class="material-icons font-bold group-hover:translate-x-1 transition-transform">play_arrow</span>
                         </template>
                       </span>
@@ -574,10 +574,10 @@
                 : 'border-slate-200 dark:border-white/10 hover:border-primary/30 text-slate-600 dark:text-gray-400'"
             >
               <div class="absolute -top-1 -right-1 group-hover:rotate-12 transition-transform">
-                <span class="text-[8px] font-bold bg-primary text-black px-1.5 py-0.5 rounded-bl-lg">12x</span>
+                <span class="text-[8px] font-bold bg-primary text-black px-1.5 py-0.5 rounded-bl-lg">21x</span>
               </div>
               <span class="material-icons text-3xl group-hover:scale-110 transition-transform">payments</span>
-              <span class="text-sm font-black uppercase tracking-tight">Parcelar</span>
+              <span class="text-sm font-black uppercase tracking-tight">Parcelow</span>
             </button>
           </div>
           
@@ -610,7 +610,7 @@
             <template v-if="submitting">
               <span class="flex items-center justify-center gap-3">
                 <span class="w-5 h-5 border-4 border-black border-t-transparent rounded-full animate-spin"></span>
-                Iniciando...
+                {{ paymentMethod === 'parcelow' ? 'Redirecionando para Parcelow...' : 'Iniciando...' }}
               </span>
             </template>
             <template v-else>
@@ -621,45 +621,6 @@
       </div>
     </Modal>
 
-    <!-- Modal de Confirmação Parcelow -->
-    <Modal
-      v-model="showParcelowConfirm"
-      :title="t('payment.parcelow.confirmModal.title')"
-    >
-      <div v-if="parcelowData" class="flex flex-col gap-6 p-1">
-        <p class="text-sm text-slate-600 dark:text-gray-300 leading-relaxed">
-          {{ t('payment.parcelow.confirmModal.info') }}
-        </p>
-
-        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 space-y-3">
-          <div class="flex justify-between items-center text-sm">
-            <span class="text-slate-500 dark:text-gray-400">{{ t('payment.parcelow.confirmModal.priceUSD') }}</span>
-            <span class="text-slate-900 dark:text-white font-bold">{{ formatPrice(parcelowData.total_usd, 'USD') }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-slate-900 dark:text-white font-black uppercase text-xs tracking-widest">{{ t('payment.parcelow.confirmModal.priceBRL') }}</span>
-            <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-              {{ formatPrice(parcelowData.total_brl, 'BRL') }}
-            </span>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-3">
-          <button
-            @click="confirmParcelow"
-            class="w-full rounded-2xl bg-gradient-to-r from-primary to-secondary py-5 text-sm font-black text-black shadow-xl hover:scale-[1.02] transition-all uppercase tracking-widest"
-          >
-            {{ t('payment.parcelow.confirmModal.confirm') }}
-          </button>
-          <button
-            @click="cancelParcelow"
-            class="w-full py-4 text-xs font-bold text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-white transition-colors"
-          >
-            {{ t('payment.parcelow.confirmModal.cancel') }}
-          </button>
-        </div>
-      </div>
-    </Modal>
 
 
     <!-- Modal de Termos -->
@@ -732,11 +693,7 @@ const showTermsModal = ref(false)
 
 // Parcelow integration
 const { 
-  createCheckout: startParcelowCheckout, 
-  confirmAndRedirect: confirmParcelow,
-  cancelCheckout: cancelParcelow,
-  showConfirmationModal: showParcelowConfirm,
-  checkoutData: parcelowData,
+  createCheckout: startParcelowCheckout,
   isCreatingCheckout: parcelowLoading,
   error: parcelowError
 } = useParcelowCheckout()
@@ -999,9 +956,9 @@ const handleCheckout = async () => {
 
       if (pError) throw pError
 
-      // 2. Iniciar checkout Parcelow
+      // 2. Iniciar checkout Parcelow (mantém loading até redirecionar)
       await startParcelowCheckout(payment.id)
-      showCheckoutModal.value = false
+      // Nota: submitting.value permanece true até o redirecionamento acontecer
       return
     }
 
