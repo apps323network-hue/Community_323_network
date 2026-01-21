@@ -72,6 +72,7 @@ class ParcelowClient {
         client_email: string
         client_cpf: string
         reference: string
+        redirect_url: string
     }) {
         const accessToken = await this.getAccessToken()
 
@@ -99,6 +100,7 @@ class ParcelowClient {
         client_email: string
         client_cpf: string
         reference: string
+        redirect_url: string
     }) {
         const response = await fetch(`${this.baseUrl}/api/orders`, {
             method: 'POST',
@@ -122,7 +124,7 @@ class ParcelowClient {
                     email: params.client_email,
                     cpf: params.client_cpf
                 },
-                redirect_url: `${Deno.env.get('SITE_URL') || 'https://323network.com'}/services`,
+                redirect_url: params.redirect_url,
                 webhook_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/parcelow-webhook`
             })
         })
@@ -167,12 +169,46 @@ Deno.serve(async (req) => {
 
         console.log(`[Parcelow Checkout] Creating checkout for payment: ${payment_id}`)
 
-        // Ambiente forçado para produção para teste com a chave 1129
-        const environment = 'production'
-        const clientId = '1129'
-        const clientSecret = 'hfYoiAJokJvM2uguB26bJTt1TkQNY13df6HA4tfq'
+        // Detect environment based on origin/referer
+        const referer = req.headers.get('referer')
+        const origin = req.headers.get('origin') || ''
 
-        console.log(`[Parcelow Checkout] 🚀 FORCED PRODUCTION MODE with keys: ${clientId}`)
+        // 1. Determine siteUrl for redirection
+        let siteUrl = ''
+        if (referer) {
+            try {
+                siteUrl = new URL(referer).origin
+            } catch (e) {
+                siteUrl = origin
+            }
+        } else {
+            siteUrl = origin || 'https://323network.com'
+        }
+
+        const isLocalhost = siteUrl.includes('localhost') || siteUrl.includes('127.0.0.1')
+        const isStaging = siteUrl.includes('vercel.app')
+
+        // Se não for localhost nem staging, forçamos a URL de produção
+        if (!isLocalhost && !isStaging) {
+            siteUrl = 'https://323network.com'
+        }
+
+        // Use staging/sandbox for localhost/staging URLs, production otherwise
+        const environment: 'staging' | 'production' = (isLocalhost || isStaging) ? 'staging' : 'production'
+
+        const clientId = environment === 'production'
+            ? Deno.env.get('PARCELOW_CLIENT_ID_PRODUCTION')
+            : Deno.env.get('PARCELOW_CLIENT_ID_STAGING')
+
+        const clientSecret = environment === 'production'
+            ? Deno.env.get('PARCELOW_CLIENT_SECRET_PRODUCTION')
+            : Deno.env.get('PARCELOW_CLIENT_SECRET_STAGING')
+
+        if (!clientId || !clientSecret) {
+            throw new Error(`Parcelow credentials not configured for ${environment} environment`)
+        }
+
+        console.log(`[Parcelow Checkout] Running in ${environment.toUpperCase()} mode (Origin: ${origin})`)
 
         // Inicializar Supabase Admin
         const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
@@ -249,33 +285,12 @@ Deno.serve(async (req) => {
             client_name: profile.nome || 'Cliente',
             client_email: profile.email || user.email,
             client_cpf: cleanCpf,
-            reference: payment.id
+            reference: payment.id,
+            redirect_url: `${siteUrl}/pagamento/sucesso`
         })
 
         console.log(`[Parcelow Checkout] ✅ Order created. Parcelow ID: ${orderData.data.order_id}`)
         console.log(`[Parcelow Checkout] 📊 Response data:`, JSON.stringify(orderData, null, 2))
-
-        // Buscar taxa de câmbio atual
-        let exchangeRate = 5.95 // Fallback
-        try {
-            const rateResponse = await fetch('https://api.exchangerate-api.com/v4/latest/USD')
-            const rateData = await rateResponse.json()
-            exchangeRate = rateData.rates.BRL || 5.95
-            console.log(`[Parcelow Checkout] 💱 Exchange rate: ${exchangeRate}`)
-        } catch (error) {
-            console.error('[Parcelow Checkout] ⚠️ Failed to fetch exchange rate, using fallback:', error)
-        }
-
-        // Calcular total em BRL (mesma lógica do PIX)
-        const RATE_MARGIN = 1.04 // Margem de 4%
-        const PIX_FEE_PERCENTAGE = 0.0179 // Taxa PIX 1.79%
-        const usdAmount = payment.amount / 100 // Converter centavos para dólares
-        const rateWithMargin = exchangeRate * RATE_MARGIN
-        const netAmountBRL = usdAmount * rateWithMargin
-        const grossAmountBRL = netAmountBRL / (1 - PIX_FEE_PERCENTAGE)
-        const totalBrlCents = Math.round(grossAmountBRL * 100) // Converter para centavos
-
-        console.log(`[Parcelow Checkout] 💰 Calculated BRL: R$ ${(totalBrlCents / 100).toFixed(2)}`)
 
         // Salvar dados no banco
         const { error: updateError } = await supabaseAdmin
@@ -288,9 +303,7 @@ Deno.serve(async (req) => {
                 metadata: {
                     ...payment.metadata,
                     parcelow_environment: environment,
-                    parcelow_created_at: new Date().toISOString(),
-                    exchange_rate: exchangeRate,
-                    total_brl_calculated: totalBrlCents
+                    parcelow_created_at: new Date().toISOString()
                 }
             })
             .eq('id', payment_id)
@@ -307,7 +320,6 @@ Deno.serve(async (req) => {
                 order_id: orderData.data.order_id,
                 status: 'Open',
                 total_usd: payment.amount,
-                total_brl: totalBrlCents,
                 order_amount: payment.amount
             }),
             {
