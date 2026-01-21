@@ -561,11 +561,28 @@ async function sendEmailWithAttachment(
     // Fetch user name for email subject
     const { data: user } = await supabase
         .from('profiles')
-        .select('nome')
+        .select('nome, email')
         .eq('id', userId)
         .single()
 
     const userName = user?.nome || 'Unknown User'
+    const userEmail = user?.email || ''
+
+    // Skip sending email for @uorak users (internal test accounts)
+    if (userEmail.toLowerCase().endsWith('@uorak')) {
+        console.log(`[generate-legal-pdf] ⏭️ Skipping email notification for @uorak user: ${userEmail}`)
+
+        // Mark as "skipped" for tracking purposes
+        await supabase
+            .from('legal_documents')
+            .update({
+                email_sent: false,
+                email_error: 'Skipped: @uorak account'
+            })
+            .eq('storage_path', `${userId}/${type}/${pdfData.filename}`)
+
+        return
+    }
 
     let subject: string
     let htmlBody: string

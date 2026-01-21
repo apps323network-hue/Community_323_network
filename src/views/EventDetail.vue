@@ -77,13 +77,31 @@
                     {{ isPastEvent ? t('events.eventFinished') : t('events.upcomingEvent') }}
                   </span>
                 </div>
+
+                <!-- Share Button -->
+                <div class="absolute top-20 right-6 z-30">
+                  <ShareButton
+                    v-if="event"
+                    :options="{
+                      url: `/eventos/${event.id}`,
+                      title: translatedTitle,
+                      description: translatedDescription?.substring(0, 160) || '',
+                      imageUrl: event.image_url,
+                      type: 'event',
+                      id: event.id
+                    }"
+                    variant="icon"
+                  />
+                </div>
               </div>
 
               <!-- Title & Desc -->
               <div class="relative -mt-20 p-8 sm:p-10 z-20">
-                 <h1 class="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-[0.9] tracking-tighter mb-6 drop-shadow-lg">
-                  {{ translatedTitle }}
-                </h1>
+                <div class="flex items-start justify-between gap-4 mb-6">
+                  <h1 class="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-[0.9] tracking-tighter drop-shadow-lg flex-1">
+                    {{ translatedTitle }}
+                  </h1>
+                </div>
                 
                 <div class="flex flex-wrap gap-4 mb-8">
                    <!-- Details Chips -->
@@ -281,7 +299,10 @@ import { useI18n } from 'vue-i18n'
 import { useEvents } from '@/composables/useEvents'
 import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import ShareButton from '@/components/ui/ShareButton.vue'
 import { toast } from 'vue-sonner'
+import { useDynamicMeta } from '@/composables/useDynamicMeta'
+import { watch } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -379,6 +400,19 @@ async function handleCancel() {
     alert(t('errors.genericError'))
   }
 }
+
+// Set dynamic meta tags for social sharing
+watch(() => event.value, (newEvent) => {
+  if (newEvent) {
+    useDynamicMeta({
+      title: `${translatedTitle.value} - 323 Network`,
+      description: translatedDescription.value?.substring(0, 160) || '',
+      image: newEvent.image_url,
+      url: `/eventos/${newEvent.id}`,
+      type: 'event'
+    })
+  }
+}, { immediate: true })
 
 onMounted(async () => {
   if (eventId.value) {
