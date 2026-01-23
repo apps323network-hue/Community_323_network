@@ -94,15 +94,12 @@ export const useGamificationStore = defineStore('gamification', () => {
 
                 if (fetchErr) throw fetchErr
 
-                if (existingPoints && existingPoints.length > 0) {
+                const points = existingPoints || []
+                if (points.length > 0) {
                     if (uniquePerId && originId) {
-                        // Check if any point matches the specific originId
-                        // We also check for null originId to be safe against legacy data, though we can't be sure
-                        // Ideally we only match exact ID.
-                        const alreadyAwarded = existingPoints.some(p => p.origem_id === originId)
+                        const alreadyAwarded = points.some(p => p.origem_id === originId)
                         if (alreadyAwarded) return
                     } else {
-                        // Global uniqueness for this origin type
                         return
                     }
                 }
