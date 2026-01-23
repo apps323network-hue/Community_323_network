@@ -75,7 +75,8 @@
         "next": "Próxima",
         "previous": "Anterior",
         "hide": "Ocultar",
-        "show": "Mostrar"
+        "show": "Mostrar",
+        "emailCopied": "E-mail copiado para a área de transferência!"
     },
     "onboarding": {
         "progress": "Passo {current} de {total}",

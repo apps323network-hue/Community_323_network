@@ -75,7 +75,8 @@
         "next": "Next",
         "previous": "Previous",
         "hide": "Hide",
-        "show": "Show"
+        "show": "Show",
+        "emailCopied": "Email copied to clipboard!"
     },
     "onboarding": {
         "progress": "Step {current} of {total}",
