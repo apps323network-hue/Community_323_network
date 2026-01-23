@@ -299,10 +299,22 @@ import { supabase } from '@/lib/supabase'
 import { toast } from 'vue-sonner'
 import { sendConnectionRequestEmail } from '@/lib/emails'
 import type { Member } from '@/types/members'
+import { useDynamicMeta } from '@/composables/useDynamicMeta'
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
+
+const member = ref<Member | null>(null)
+
+// SEO
+useDynamicMeta(() => ({
+  title: member.value ? `${member.value.nome} - @${member.value.username || member.value.nome.toLowerCase().replace(' ', '.')}` : t('members.title'),
+  description: member.value?.bio || member.value?.area_atuacao || t('members.description'),
+  image: member.value?.avatar_url,
+  url: `/comunidade/membro/${member.value?.id}`,
+  type: 'profile'
+}))
 const { fetchMemberById, loading, error } = useMembers()
 loading.value = true // Prevent flash of not found state
 const { posts: memberPosts, loading: postsLoading, hasMore: postsHasMore, loadPosts, loadMorePosts, removeComment } = usePosts()
@@ -313,7 +325,6 @@ const userStore = useUserStore()
 
 const isAdmin = computed(() => userStore.profile?.role === 'admin')
 
-const member = ref<Member | null>(null)
 const memberConnections = ref(0)
 const memberChallenges = ref<any[]>([])
 const expandedComments = ref(new Set<string>())
