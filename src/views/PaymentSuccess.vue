@@ -13,8 +13,8 @@
           <div class="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
         <div class="text-center space-y-2">
-          <h2 class="text-xl font-black text-white uppercase tracking-widest">Validando Transação</h2>
-          <p class="text-slate-400 text-sm animate-pulse">Aguarde um instante enquanto confirmamos tudo...</p>
+          <h2 class="text-xl font-black text-white uppercase tracking-widest">{{ t('payment.success.validating') }}</h2>
+          <p class="text-slate-400 text-sm animate-pulse">{{ t('payment.success.pleaseWait') }}</p>
         </div>
       </div>
 
@@ -30,10 +30,10 @@
 
         <div class="space-y-4 mb-10">
           <h1 class="text-4xl md:text-5xl font-black text-white leading-tight tracking-tighter uppercase">
-            Pagamento <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Confirmado!</span>
+            {{ t('payment.success.title').split(' ')[0] }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{{ t('payment.success.title').split(' ')[1] }}</span>
           </h1>
           <p class="text-slate-400 text-lg max-w-md mx-auto leading-relaxed">
-            Sua jornada começa agora. Preparamos tudo para que você tenha a melhor experiência possível.
+            {{ t('payment.success.subtitle') }}
           </p>
         </div>
 
@@ -45,12 +45,12 @@
             </div>
             <div class="flex-1 text-center md:text-left">
               <p class="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1">
-                {{ paymentType === 'program' ? 'Programa Matriculado' : 'Serviço Contratado' }}
+                {{ paymentType === 'program' ? t('payment.success.programEnrolled') : t('payment.success.serviceContracted') }}
               </p>
               <h3 class="text-xl md:text-2xl font-black text-white tracking-tight">{{ itemName }}</h3>
             </div>
             <div class="hidden md:block px-4 py-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 text-[10px] font-black uppercase tracking-widest">
-              Ativo Imediatamente
+              {{ t('payment.success.activeImmediately') }}
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@
             <div class="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-gradient-x"></div>
             <span class="relative flex items-center justify-center gap-3 uppercase tracking-widest text-sm">
               <span class="material-icons">play_circle</span>
-              Começar a Assistir agora
+              {{ t('payment.success.startWatching') }}
             </span>
           </RouterLink>
           
@@ -76,7 +76,7 @@
           >
             <div class="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-gradient-x"></div>
             <span class="relative flex items-center justify-center gap-3 uppercase tracking-widest text-sm">
-              {{ paymentType === 'program' ? 'Ver Meus Programas' : 'Acompanhar Pedido' }}
+              {{ paymentType === 'program' ? t('payment.success.viewMyPrograms') : t('payment.success.followOrder') }}
               <span class="material-icons">arrow_forward</span>
             </span>
           </RouterLink>
@@ -85,7 +85,7 @@
             :to="paymentType === 'program' ? '/programs' : '/servicos'"
             class="px-8 py-5 rounded-2xl border-2 border-white/10 text-white font-black uppercase tracking-widest text-xs hover:bg-white/5 transition-all flex items-center justify-center gap-2"
           >
-            Voltar para a Exploração
+            {{ t('payment.success.backToExploration') }}
           </RouterLink>
         </div>
       </div>
@@ -98,11 +98,11 @@
              <span class="material-icons text-4xl text-yellow-500 animate-spin-slow">hourglass_empty</span>
            </div>
         </div>
-        <h1 class="text-3xl font-black text-white mb-4 uppercase tracking-tight">Processando sua compra</h1>
+        <h1 class="text-3xl font-black text-white mb-4 uppercase tracking-tight">{{ t('payment.success.processingPurchase') }}</h1>
         <p class="text-slate-400 mb-8 leading-relaxed">
-          <span v-if="paymentMethod === 'pix'" class="block font-bold text-yellow-500 mb-2">Aguardando confirmação do PIX...</span>
-          <span v-else>Estamos validando sua transação com a operadora.</span>
-          Isso geralmente leva menos de um minuto. Não feche esta página.
+          <span v-if="paymentMethod === 'pix'" class="block font-bold text-yellow-500 mb-2">{{ t('payment.success.waitingPix') }}</span>
+          <span v-else>{{ t('payment.success.validatingTransaction') }}</span>
+          {{ t('payment.success.dontClosePage') }}
         </p>
       </div>
 
@@ -112,38 +112,28 @@
           <span class="material-icons text-4xl text-red-500">error_outline</span>
         </div>
         <h1 class="text-3xl font-black text-white mb-4 uppercase tracking-tighter">
-          Ops! Algo não saiu como o esperado
+          {{ t('payment.success.errorTitle') }}
         </h1>
         <p class="text-slate-400 mb-10 leading-relaxed text-lg">
           {{ paymentStatus === 'failed' 
-            ? 'O pagamento foi recusado. Verifique os dados do cartão ou tente um novo método.'
-            : 'Não conseguimos localizar seu pagamento. Se o valor foi debitado, entre em contato com nosso suporte.' }}
+            ? t('payment.success.failedDescription')
+            : t('payment.success.notFoundDescription') }}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
             <RouterLink
               :to="paymentType === 'program' ? `/programs/${route.query.program_id || ''}` : '/servicos'"
               class="px-8 py-4 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-sm hover:scale-105 transition-all shadow-xl"
             >
-              Tentar Novamente
+              {{ t('payment.success.tryAgain') }}
             </RouterLink>
             <a href="#" class="px-8 py-4 rounded-2xl border border-white/10 text-white font-black uppercase tracking-widest text-xs hover:bg-white/5 transition-all flex items-center justify-center gap-2">
                <span class="material-icons text-sm">support_agent</span>
-               Suporte via WhatsApp
+               {{ t('payment.success.whatsappSupport') }}
             </a>
         </div>
       </div>
-      <!-- Floating Scroll Indicator -->
-      <Transition name="fade">
-        <div 
-          v-if="(paymentStatus === 'completed' || paymentStatus === 'paid') && showScrollArrow"
-          class="fixed bottom-20 right-8 z-[100] pointer-events-none opacity-40 hover:opacity-100 transition-opacity"
-        >
-          <div class="animate-bounce-slow">
-            <span class="material-icons text-slate-900 dark:text-white text-2xl">expand_more</span>
-          </div>
-        </div>
-      </Transition>
-    </div>
+
+      </div>
   </AppLayout>
 </template>
 
@@ -152,7 +142,9 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { useSupabase } from '@/composables/useSupabase'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import { useLocale } from '@/composables/useLocale'
 
+const { t, locale } = useLocale()
 const route = useRoute()
 const { supabase } = useSupabase()
 
@@ -162,19 +154,13 @@ const itemName = ref('')
 const programId = ref('')
 const paymentType = ref<'service' | 'program'>((route.query.type as any) || 'service')
 const paymentMethod = ref<'card' | 'pix' | null>(null)
-const showScrollArrow = ref(true)
+
 
 let pollInterval: any = null
 let attempts = 0
 const MAX_ATTEMPTS = 30 // 30 tentativas x 2s = 60 segundos de espera máxima
 
-function handleScroll() {
-  if (window.scrollY > 50) {
-    showScrollArrow.value = false
-  } else {
-    showScrollArrow.value = true
-  }
-}
+
 
 async function checkPaymentStatus() {
   const sessionId = (route.query.session_id || route.query.order_id) as string
@@ -193,7 +179,7 @@ async function checkPaymentStatus() {
         .from('program_enrollments')
         .select(`
           *,
-          programs:program_id (title_pt)
+          programs (title_pt, title_en)
         `)
       
       if (paymentId) {
@@ -208,7 +194,7 @@ async function checkPaymentStatus() {
         .from('service_payments')
         .select(`
           *,
-          services:service_id (nome)
+          services (nome_pt, nome_en)
         `)
       
       if (paymentId) {
@@ -229,12 +215,16 @@ async function checkPaymentStatus() {
     }
 
     if (paymentType.value === 'program') {
-      itemName.value = (payment as any).programs?.title_pt || ''
+      itemName.value = locale.value === 'en' && (payment as any).programs?.title_en 
+        ? (payment as any).programs?.title_en 
+        : (payment as any).programs?.title_pt || ''
       programId.value = (payment as any).program_id
       paymentMethod.value = (payment as any).payment_method
       paymentStatus.value = (payment as any).payment_status
     } else {
-      itemName.value = (payment as any).services?.nome || ''
+      itemName.value = locale.value === 'en' && (payment as any).services?.nome_en
+        ? (payment as any).services?.nome_en
+        : (payment as any).services?.nome_pt || ''
       paymentMethod.value = (payment as any).payment_method
       paymentStatus.value = (payment as any).status
     }
@@ -253,7 +243,6 @@ async function checkPaymentStatus() {
 
 onMounted(() => {
   checkPaymentStatus()
-  window.addEventListener('scroll', handleScroll)
 
   pollInterval = setInterval(async () => {
     attempts++
@@ -264,26 +253,33 @@ onMounted(() => {
       const sessionId = route.query.session_id || route.query.order_id || route.query.payment_id
       console.log('🔄 Triggering check-payment-status self-healing...')
       
-      try {
-        const { data, error } = await supabase.functions.invoke('check-payment-status', { 
-          body: { session_id: sessionId } 
-        })
-        
-        if (error) {
-          console.error('❌ Error invoking check-payment-status:', error)
-        } else {
-          console.log('✅ check-payment-status response:', data)
+      // Só aciona o self-healing se for um ID do Stripe (começa com cs_)
+      const isStripeId = typeof sessionId === 'string' && (sessionId.startsWith('cs_test_') || sessionId.startsWith('cs_live_'))
+      
+      if (isStripeId) {
+        try {
+          const { data, error } = await supabase.functions.invoke('check-payment-status', { 
+            body: { session_id: sessionId } 
+          })
           
-          // Se foi confirmado no Stripe, força recarregar do banco
-          if (data?.status === 'completed') {
-            console.log('🎉 Payment confirmed by Stripe! Reloading from database...')
-            // Aguarda 1 segundo para garantir que o banco foi atualizado
-            await new Promise(resolve => setTimeout(resolve, 1000))
-            await checkPaymentStatus()
+          if (error) {
+            console.error('❌ Error invoking check-payment-status:', error)
+          } else {
+            console.log('✅ check-payment-status response:', data)
+            
+            // Se foi confirmado no Stripe, força recarregar do banco
+            if (data?.status === 'completed') {
+              console.log('🎉 Payment confirmed by Stripe! Reloading from database...')
+              // Aguarda 1 segundo para garantir que o banco foi atualizado
+              await new Promise(resolve => setTimeout(resolve, 1000))
+              await checkPaymentStatus()
+            }
           }
+        } catch (err) {
+          console.error('❌ Failed to invoke check-payment-status:', err)
         }
-      } catch (err) {
-        console.error('❌ Failed to invoke check-payment-status:', err)
+      } else {
+        console.log('ℹ️ Skipping self-healing: ID is not from Stripe (likely Parcelow/Internal)')
       }
     }
 
@@ -295,7 +291,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (pollInterval) clearInterval(pollInterval)
-  window.removeEventListener('scroll', handleScroll)
 })
 </script>
 

@@ -28,7 +28,7 @@ const routes: RouteRecordRaw[] = [
     path: '/feed/:postId',
     name: 'PostDetail',
     component: () => import('@/views/PostDetail.vue'),
-    meta: { requiresAuth: true },
+    meta: { publicAccess: true, limitedForGuests: true },
   },
   {
     path: '/login',
@@ -126,7 +126,7 @@ const routes: RouteRecordRaw[] = [
     path: '/comunidade/:id',
     name: 'MemberProfile',
     component: () => import('@/views/MemberProfile.vue'),
-    meta: { requiresAuth: true },
+    meta: { publicAccess: true, limitedForGuests: true },
   },
   {
     path: '/eventos',
@@ -224,6 +224,15 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/PaymentCancel.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/payment/success',
+    redirect: (to: { query: any }) => ({ path: '/pagamento/sucesso', query: to.query }),
+  },
+  {
+    path: '/payment/cancel',
+    redirect: (to: { query: any }) => ({ path: '/pagamento/cancelado', query: to.query }),
+  },
+
 
   {
     path: '/desafios',

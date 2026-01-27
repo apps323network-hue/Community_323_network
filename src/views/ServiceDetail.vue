@@ -45,7 +45,11 @@
         <div class="absolute inset-0 flex flex-col justify-end p-6 md:p-12">
           <div class="max-w-3xl space-y-4 md:space-y-6">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase tracking-widest w-fit">
-              <span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+              <template v-if="service.icon">
+                <img v-if="service.icon.includes('/')" :src="service.icon" class="w-4 h-4 object-contain filter brightness-0 invert" />
+                <span v-else class="material-symbols-outlined text-sm text-secondary">{{ service.icon }}</span>
+              </template>
+              <span v-else class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
               {{ service.categoria?.replace('_', ' ') || 'Service' }}
             </div>
 
@@ -349,7 +353,7 @@ import ParcelowService from '@/lib/parcelowService'
 import { useUserStore } from '@/stores/user'
 import { computed } from 'vue'
 
-import { isLocalhost } from '@/utils/localhost'
+
 
 const route = useRoute()
 const router = useRouter()
@@ -371,7 +375,7 @@ const {
   error: parcelowError
 } = useParcelowCheckout()
 
-const showParcelow = computed(() => isLocalhost())
+const showParcelow = computed(() => true)
 
 // CPF validation for Parcelow
 const isMissingCpf = computed(() => {
@@ -458,6 +462,7 @@ async function fetchService() {
       beneficio_membro: serviceData[`beneficio_membro_${locale}`] || serviceData.beneficio_membro_pt || serviceData.beneficio_membro_en,
       moeda: serviceData.currency || 'USD',
       image_url: serviceData.image_url || DEFAULT_SERVICE_IMAGE,
+      icon: serviceData.icon,
       creator
     }
   } catch (error) {

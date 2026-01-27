@@ -699,7 +699,7 @@ const {
   error: parcelowError
 } = useParcelowCheckout()
 
-const showParcelow = computed(() => isLocalhost())
+const showParcelow = computed(() => true)
 
 // CPF validation for Parcelow
 const isMissingCpf = computed(() => {
@@ -871,17 +871,13 @@ function handleRemoveCoupon() {
 }
 
 // Set dynamic meta tags for social sharing
-watch(() => program.value, (newProgram) => {
-  if (newProgram) {
-    useDynamicMeta({
-      title: `${title.value} - 323 Network`,
-      description: description.value?.substring(0, 160) || '',
-      image: newProgram.banner_url,
-      url: `/programas/${newProgram.id}`,
-      type: 'article'
-    })
-  }
-}, { immediate: true })
+useDynamicMeta(() => ({
+  title: `${title.value}`,
+  description: description.value?.substring(0, 160) || '',
+  image: program.value?.banner_url,
+  url: `/programs/${program.value?.id}`,
+  type: 'article'
+}))
 
 function calculateCurrentFee(): number {
   if (!program.value || !paymentMethod.value) return 0
