@@ -1,5 +1,5 @@
 <template>
-  <aside class="lg:sticky lg:top-24 h-fit space-y-8">
+  <aside class="xl:sticky xl:top-24 h-fit space-y-8">
     <!-- Próximos Eventos Card -->
     <div class="rounded-2xl p-5 shadow-premium dark:shadow-2xl relative overflow-hidden bg-white dark:bg-surface-dark border border-slate-200 dark:border-none neon-border-card">
       <div class="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full blur-xl"></div>
@@ -230,18 +230,6 @@ async function handleFollowMember(memberId: string) {
     if (success) {
       connectionStatuses.value[memberId] = 'pending'
       
-      // 1. Criar notificação in-app
-      await supabase.from('notifications').insert({
-        user_id: memberId,
-        type: 'connection_request',
-        title: 'Nova solicitação de conexão',
-        content: `${authStore.user.user_metadata?.nome || 'Um membro'} quer se conectar com você.`,
-        metadata: { 
-          requester_id: authStore.user.id,
-          actor_name: authStore.user.user_metadata?.nome || 'Um membro'
-        }
-      })
-
       // 2. Enviar Email
       // Precisamos do email do destinatário
       const { data: profile } = await supabase
@@ -288,8 +276,7 @@ async function loadFeaturedMembers() {
 }
 
 function handleBusinessClick() {
-  // TODO: Abrir modal ou navegar para página de anúncios
-  console.log('Business ad clicked')
+  router.push('/contact-us')
 }
 
 onMounted(() => {
