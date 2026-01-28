@@ -5,17 +5,17 @@
     <main class="max-w-[1440px] mx-auto px-4 sm:px-6 xl:px-8 py-8 flex-1 pb-20 xl:pb-8 min-h-[calc(100vh-200px)] w-full">
       <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
         <!-- Sidebar Esquerda -->
-        <div class="hidden xl:block xl:col-span-3 xl:col-span-2">
+        <div class="hidden xl:block xl:col-span-3">
           <AppSidebar @edit-profile="handleEditProfile" />
         </div>
         
         <!-- Conteúdo Principal -->
-        <div class="xl:col-span-6 xl:col-span-8">
+        <div class="xl:col-span-6">
           <slot />
         </div>
         
         <!-- Sidebar Direita -->
-        <div class="hidden xl:block xl:col-span-3 xl:col-span-2">
+        <div class="hidden xl:block xl:col-span-3">
           <AppRightSidebar />
         </div>
       </div>
