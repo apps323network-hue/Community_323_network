@@ -192,14 +192,13 @@ export const usePostStore = defineStore('posts', () => {
       })
 
       // Transform data to match Post interface
-      // Filtrar posts removidos ou spam (RLS já deveria bloquear, mas garantimos aqui também)
+      // Filtrar posts removidos ou spam - não mostrar para ninguém (exceto admins via RLS)
       const transformedPosts: Post[] = filteredData
         .filter((post: any) => {
-          // Filtrar posts removidos e spam (exceto se for o próprio criador)
+          // Posts removidos ou spam não devem aparecer para ninguém, nem para o criador
+          // Apenas admins podem ver (controlado pela RLS)
           const isRemovedOrSpam = post.status === 'removed' || post.status === 'spam'
-          const isOwner = post.user_id === currentUserId.value
-          // Se for removido/spam e não for o dono, não mostrar
-          if (isRemovedOrSpam && !isOwner) {
+          if (isRemovedOrSpam) {
             return false
           }
           return true
