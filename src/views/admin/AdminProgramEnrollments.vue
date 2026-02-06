@@ -11,20 +11,30 @@
             <span class="material-icons text-sm mr-1">arrow_back</span>
             Back to Programs
           </RouterLink>
-          <div v-if="program" class="flex items-center gap-3">
-             <div class="h-10 w-14 rounded bg-slate-200 dark:bg-white/10 overflow-hidden flex-shrink-0">
-                <img v-if="program.thumbnail_url" :src="program.thumbnail_url" class="h-full w-full object-cover" />
-                <div v-else class="h-full w-full flex items-center justify-center text-slate-400">
-                  <span class="material-icons">image</span>
-                </div>
-             </div>
-             <div>
-                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">
-                  Enrollments: {{ currentLocale === 'pt-BR' ? program.title_pt : program.title_en }}
-                </h1>
-                <p class="text-slate-500 text-sm">Manage enrolled students and track progress</p>
-             </div>
-          </div>
+              <div v-if="program" class="flex items-center gap-3">
+                 <div class="h-10 w-14 rounded bg-slate-200 dark:bg-white/10 overflow-hidden flex-shrink-0">
+                    <img v-if="program.thumbnail_url" :src="program.thumbnail_url" class="h-full w-full object-cover" />
+                    <div v-else class="h-full w-full flex items-center justify-center text-slate-400">
+                      <span class="material-icons">image</span>
+                    </div>
+                 </div>
+                 <div>
+                    <div class="flex items-center gap-2">
+                       <h1 class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">
+                         Enrollments: {{ currentLocale === 'pt-BR' ? program.title_pt : program.title_en }}
+                       </h1>
+                       <button 
+                         @click="openSheetsConfig"
+                         class="p-1 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all text-slate-400 hover:text-primary group relative"
+                         title="Google Sheets Settings"
+                       >
+                         <span class="material-icons text-lg">settings_suggest</span>
+                         <div v-if="!program.google_sheets_url" class="absolute -top-1 -right-1 w-2 h-2 bg-amber-500 rounded-full animate-pulse border-2 border-white dark:border-surface-dark"></div>
+                       </button>
+                    </div>
+                    <p class="text-slate-500 text-sm">Manage enrolled students and track progress</p>
+                 </div>
+              </div>
           <div v-else-if="initialLoading" class="h-12 w-96 bg-slate-200 dark:bg-white/10 animate-pulse rounded-lg"></div>
         </div>
 
@@ -118,6 +128,18 @@
           >
             <span class="material-icons text-sm" :class="{ 'animate-pulse': exportingBulk }">download</span>
             {{ exportingBulk ? 'Exporting...' : 'Export Selected' }}
+          </button>
+          
+          <!-- Hidden File Input for CSV Update removed as per sync improvement -->
+          
+          <button
+            @click="syncToGoogleSheets"
+            :disabled="syncingToSheets"
+            class="flex items-center gap-2 px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-red-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Sync selected students to Google Sheets"
+          >
+            <span class="material-icons text-sm" :class="{ '': syncingToSheets }">sync_alt</span>
+            {{ syncingToSheets ? 'Syncing...' : 'Sync to Sheets' }}
           </button>
         </div>
       </div>
@@ -408,7 +430,65 @@
           </div>
        </div>
 
-    </div>
+     <!-- Google Sheets Config Modal -->
+     <div v-if="showSheetsConfig" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div class="bg-white dark:bg-surface-dark w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden transform transition-all">
+           <div class="p-6">
+              <div class="flex items-center justify-between mb-2">
+                 <h3 class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Google Sheets Integration</h3>
+                 <button @click="showSheetsConfig = false" class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                    <span class="material-icons">close</span>
+                 </button>
+              </div>
+              <p class="text-slate-500 text-xs mb-6 font-bold uppercase tracking-widest">Connect your program data to a spreadsheet</p>
+              
+              <div class="space-y-6">
+                 <div class="p-4 bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/10 flex items-start gap-3">
+                    <span class="material-icons text-primary text-xl">info</span>
+                    <div class="text-xs text-slate-600 dark:text-gray-300 leading-relaxed">
+                       Paste the URL of your Google Sheet below. Make sure the spreadsheet is shared with <strong>n8n@n8n.323.network</strong> (or equivalent) if necessary.
+                       New syncs will be appended to the bottom of the first sheet.
+                    </div>
+                 </div>
+
+                 <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-gray-400 uppercase mb-2 ml-1">Spreadsheet URL</label>
+                    <div class="relative group">
+                       <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">link</span>
+                       <input 
+                          v-model="tempSheetsUrl"
+                          type="url"
+                          placeholder="https://docs.google.com/spreadsheets/d/..."
+                          class="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-surface-dark transition-all"
+                       />
+                    </div>
+                 </div>
+
+                 <div class="bg-slate-50 dark:bg-white/5 p-4 rounded-xl border border-slate-200 dark:border-white/5">
+                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Sync Preview Columns</div>
+                    <div class="flex flex-wrap gap-2">
+                       <span v-for="col in ['Name', 'Email', 'Phone', 'Status', 'Payment', 'Amount', 'Date']" :key="col" class="px-2 py-1 bg-white dark:bg-white/5 rounded text-[10px] font-bold text-slate-500 dark:text-slate-400 shadow-sm border border-slate-100 dark:border-white/5">
+                          {{ col }}
+                       </span>
+                    </div>
+                 </div>
+              </div>
+
+              <div class="mt-8 flex gap-3">
+                 <button @click="showSheetsConfig = false" class="flex-1 px-4 py-4 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all uppercase text-xs tracking-widest">
+                    {{ t('programs.admin.cancel') }}
+                 </button>
+                 <button @click="updateSheetsUrl" :disabled="updating" class="flex-2 px-8 py-4 bg-primary dark:bg-secondary text-white font-black rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 uppercase text-xs tracking-widest">
+                    <span v-if="updating" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    <span v-else class="material-icons text-sm">save</span>
+                    {{ updating ? t('programs.admin.saving') : 'Save Settings' }}
+                 </button>
+              </div>
+           </div>
+        </div>
+     </div>
+
+   </div>
   </AdminLayout>
 </template>
 
@@ -434,6 +514,9 @@ const updating = ref(false)
 const syncing = ref<string | null>(null) // ID of enrollment being synced
 const exporting = ref<string | null>(null) // ID of enrollment being exported
 const exportingBulk = ref(false) // Bulk export in progress
+const syncingToSheets = ref(false)
+const showSheetsConfig = ref(false)
+const tempSheetsUrl = ref('')
 const storing = ref<string | null>(null) // ID of enrollment being stored
 const storingBulk = ref(false) // Bulk store in progress
 
@@ -691,7 +774,158 @@ const exportSelected = async () => {
   }
 }
 
+const openSheetsConfig = () => {
+  tempSheetsUrl.value = program.value?.google_sheets_url || ''
+  showSheetsConfig.value = true
+}
+
+const updateSheetsUrl = async () => {
+  if (!program.value) return
+  
+  updating.value = true
+  try {
+    const { error } = await supabase
+      .from('programs')
+      .update({ google_sheets_url: tempSheetsUrl.value })
+      .eq('id', program.value.id)
+
+    if (error) throw error
+
+    program.value.google_sheets_url = tempSheetsUrl.value
+    toast.success('Google Sheets URL updated successfully!')
+    showSheetsConfig.value = false
+  } catch (error: any) {
+    console.error('Error updating sheets URL:', error)
+    toast.error('Error: ' + (error.message || 'Unknown error'))
+  } finally {
+    updating.value = false
+  }
+}
+
+const syncToGoogleSheets = async () => {
+  if (selectedEnrollments.value.length === 0) {
+    toast.error('Please select students to sync')
+    return
+  }
+
+  if (!program.value?.google_sheets_url) {
+    toast.error('Google Sheets URL not configured. Please click the settings icon next to the title.')
+    openSheetsConfig()
+    return
+  }
+
+  syncingToSheets.value = true
+  try {
+    const selectedEnrollmentData = enrollments.value.filter(e => 
+      selectedEnrollments.value.includes(e.id)
+    )
+
+    // Batch fetch profiles in chunks of 50 to be more efficient
+    const userIds = [...new Set(selectedEnrollmentData.map(e => e.user_id).filter(id => !!id))]
+    const userProfiles: any[] = []
+    const chunkSize = 50
+    
+    for (let i = 0; i < userIds.length; i += chunkSize) {
+      const chunk = userIds.slice(i, i + chunkSize)
+      const { data: chunkData, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, nome, email, phone, whatsapp')
+        .in('id', chunk)
+      
+      if (profileError) console.warn('Profile fetch error:', profileError)
+      if (chunkData) userProfiles.push(...chunkData)
+    }
+
+    // Batch fetch terms acceptance
+    const { data: termsData } = await supabase
+      .from('comprehensive_term_acceptance')
+      .select('user_id, term_type')
+      .in('user_id', userIds)
+
+    const termsMap = new Map<string, Set<string>>()
+    termsData?.forEach(t => {
+      if (!termsMap.has(t.user_id)) termsMap.set(t.user_id, new Set())
+      termsMap.get(t.user_id)?.add(t.term_type)
+    })
+
+    const profilesMap = new Map(userProfiles.map(p => [p.id, p]))
+    const currentProgram = program.value!
+    const sheetUrl = currentProgram.google_sheets_url!.trim()
+
+    // Format data for Google Sheets
+    const syncData = selectedEnrollmentData.map(enrollment => {
+      const profile = profilesMap.get(enrollment.user_id)
+      const userTerms = termsMap.get(enrollment.user_id)
+      
+      // Aggressive catch for name/email
+      const userName = profile?.nome || (enrollment as any).user?.nome || 'N/A'
+      const userEmail = profile?.email || (enrollment as any).user?.email || 'N/A'
+      const userPhone = profile?.phone || profile?.whatsapp || (enrollment as any).user?.phone || 'N/A'
+      
+      return {
+        'Name': userName,
+        'Email': userEmail,
+        'Phone': userPhone,
+        'Status': enrollment.status,
+        'Enrollment Date': new Date(enrollment.enrolled_at).toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }),
+        'Program': currentProgram.title_pt,
+        'Payment Status': enrollment.payment_status,
+        'Payment Amount': enrollment.payment_amount ? `${(enrollment.payment_amount / 100).toFixed(2)} ${enrollment.payment_currency || 'USD'}` : '0.00',
+        'Payment ID': enrollment.payment_id || 'N/A',
+        'Payment Method': enrollment.payment_method || 'N/A',
+        'Privacy Policy': userTerms?.has('privacy_policy') ? 'Accepted' : 'N/A',
+        'Terms of Service': userTerms?.has('terms_of_service') ? 'Accepted' : 'N/A'
+      }
+    })
+
+    // Call n8n webhook
+    const baseUrl = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://nwh.suaiden.com/webhook'
+    const response = await fetch(`${baseUrl}/sync-enrollments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'sync_enrollments',
+        sheet_url: sheetUrl, // n8n reads this once to find the sheet
+        total_students: syncData.length,
+        data: syncData // These are the rows that go into the sheet
+      })
+    })
+
+    if (!response.ok) throw new Error('Failed to send data to n8n')
+
+    toast.success(`${syncData.length} student(s) synced to Google Sheets!`)
+    clearSelection()
+  } catch (error: any) {
+    console.error('Error syncing to Google Sheets:', error)
+    toast.error('Error syncing: ' + (error.message || 'Unknown error'))
+  } finally {
+    syncingToSheets.value = false
+  }
+}
+
 const processAndDownloadCSV = async (enrollmentData: ProgramEnrollment[]) => {
+  try {
+    const { headers, csvRows } = await generateCSVData(enrollmentData)
+    const csvContent = [headers.join(','), ...csvRows].join('\n')
+
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    
+    link.setAttribute('href', url)
+    link.setAttribute('download', `enrollments_${program.value?.title_en || 'program'}_${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    toast.success(`${enrollmentData.length} enrollment(s) exported successfully!`)
+  } catch (error) {
+    console.error('Error in processAndDownloadCSV:', error)
+    throw error
+  }
+}
+
+const generateCSVData = async (enrollmentData: ProgramEnrollment[]) => {
   const exportData: Record<string, any>[] = []
   
   for (const enrollment of enrollmentData) {
@@ -756,31 +990,18 @@ const processAndDownloadCSV = async (enrollmentData: ProgramEnrollment[]) => {
     }
   }
 
-  if (exportData.length === 0) return
+  if (exportData.length === 0) return { headers: [], csvRows: [] }
 
   const headers = Object.keys(exportData[0])
-  const csvContent = [
-    headers.join(','),
-    ...exportData.map(row => 
-      headers.map(header => {
-        const value = row[header] || ''
-        const escaped = String(value).replace(/"/g, '""')
-        return `"${escaped}"`
-      }).join(',')
-    )
-  ].join('\n')
+  const csvRows = exportData.map(row => 
+    headers.map(header => {
+      const value = row[header] || ''
+      const escaped = String(value).replace(/"/g, '""')
+      return `"${escaped}"`
+    }).join(',')
+  )
 
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
-  const url = URL.createObjectURL(blob)
-  
-  link.setAttribute('href', url)
-  link.setAttribute('download', `enrollments_${program.value?.title_en || 'program'}_${new Date().toISOString().split('T')[0]}.csv`)
-  link.style.visibility = 'hidden'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  toast.success(`${exportData.length} enrollment(s) exported successfully!`)
+  return { headers, csvRows }
 }
 
 const storeEnrollmentDocument = async (enrollment: ProgramEnrollment) => {

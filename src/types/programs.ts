@@ -44,6 +44,9 @@ export interface Program {
     classroom_course_id?: string
     classroom_invite_link?: string
 
+    // Google Sheets integration
+    google_sheets_url?: string
+
     // Media
     thumbnail_url?: string
     banner_url?: string
@@ -165,6 +168,7 @@ export interface CreateProgramData {
     classroom_enabled?: boolean
     classroom_course_id?: string
     classroom_invite_link?: string
+    google_sheets_url?: string
     thumbnail_url?: string
     banner_url?: string
     duration_hours?: number
