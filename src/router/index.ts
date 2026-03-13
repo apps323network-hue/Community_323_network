@@ -412,6 +412,13 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/admin/AdminSubscriptions.vue'),
     meta: { requiresAuth: true, requiresRole: 'admin' },
   },
+  {
+    path: '/asset-protection',
+    alias: '/asset-protection/',
+    name: 'AssetProtection',
+    component: () => import('@/views/ApexGuardIframe.vue'),
+    meta: { publicAccess: true, title: 'Asset Protection' },
+  },
   // Catch-all 404 route - must be last
   {
     path: '/:pathMatch(.*)*',
@@ -506,7 +513,8 @@ router.beforeEach(async (to, _from, next) => {    // O Supabase adiciona type=re
       '/register',
       '/auth/callback',
       '/reset-password',
-      '/forgot-password'
+      '/forgot-password',
+      '/asset-protection'
     ]
     const isPublicLegalRoute = publicLegalRoutes.includes(to.path)
 

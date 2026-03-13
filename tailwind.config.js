@@ -36,12 +36,11 @@ export default {
         session3: 'hsl(var(--session-3))',
       },
       fontFamily: {
-        display: ['Plus Jakarta Sans', 'sans-serif'],
+        display: ['Cormorant Garamond', 'Plus Jakarta Sans', 'sans-serif'],
         sans: ['Inter', 'sans-serif'],
         body: ['Outfit', 'sans-serif'],
       },
       boxShadow: {
-        // Dark mode shadows (glow forte)
         'neon-blue': '0 0 15px rgba(0, 240, 255, 0.4), 0 0 30px rgba(0, 240, 255, 0.2)',
         'neon-pink': '0 0 15px rgba(244, 37, 244, 0.4), 0 0 30px rgba(244, 37, 244, 0.2)',
         'glow-primary': '0 0 20px rgba(244, 37, 244, 0.5)',
@@ -66,20 +65,12 @@ export default {
       },
       keyframes: {
         "shimmer-slide": {
-          "0%": {
-            transform: "translate(-50%, 0)",
-          },
-          "100%": {
-            transform: "translate(50%, 0)",
-          },
+          "0%": { transform: "translate(-50%, 0)" },
+          "100%": { transform: "translate(50%, 0)" },
         },
         "spin-around": {
-          "0%": {
-            transform: "translateZ(0) rotate(0)",
-          },
-          "100%": {
-            transform: "translateZ(0) rotate(360deg)",
-          },
+          "0%": { transform: "translateZ(0) rotate(0)" },
+          "100%": { transform: "translateZ(0) rotate(360deg)" },
         },
         "fade-in": {
           "from": { opacity: "0", transform: "translateY(20px)" },
@@ -92,6 +83,7 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require("tailwindcss-animate"),
+  ],
 }
-
